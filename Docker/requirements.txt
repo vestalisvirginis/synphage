@@ -12,3 +12,6 @@ reportlab==3.6.12
 networkx==3.0
 graphviz==0.20.1
 rdflib==6.2.0
+
+# Easyfig requirements
+tk-tools==0.16.0

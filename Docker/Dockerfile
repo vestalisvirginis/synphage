@@ -2,6 +2,9 @@ FROM python:3.10.8
 
 RUN apt update -y
 RUN apt install wget -y
+RUN apt install tar -y
+RUN apt install ncbi-blast+ -y
+RUN apt install x11-xserver-utils -y
 
 WORKDIR /usr/src
 
