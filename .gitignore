@@ -1,5 +1,6 @@
 # Folders
 temp/
+tests/fixtures/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
