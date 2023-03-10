@@ -15,3 +15,17 @@ rdflib==6.2.0
 
 # Easyfig requirements
 tk-tools==0.16.0
+
+# Formating
+black
+flake8
+mypy
+flake8-cognitive-complexity
+radon
+
+# Pipeline
+dagster
+dagit
+
+# Testing
+pytest
