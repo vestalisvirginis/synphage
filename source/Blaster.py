@@ -240,4 +240,4 @@ def gene_uniqueness(spark, record_name: list, path_to_dataset: str='gene_uniquen
 
     gene_uniqueness_df = spark.read.parquet(path_to_dataset).filter((F.col('name').isin(record_name)) & (F.col('query_genome_name').isin(record_name)))
     total_seq = gene_uniqueness_df.select(F.count_distinct(F.col('query_genome_id')).alias('count')).collect()[0][0]
-    return gene_uniqueness_df.withColumn('total_seq', F.lit(total_seq)).groupby('name', 'gene', 'locus_tag', 'total_seq').count().withColumn('perc_presence', (F.col('count')+1)/(F.col('total_seq')+1)*100)
+    return gene_uniqueness_df.withColumn('total_seq', F.lit(total_seq)).groupby('name', 'gene', 'locus_tag', 'total_seq').count().withColumn('perc_presence', F.col('count')/F.col('total_seq')*100)
