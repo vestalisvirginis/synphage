@@ -62,11 +62,11 @@ def get_blastn(query: str, database: str, output: str):
 #  for file in glob.glob('tests/fixtures/synthetic_data/fasta/*.fna'):
 #    db_list = []
 #    for db in glob.glob('tests/fixtures/synthetic_data/blast_db/*'):
-#        path = Path(db).parent/Path(db).stem
-#        if path  not in db_list:
-#            print(path)
-#            db_list.append(path)
-#            BLT.get_blastn(file, path, f'tests/fixtures/synthetic_data/blast_results/{Path(file).stem}_vs_{Path(path).name}')
+#        path_db = Path(db).parent/Path(db).stem
+#        if path_db  not in db_list:
+#            print(path_db)
+#            db_list.append(path_db)
+#            BLT.get_blastn(file, path_db, f'tests/fixtures/synthetic_data/blast_results/{Path(file).stem}_vs_{Path(path_db).name}')
 #        else:
 #            print('already done!')
 #            continue
@@ -227,7 +227,7 @@ def gene_presence_table(spark, locus_input: str= "locus_and_gene", blastn_input:
 
     _query_col = [c for c in blastn_df.columns if c.startswith('query_')]
     _source_col = [c for c in blastn_df.columns if c.startswith('source_')]
-    all_df = full_locus_df.join(blastn_df.select(*_query_col, *_source_col).withColumnRenamed('source_name', 'name').withColumnRenamed('source_locus_tag', 'locus_tag').withColumnRenamed('source_gene', 'gene'), ['locus_tag', 'gene'], 'left')
+    all_df = full_locus_df.join(blastn_df.select(*_query_col, *_source_col).withColumnRenamed('source_genome_name', 'name').withColumnRenamed('source_locus_tag', 'locus_tag'), ['name', 'locus_tag'], 'left')
 
     
     return all_df.coalesce(1).write.mode("append").parquet(output_file)
@@ -241,4 +241,3 @@ def gene_uniqueness(spark, record_name: list, path_to_dataset: str='gene_uniquen
     gene_uniqueness_df = spark.read.parquet(path_to_dataset).filter((F.col('name').isin(record_name)) & (F.col('query_genome_name').isin(record_name)))
     total_seq = gene_uniqueness_df.select(F.count_distinct(F.col('query_genome_id')).alias('count')).collect()[0][0]
     return gene_uniqueness_df.withColumn('total_seq', F.lit(total_seq)).groupby('name', 'gene', 'locus_tag', 'total_seq').count().withColumn('perc_presence', (F.col('count')+1)/(F.col('total_seq')+1)*100)
-
