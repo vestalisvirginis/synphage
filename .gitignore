@@ -6,6 +6,7 @@ dag/
 output_blaster/
 data/
 .vscode/
+warwick_anna/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
