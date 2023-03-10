@@ -2,6 +2,10 @@
 temp/
 tests/fixtures/
 output_graphs/
+dag/
+output_blaster/
+data/
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
