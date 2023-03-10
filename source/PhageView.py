@@ -23,7 +23,7 @@ class CheckOrientation(enum.Enum):
 
 def _read_seq(path: str, orientation: CheckOrientation) -> SeqRecord.SeqRecord:
     """Read sequence according to genome orientation"""
-    if orientation.name == CheckOrientation.SEQUENCE:
+    if orientation.name == CheckOrientation.SEQUENCE.name:
         return SeqIO.read(path, "gb")
     else:
         return SeqIO.read(path, "gb").reverse_complement(name=True)
@@ -97,6 +97,9 @@ class Diagram:
     def create_graph(
         self,
         spark,
+        folder: str,
+        blastn_path: str,
+        gene_uniq_path: str,
         graph_title: str = "Title:",
     ):
         """Transform a list of genomes into a genome diagram"""
@@ -163,7 +166,7 @@ class Diagram:
             set_X = feature_sets[X]
             set_Y = feature_sets[Y]
 
-            X_vs_Y = spark.read.parquet('tests/fixtures/presentation/parquets/blastn_summary').filter((F.col('source_genome_name')==X) & (F.col('query_genome_name')==Y)).select(
+            X_vs_Y = spark.read.parquet(blastn_path).filter((F.col('source_genome_name')==X) & (F.col('query_genome_name')==Y)).select(
                 "source_locus_tag", "query_locus_tag", "percentage_of_identity"
             )
 
@@ -192,7 +195,7 @@ class Diagram:
                 )
                 gd_diagram.cross_track_links.append(CrossLink(F_x, F_y, color, border))
 
-        gene_color_palette = gene_uniqueness(spark, record_names, 'tests/fixtures/presentation/parquets/gene_uniqueness')
+        gene_color_palette = gene_uniqueness(spark, record_names, gene_uniq_path)
         for record_name, record in records.items():
             gd_feature_set = feature_sets[record_name]
 
@@ -205,14 +208,16 @@ class Diagram:
                             (F.col("name") == record_name)
                             & (F.col("locus_tag") == feature.qualifiers["locus_tag"][0])
                         ).select("perc_presence").collect()[0][0]
-                    if 0 <= perc <= 100:
-                        gene_color = colors.linearlyInterpolatedColor(
-                            colors.orange,
-                            colors.lightblue,
-                            0,
-                            100,
-                            perc,
-                        )
+                    if 0 <= perc <= 20:
+                        gene_color = colors.HexColor('#440154')
+                    elif 20 < perc <= 40:
+                        gene_color = colors.HexColor('#3b528b')
+                    elif 40 < perc <= 60:
+                        gene_color = colors.HexColor('#21918c')
+                    elif 60 < perc <= 80:
+                        gene_color = colors.HexColor('#5ec962')
+                    elif 80 < perc <= 100:
+                        gene_color = colors.HexColor('#fde725')
                     else:
                         gene_color = colors.black
                 except:
@@ -263,4 +268,4 @@ class Diagram:
         gd_diagram.draw(
             format="linear", pagesize="A4", fragments=1, start=0, end=max_len
         )
-        gd_diagram.write(name + ".pdf", "PDF")
+        gd_diagram.write(f"{folder}/{name}.svg", "SVG")
