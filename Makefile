@@ -1,5 +1,6 @@
 clean: # Remove workspace files
 	@find . -name "__pycache__" -exec rm -rf {} +
+	@find . -name ".DS_Store" -exec rm -rf {} +
 	@rm -rf ./.mypy_cache
 	@rm -rf ./.pytest_cache
 	@rm -rf ./htmlcov
