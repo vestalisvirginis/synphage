@@ -1,20 +1,27 @@
-pyspark==3.3.1
-pandas==1.5.1
-pyarrow==10.0.0
-numpy==1.23.4
-scipy==1.9.3
-matplotlib==3.6.2
-seaborn==0.12.1
-plotly==5.11.0
-jupyterlab==3.5.0
-biopython==1.80
-reportlab==3.6.12
-networkx==3.0
-graphviz==0.20.1
-rdflib==6.2.0
+# Data analysis
+pyspark  #==3.3.1
+pandas   #==1.5.1
+pyarrow  #==10.0.0
+numpy    #==1.23.4
+scipy    #==1.9.3
+cuallee
 
-# Easyfig requirements
-tk-tools==0.16.0
+# Data visualisation
+matplotlib   #==3.6.2
+seaborn      #==0.12.1
+plotly       #==5.11.0
+
+# Notebook and visualisation
+jupyterlab   #==3.5.0
+ipywidgets
+
+# Biology related libraries
+biopython    #==1.80
+reportlab    #==3.6.12
+networkx     #==3.0
+graphviz     #==0.20.1
+rdflib       #==6.2.0
+#depht        # not compatible with other library versions (plotly, pandas)
 
 # Formating
 black
