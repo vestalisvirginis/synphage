@@ -7,6 +7,7 @@ output_blaster/
 data/
 .vscode/
 warwick_anna/
+dagster_home/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
