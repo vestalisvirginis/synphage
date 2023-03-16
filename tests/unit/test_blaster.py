@@ -2,7 +2,7 @@ import os
 
 from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
-from source import Blaster as BLT
+from source.assets import Blaster as BLT
 
 
 def test_file_conversion_positive_no_output():
