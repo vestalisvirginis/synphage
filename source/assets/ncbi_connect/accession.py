@@ -26,7 +26,7 @@ ncbi_query_config = {
         required_resource_keys={"ncbi_connection"},
         config_schema=ncbi_query_config,
         description="Getting the number of records matching the keyword(s) in the specified database",
-        compute_kind="ncbi",
+        compute_kind="NCBI",
         metadata={"owner" : "Virginie Grosboillot"},
 )
 def accession_count(context) -> int:
@@ -49,7 +49,7 @@ ncbi_query_config_search = {
     required_resource_keys={"ncbi_connection"},
     config_schema={**ncbi_query_config, **ncbi_query_config_search},
     description="Getting all accession Ids corresponding to keyword(s)",
-    compute_kind="ncbi",
+    compute_kind="NCBI",
     metadata={"owner" : "Virginie Grosboillot"},
 )
 def accession_ids(context, accession_count):
@@ -90,7 +90,7 @@ ncbi_query_config_fetch = {
     required_resource_keys={"ncbi_connection"},
     config_schema={**download_folder_config, **ncbi_query_config_fetch},
     description="Download records one by one from the ncbi database",
-    compute_kind="ncbi",
+    compute_kind="NCBI",
     metadata={"owner" : "Virginie Grosboillot"},
 )
 def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
