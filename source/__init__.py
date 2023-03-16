@@ -1,10 +1,10 @@
 from dagster import Definitions
 
-from .assets import ncbi_connect_assets
+from .assets import ncbi_connect_assets, blaster_assets
 from .resources import RESOURCES_LOCAL
 
 
-all_assets = [*ncbi_connect_assets]
+all_assets = [*ncbi_connect_assets, *blaster_assets]
 
 
 resources_by_deployment_name = {
