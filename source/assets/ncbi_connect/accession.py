@@ -98,6 +98,7 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
     B = set(downloaded_genomes)
     C = A.difference(B)
     context.log.info(f"Number of NOT Downloaded: {len(C)}")
+    path = context.op_config["output_directory"]
     #context.log.info(accession_ids["IdList"])
     for entry in list(C):
         r = context.resources.ncbi_connection.conn.efetch(
@@ -108,7 +109,7 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
             webenv = accession_ids["WebEnv"], 
             query_key = accession_ids["QueryKey"]
         )
-        path = context.op_config["output_directory"]
+
         file_name = f"{path}/{entry}.gb"
         with open(file_name, "w") as writer:
             writer.write(r.read())
