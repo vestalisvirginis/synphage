@@ -114,4 +114,4 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
         with open(file_name, "w") as writer:
             writer.write(r.read())
             
-    return list(map(lambda x: f"{path}/{x}", accession_ids["IdList"]))
+    return list(map(lambda x: f"{path}/{x}.gb", accession_ids["IdList"]))
