@@ -80,34 +80,37 @@ def genbank_to_fasta(context, sequence_sorting) -> List[str]:
     context.log.info(f"Number of file to process: {len(sequence_sorting)}")
 
     path = context.op_config["spbetaviruses_directory"]
-
+    fasta_files = []
     for acc in sequence_sorting:
         file = f'{path}/{acc}.gb'
         output = f'{context.op_config["fasta_directory"]}/{Path(file).stem}.fna'
+        fasta_files.append(output)
 
         genome = SeqIO.read(file, "genbank")
+        genome_records = list(SeqIO.parse(file, "genbank"))
 
         with open(output, "w") as f:
-            for feature in genome.features:
-                if feature.type == "gene":
-                    for seq_record in SeqIO.parse(file, "genbank"):
-                        f.write(
-                            ">%s | %s | %s | %s | %s | %s\n%s\n"
-                            % (
-                                seq_record.name,
-                                seq_record.id,
-                                seq_record.description,
-                                feature.qualifiers["gene"][0] if 'gene' in feature.qualifiers.keys() else 'None',
-                                feature.qualifiers["locus_tag"][0],
-                                feature.location,
-                                seq_record.seq[
-                                    feature.location.start : feature.location.end
-                                ],
-                            )
+            gene_features = list(filter(lambda x: x.type == "gene", genome.features))
+            for feature in gene_features:
+                for seq_record in genome_records:
+                    f.write(
+                        ">%s | %s | %s | %s | %s | %s\n%s\n"
+                        % (
+                            seq_record.name,
+                            seq_record.id,
+                            seq_record.description,
+                            feature.qualifiers["gene"][0] if 'gene' in feature.qualifiers.keys() else 'None',
+                            feature.qualifiers["locus_tag"][0],
+                            feature.location,
+                            seq_record.seq[
+                                feature.location.start : feature.location.end
+                            ],
                         )
-    fasta_files = [file for file in glob.glob(f'{context.op_config["fasta_directory"]}/*.fna')]
+                    )
+    #fasta_files = [file for file in glob.glob(f'{context.op_config["fasta_directory"]}/*.fna')]
     context.log.info(f"Number of file processed: {len(fasta_files)}")
-    return list(map(lambda x: x, os.listdir(context.op_config["fasta_directory"])))
+    #return list(map(lambda x: x, os.listdir(context.op_config["fasta_directory"])))
+    return fasta_files
 
 
 
@@ -123,8 +126,11 @@ blastn_folder_config = {
     metadata={"owner" : "Virginie Grosboillot"},
 )
 def create_blast_db(context, genbank_to_fasta):
+    db = []
     for input in genbank_to_fasta:
-        file_name = Path(input).stem
-        return os.system(
-            f'makeblastdb -in {input} -input_type fasta -dbtype nucl -out {context.op_config["blast_db_directory"]}/{file_name}'
+        output = f'{context.op_config["blast_db_directory"]}/{Path(input).stem}'
+        os.system(
+            f'makeblastdb -in {input} -input_type fasta -dbtype nucl -out {output}'
         )
+        db.append(output)
+    return db
