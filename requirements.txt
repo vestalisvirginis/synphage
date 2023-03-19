@@ -33,6 +33,7 @@ radon
 # Pipeline
 dagster
 dagit
+dagster-aws
 
 # Testing
 pytest
