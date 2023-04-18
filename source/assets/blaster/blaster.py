@@ -1,4 +1,4 @@
-from dagster import asset, Field
+from dagster import asset, Field, op, graph
 
 import os
 import glob
@@ -9,72 +9,97 @@ from Bio import SeqIO
 from pathlib import Path
 from functools import reduce
 from typing import List
+from pyspark.sql import SparkSession
+
+import pyspark.sql.functions as F
 
 
 genbank_folder_config = {
-    "phage_download_directory": Field(str, description="Path to folder containing the genebank sequence files", default_value="/usr/src/data_folder/genome_download"),
-    "spbetaviruses_directory": Field(str, description="Path to folder containing the genebank sequence files", default_value="/usr/src/data_folder/genbank_spbetaviruses"),
+    "phage_download_directory": Field(
+        str,
+        description="Path to folder containing the genebank sequence files",
+        default_value="/usr/src/data_folder/genome_download",
+    ),
+    "spbetaviruses_directory": Field(
+        str,
+        description="Path to folder containing the genebank sequence files",
+        default_value="/usr/src/data_folder/genbank_spbetaviruses",
+    ),
 }
+
 
 @asset(
     config_schema={**genbank_folder_config},
-    description='Select for Spbetaviruses with complete genome sequence',
+    description="Select for Spbetaviruses with complete genome sequence",
     compute_kind="Biopython",
-    metadata={"owner" : "Virginie Grosboillot"},
+    metadata={"owner": "Virginie Grosboillot"},
 )
 def sequence_sorting(context, fetch_genome) -> List[str]:
-
     context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
-    #context.log.info(f"Files: {fetch_genome}")
+    # context.log.info(f"Files: {fetch_genome}")
 
     complete_sequences = []
     for file in fetch_genome:
-        for p in SeqIO.parse(file, 'gb'):
-            if re.search('complete genome', p.description):
+        for p in SeqIO.parse(file, "gb"):
+            if re.search("complete genome", p.description):
                 complete_sequences.append(file)
 
     context.log.info(f"Number of complete sequences: {len(complete_sequences)}")
 
     bacillus_sub_sequences = []
     for file in complete_sequences:
-        for p in SeqIO.parse(file, 'gb'):
+        for p in SeqIO.parse(file, "gb"):
             for feature in p.features:
-                if (feature.type == 'source'):
+                if feature.type == "source":
                     for v in feature.qualifiers.values():
-                        if re.search('Bacillus subtilis', v[0]):
+                        if re.search("Bacillus subtilis", v[0]):
                             bacillus_sub_sequences.append(file)
 
-    context.log.info(f"Number of Bacillus subtilis sequences: {len(bacillus_sub_sequences)}")
+    context.log.info(
+        f"Number of Bacillus subtilis sequences: {len(bacillus_sub_sequences)}"
+    )
 
     genes_in_sequences = []
     for file in bacillus_sub_sequences:
-        for p in SeqIO.parse(file, 'gb'):
-            if set(['gene']).issubset(set([type_f.type for type_f in p.features])):
+        for p in SeqIO.parse(file, "gb"):
+            if set(["gene"]).issubset(set([type_f.type for type_f in p.features])):
                 genes_in_sequences.append(file)
 
-    context.log.info(f"Number of sequences with gene features: {len(genes_in_sequences)}")
+    context.log.info(
+        f"Number of sequences with gene features: {len(genes_in_sequences)}"
+    )
 
     for file in genes_in_sequences:
-        shutil.copy2(file, f'{context.op_config["spbetaviruses_directory"]}/{Path(file).stem}.gb')
-    
-    return list(map(lambda x: Path(x).stem, os.listdir(context.op_config["spbetaviruses_directory"])))
+        shutil.copy2(
+            file, f'{context.op_config["spbetaviruses_directory"]}/{Path(file).stem}.gb'
+        )
+
+    return list(
+        map(
+            lambda x: Path(x).stem,
+            os.listdir(context.op_config["spbetaviruses_directory"]),
+        )
+    )
 
 
 fasta_folder_config = {
-    "fasta_directory": Field(str, description="Path to folder containing the fasta sequence files", default_value="/usr/src/data_folder/gene_identity/fasta"),
+    "fasta_directory": Field(
+        str,
+        description="Path to folder containing the fasta sequence files",
+        default_value="/usr/src/data_folder/gene_identity/fasta",
+    ),
 }
+
 
 @asset(
     config_schema={**genbank_folder_config, **fasta_folder_config},
     description="""Parse genebank file and create a file containing every genes in the fasta format.
     Note: The sequence start and stop indexes are `-1` on the fasta file 1::10  --> [0:10] included/excluded.""",
     compute_kind="Biopython",
-    metadata={"owner" : "Virginie Grosboillot"},
+    metadata={"owner": "Virginie Grosboillot"},
 )
 def genbank_to_fasta(context, sequence_sorting) -> List[str]:
-
     # Check files that have already been processed
-
 
     # Process new files
     context.log.info(f"Number of file to process: {len(sequence_sorting)}")
@@ -82,14 +107,14 @@ def genbank_to_fasta(context, sequence_sorting) -> List[str]:
     path = context.op_config["spbetaviruses_directory"]
     fasta_files = []
     for acc in sequence_sorting:
-        file = f'{path}/{acc}.gb'
-        output = f'{context.op_config["fasta_directory"]}/{Path(file).stem}.fna'
-        fasta_files.append(output)
+        file = f"{path}/{acc}.gb"
+        output_dir = f'{context.op_config["fasta_directory"]}/{Path(file).stem}.fna'
+        fasta_files.append(output_dir)
 
         genome = SeqIO.read(file, "genbank")
         genome_records = list(SeqIO.parse(file, "genbank"))
 
-        with open(output, "w") as f:
+        with open(output_dir, "w") as f:
             gene_features = list(filter(lambda x: x.type == "gene", genome.features))
             for feature in gene_features:
                 for seq_record in genome_records:
@@ -99,7 +124,9 @@ def genbank_to_fasta(context, sequence_sorting) -> List[str]:
                             seq_record.name,
                             seq_record.id,
                             seq_record.description,
-                            feature.qualifiers["gene"][0] if 'gene' in feature.qualifiers.keys() else 'None',
+                            feature.qualifiers["gene"][0]
+                            if "gene" in feature.qualifiers.keys()
+                            else "None",
                             feature.qualifiers["locus_tag"][0],
                             feature.location,
                             seq_record.seq[
@@ -107,30 +134,230 @@ def genbank_to_fasta(context, sequence_sorting) -> List[str]:
                             ],
                         )
                     )
-    #fasta_files = [file for file in glob.glob(f'{context.op_config["fasta_directory"]}/*.fna')]
+    # fasta_files = [file for file in glob.glob(f'{context.op_config["fasta_directory"]}/*.fna')]
     context.log.info(f"Number of file processed: {len(fasta_files)}")
-    #return list(map(lambda x: x, os.listdir(context.op_config["fasta_directory"])))
+    # return list(map(lambda x: x, os.listdir(context.op_config["fasta_directory"])))
     return fasta_files
 
 
-
 blastn_folder_config = {
-    "blast_db_directory": Field(str, description="Path to folder containing the database for the blastn", default_value="/usr/src/data_folder/gene_identity/blastn_database"),
-    "blastn_directory": Field(str, description="Path to folder containing the blastn output files", default_value="/usr/src/data_folder/gene_identity/blastn"),
+    "blast_db_directory": Field(
+        str,
+        description="Path to folder containing the database for the blastn",
+        default_value="/usr/src/data_folder/gene_identity/blastn_database",
+    ),
+    "blastn_directory": Field(
+        str,
+        description="Path to folder containing the blastn output files",
+        default_value="/usr/src/data_folder/gene_identity/blastn",
+    ),
 }
+
 
 @asset(
     config_schema={**fasta_folder_config, **blastn_folder_config},
     description="Receive a fasta file as input and create a database for blast in the output directory",
     compute_kind="Blastn",
-    metadata={"owner" : "Virginie Grosboillot"},
+    metadata={"owner": "Virginie Grosboillot"},
 )
 def create_blast_db(context, genbank_to_fasta):
     db = []
     for input in genbank_to_fasta:
-        output = f'{context.op_config["blast_db_directory"]}/{Path(input).stem}'
+        output_dir = f'{context.op_config["blast_db_directory"]}/{Path(input).stem}'
         os.system(
-            f'makeblastdb -in {input} -input_type fasta -dbtype nucl -out {output}'
+            f"makeblastdb -in {input} -input_type fasta -dbtype nucl -out {outpu_dir}"
         )
-        db.append(output)
+        db.append(output_dir)
     return db
+
+
+@asset(
+    config_schema={**fasta_folder_config, **blastn_folder_config},
+    description="Perform blastn between sequence and database and return results as json",
+    compute_kind="Blastn",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def get_blastn(context, genbank_to_fasta, create_blast_db):
+    blastn_summary = []
+    for query in genbank_to_fasta:
+        for database in create_blast_db:
+            output_dir = f'{context.op_config["blastn_directory"]}/{Path(query).stem}_vs_{Path(database).stem}'
+            os.system(
+                f"blastn -query {query} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
+            )
+            blastn_summary.append(output_dir)
+            context.log.info(f"{Path(output_dir)} processed successfully")
+    return blastn_summary
+
+
+blastn_summary_config = {
+    "blastn_summary_dataframe": Field(
+        str,
+        description="Dataframe containing all the blastn parsed results",
+        default_value="/usr/src/data_folder/gene_identity/blastn_summary",
+    ),
+}
+
+
+@asset(config_schema=blastn_summary_config)
+def parse_blastn(context, get_blastn):
+    """Extract blastn information and save them into a Dataframe"""
+
+    spark = SparkSession.builder.getOrCreate()
+
+    output_file = context.op_config["blastn_summary_dataframe"]
+
+    for json_file in get_blastn:
+        df = (
+            spark.read.option("multiline", "true")
+            .json(json_file)
+            .select(F.explode("BlastOutput2.report.results.search").alias("search"))
+        )
+
+        keys_list = ["query_id", "query_title", "query_len", "message", "hits"]
+        keys_no_message = ["query_id", "query_title", "query_len", "hits"]
+        hits_list = ["num", "description", "len", "hsps"]
+        description_item = "title"
+        hsps_list = [
+            "num",
+            "evalue",
+            "identity",
+            "query_from",
+            "query_to",
+            "query_strand",
+            "hit_from",
+            "hit_to",
+            "hit_strand",
+            "align_len",
+            "gaps",
+        ]
+
+        try:
+            (
+                reduce(
+                    lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
+                    [i for i in hsps_list],
+                    reduce(
+                        lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
+                        [i for i in hits_list],
+                        reduce(
+                            lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
+                            [i for i in keys_list],
+                            df,
+                        ).filter(F.col("message").isNull()),
+                    )
+                    .withColumn(
+                        "source", F.col("description").getItem(description_item)[0]
+                    )
+                    .withColumnRenamed("num", "number_of_hits"),
+                )
+                .drop("search", "hits", "description", "hsps")
+                .withColumns(
+                    {
+                        "query_genome_name": F.regexp_extract(
+                            "query_title", r"^\w+", 0
+                        ),
+                        "query_genome_id": F.regexp_extract(
+                            "query_title", r"\w+\.\d", 0
+                        ),
+                        "query_gene": F.regexp_extract(
+                            "query_title", r"\| (\w+) \|", 1
+                        ),
+                        "query_locus_tag": F.regexp_extract(
+                            "query_title", r" (\w+) \| \[", 1
+                        ),
+                        "query_start_end": F.regexp_extract(
+                            "query_title", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "query_gene_strand": F.regexp_extract(
+                            "query_title", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumns(
+                    {
+                        "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
+                        "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
+                        "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
+                        "source_locus_tag": F.regexp_extract(
+                            "source", r" (\w+) \| \[", 1
+                        ),
+                        "source_start_end": F.regexp_extract(
+                            "source", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "source_gene_strand": F.regexp_extract(
+                            "source", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumn(
+                    "percentage_of_identity",
+                    F.round(F.col("identity") / F.col("align_len") * 100, 3),
+                )
+            ).coalesce(1).write.mode("append").parquet(output_file)
+
+        except:
+            (
+                reduce(
+                    lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
+                    [i for i in hsps_list],
+                    reduce(
+                        lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
+                        [i for i in hits_list],
+                        reduce(
+                            lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
+                            [i for i in keys_no_message],
+                            df,
+                        ),
+                    )
+                    .withColumn(
+                        "source", F.col("description").getItem(description_item)[0]
+                    )
+                    .withColumnRenamed("num", "number_of_hits"),
+                )
+                .drop("search", "hits", "description", "hsps")
+                .withColumns(
+                    {
+                        "query_genome_name": F.regexp_extract(
+                            "query_title", r"^\w+", 0
+                        ),
+                        "query_genome_id": F.regexp_extract(
+                            "query_title", r"\w+\.\d", 0
+                        ),
+                        "query_gene": F.regexp_extract(
+                            "query_title", r"\| (\w+) \|", 1
+                        ),
+                        "query_locus_tag": F.regexp_extract(
+                            "query_title", r" (\w+) \| \[", 1
+                        ),
+                        "query_start_end": F.regexp_extract(
+                            "query_title", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "query_gene_strand": F.regexp_extract(
+                            "query_title", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumns(
+                    {
+                        "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
+                        "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
+                        "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
+                        "source_locus_tag": F.regexp_extract(
+                            "source", r" (\w+) \| \[", 1
+                        ),
+                        "source_start_end": F.regexp_extract(
+                            "source", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "source_gene_strand": F.regexp_extract(
+                            "source", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumn(
+                    "percentage_of_identity",
+                    F.round(F.col("identity") / F.col("align_len") * 100, 3),
+                )
+            ).coalesce(1).write.mode("append").parquet(output_file)
+
+    return f'{output_file} has been updated'
