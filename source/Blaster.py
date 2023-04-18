@@ -227,7 +227,7 @@ def gene_presence_table(spark, locus_input: str= "locus_and_gene", blastn_input:
 
     _query_col = [c for c in blastn_df.columns if c.startswith('query_')]
     _source_col = [c for c in blastn_df.columns if c.startswith('source_')]
-    all_df = full_locus_df.join(blastn_df.select(*_query_col, *_source_col).withColumnRenamed('source_genome_name', 'name').withColumnRenamed('source_locus_tag', 'locus_tag'), ['name', 'locus_tag'], 'left')
+    all_df = full_locus_df.join(blastn_df.select(*_query_col, *_source_col).withColumnRenamed('query_genome_name', 'name').withColumnRenamed('query_locus_tag', 'locus_tag'), ['name', 'locus_tag'], 'left')
 
     
     return all_df.coalesce(1).write.mode("append").parquet(output_file)
@@ -241,3 +241,19 @@ def gene_uniqueness(spark, record_name: list, path_to_dataset: str='gene_uniquen
     gene_uniqueness_df = spark.read.parquet(path_to_dataset).filter((F.col('name').isin(record_name)) & (F.col('query_genome_name').isin(record_name)))
     total_seq = gene_uniqueness_df.select(F.count_distinct(F.col('query_genome_id')).alias('count')).collect()[0][0]
     return gene_uniqueness_df.withColumn('total_seq', F.lit(total_seq)).groupby('name', 'gene', 'locus_tag', 'total_seq').count().withColumn('perc_presence', F.col('count')/F.col('total_seq')*100)
+
+
+
+def _get_match_rna_seq(spark, file: str='gene_uniqueness'):
+
+    no_match_df = file.filter(F.col('query_genome_name').isNull()).select('name', 'locus_tag', 'gene')
+
+    loci = [locus[0] for locus in no_match_df.select('locus_tag').toLocalIterator()]
+
+    df = spark.read.option("delimiter", "|").option("multiligne", "true").option('lineSep', '>').option("ignoreLeadingWhiteSpace", "true").option("ignoreTrailingWhiteSpace", "true").csv('bacillus_genome_comparison/NC_022898.1.fna').filter(F.col('_c4').isin(loci))
+
+
+    #df.select(F.concat_ws('|', *df.columns)).coalesce(1).write.option("lineSep", "\n").text('bacillus_genome_comparison/txt_trial')
+    df.select(F.regexp_replace(F.concat_ws('|', *df.columns), r'^', r'>')).coalesce(1).write.option("lineSep", "\n").text('bacillus_genome_comparison/txt_trial')
+
+    os.system(f'blastn -query {file} -db {database} -word_size 7 -evalue 1e3 -dust no -out {output} -outfmt 15')
