@@ -12,6 +12,7 @@ resources_by_deployment_name = {
 }
 
 
-defs = Definitions(assets=all_assets,
-                   resources=resources_by_deployment_name["local"],
-                   )
+defs = Definitions(
+    assets=all_assets,
+    resources=resources_by_deployment_name["local"],
+)
