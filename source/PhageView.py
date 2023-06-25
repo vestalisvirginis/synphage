@@ -13,7 +13,7 @@ from Bio.Graphics.GenomeDiagram import CrossLink
 import pyspark.sql.functions as F
 
 
-from source.Blaster import gene_uniqueness
+from source.Blaster import gene_uniqueness, assess_file_content
 
 
 class CheckOrientation(enum.Enum):
@@ -29,13 +29,15 @@ def _read_seq(path: str, orientation: CheckOrientation) -> SeqRecord.SeqRecord:
         return SeqIO.read(path, "gb").reverse_complement(name=True)
 
 
-def _get_feature(features, id, tags=("locus_tag", "gene", "old_locus_tag")):
+def _get_feature(features, id, tags=("locus_tag", "gene", "old_locus_tag", "protein_id")):
     """Search list of SeqFeature objects for an identifier under the given tags."""
     for f in features:
         for key in tags:
             # tag may not be present in this feature
             for x in f.qualifiers.get(key, []):
                 if x == id:
+                    return f
+                elif x[:-2] == id:
                     return f
     raise KeyError(id)
 
@@ -199,47 +201,98 @@ class Diagram:
         for record_name, record in records.items():
             gd_feature_set = feature_sets[record_name]
 
-            for feature in record.features:
-                if feature.type != "gene":
-                    # Exclude this feature
-                    continue
-                try: 
-                    perc = gene_color_palette.filter(
-                            (F.col("name") == record_name)
-                            & (F.col("locus_tag") == feature.qualifiers["locus_tag"][0])
-                        ).select("perc_presence").collect()[0][0]
-                    if 0 <= perc <= 20:
-                        gene_color = colors.HexColor('#440154')
-                    elif 20 < perc <= 40:
-                        gene_color = colors.HexColor('#3b528b')
-                    elif 40 < perc <= 60:
-                        gene_color = colors.HexColor('#21918c')
-                    elif 60 < perc <= 80:
-                        gene_color = colors.HexColor('#5ec962')
-                    elif 80 < perc <= 100:
-                        gene_color = colors.HexColor('#fde725')
-                    else:
-                        gene_color = colors.black
-                except:
-                    gene_color = colors.white
-                try:
-                    name = feature.qualifiers["gene"][0]
-                except:
-                    name=feature.qualifiers["locus_tag"][0]
-                finally:
-                    name=''
-                gd_feature_set.add_feature(
-                    feature,
-                    sigil="BIGARROW",
-                    color=gene_color,
-                    label=True,
-                    name=name,
-                    label_position="middle",
-                    label_size=6,
-                    label_angle=0,
-                    label_strand=1,
-                )
-
+            gene_value = assess_file_content(record)
+            if gene_value == True:
+                for feature in record.features:
+                    if feature.type != "gene":
+                        # Exclude this feature
+                        continue
+                    try: 
+                        perc = gene_color_palette.filter(
+                                (F.col("name") == record_name)
+                                & (F.col("locus_tag") == feature.qualifiers["locus_tag"][0])
+                            ).select("perc_presence").collect()[0][0]
+                        if perc == 0:
+                            gene_color = colors.HexColor('#440154')
+                        elif 0 < perc <= 20:
+                            gene_color = colors.HexColor('#443983')
+                        elif 20 < perc <= 40:
+                            gene_color = colors.HexColor('#31688e')
+                        elif 40 < perc <= 60:
+                            gene_color = colors.HexColor('#21918c')
+                        elif 60 < perc <= 80:
+                            gene_color = colors.HexColor('#35b779')
+                        elif 80 < perc < 100:
+                            gene_color = colors.HexColor('#90d743')
+                        elif perc == 100:
+                            gene_color = colors.HexColor('#fde725')
+                        else:
+                            gene_color = colors.black
+                    except:
+                        gene_color = colors.white
+                    try:
+                        for k,v in feature.qualifiers.items():
+                            if k == 'gene':
+                                name = v[0]
+                    except:
+                        for k,v in feature.qualifiers.items():
+                            if k == 'locus_tag':
+                                name = v[0]
+                    finally:
+                        name=''
+                    gd_feature_set.add_feature(
+                        feature,
+                        sigil="BIGARROW",
+                        color=gene_color,
+                        label=True,
+                        name=name,
+                        label_position="middle",
+                        label_size=6,
+                        label_angle=0,
+                        label_strand=1,
+                    )
+            else:
+                for feature in record.features:
+                    if feature.type != "CDS":
+                        # Exclude this feature
+                        continue
+                    try: 
+                        perc = gene_color_palette.filter(
+                                (F.col("name") == record_name)
+                                & (F.col("locus_tag") == feature.qualifiers["protein_id"][0][:-2])
+                            ).select("perc_presence").collect()[0][0]
+                        if perc == 0:
+                            gene_color = colors.HexColor('#440154')
+                        elif 0 < perc <= 20:
+                            gene_color = colors.HexColor('#443983')
+                        elif 20 < perc <= 40:
+                            gene_color = colors.HexColor('#31688e')
+                        elif 40 < perc <= 60:
+                            gene_color = colors.HexColor('#21918c')
+                        elif 60 < perc <= 80:
+                            gene_color = colors.HexColor('#35b779')
+                        elif 80 < perc < 100:
+                            gene_color = colors.HexColor('#90d743')
+                        elif perc == 100:
+                            gene_color = colors.HexColor('#fde725')
+                        else:
+                            gene_color = colors.black
+                    except:
+                        gene_color = colors.white
+                    for k,v in feature.qualifiers.items():
+                        if k == 'protein_id':
+                            name = v[0][:-2]
+                    gd_feature_set.add_feature(
+                        feature,
+                        sigil="BIGARROW",
+                        color=gene_color,
+                        #label=True,
+                        #name=name,
+                        #label_position="middle",
+                        #label_size=6,
+                        #label_angle=0,
+                        #label_strand=1,
+                    )
         # import numpy as np
         # transcriptomic_data =  list(np.random.uniform(low=5.0, high=18.0, size=(203, )))
         # transcriptomic = {'trans_name', transcriptomic_data}

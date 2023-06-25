@@ -1,6 +1,7 @@
 import os
 
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 from pathlib import Path
 from functools import reduce
 
@@ -9,33 +10,76 @@ from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
 
 
+
+def assess_file_content(genome: SeqRecord):
+    """Assess wether the genbank file contains gene or only CDS"""
+
+    gene_count = 0
+    gene_value = False
+
+    for feature in genome.features:
+            if feature.type == "gene":
+                gene_count = gene_count+1
+                if gene_count > 1:
+                    gene_value = True
+                    break
+    
+    return gene_value
+
+
 def genbank_to_fasta(input: str, output: str='None'):
     """Parse genebank file and create a file containing every genes in the fasta format.
     Note: The sequence start and stop indexes are `-1` on the fasta file 1::10  --> [0:10] included/excluded."""
 
     if output == 'None':
         output = f'{Path(input).parent}/{Path(input).stem}.fna'
+    else:
+        output = f'{output}/{Path(input).stem}.fna'
 
     genome = SeqIO.read(input, "genbank")
 
-    with open(output, "w") as f:
-        for feature in genome.features:
-            if feature.type == "gene":
-                for seq_record in SeqIO.parse(input, "genbank"):
-                    f.write(
-                        ">%s | %s | %s | %s | %s | %s\n%s\n"
-                        % (
-                            seq_record.name,
-                            seq_record.id,
-                            seq_record.description,
-                            feature.qualifiers["gene"][0] if 'gene' in feature.qualifiers.keys() else 'None',
-                            feature.qualifiers["locus_tag"][0],
-                            feature.location,
-                            seq_record.seq[
-                                feature.location.start : feature.location.end
-                            ],
+    gene_value = assess_file_content(genome)
+
+    if gene_value == True:
+        with open(output, "w") as f:
+            for feature in genome.features:
+                if feature.type == "gene":
+                    for seq_record in SeqIO.parse(input, "genbank"):
+                        f.write(
+                            ">%s | %s | %s | %s | %s | %s\n%s\n"
+                            % (
+                                seq_record.name,
+                                seq_record.id,
+                                seq_record.description,
+                                feature.qualifiers["gene"][0] if 'gene' in feature.qualifiers.keys() else 'None',
+                                feature.qualifiers["locus_tag"][0],
+                                feature.location,
+                                seq_record.seq[
+                                    feature.location.start : feature.location.end
+                                ],
+                            )
                         )
-                    )
+
+    else:
+        with open(output, "w") as f:
+            for feature in genome.features:
+                if feature.type == "CDS":
+                    for seq_record in SeqIO.parse(input, "genbank"):
+                        f.write(
+                            ">%s | %s | %s | %s | %s | %s\n%s\n"
+                            % (
+                                seq_record.name,
+                                seq_record.id,
+                                seq_record.description,
+                                feature.qualifiers["protein_id"][0][:-2],
+                                feature.qualifiers["protein_id"][0][:-2],
+                                feature.location,
+                                seq_record.seq[
+                                    feature.location.start : feature.location.end
+                                ],
+                            )
+                        )
+
     return f"File {output} has been written."
 
 
@@ -129,7 +173,7 @@ def parse_blastn(spark, json_file: str, output: str="blastn_summary"):
                     "query_gene_strand": F.regexp_extract(
                         "query_title", r"(\((\+|\-)\))", 0
                     ),
-                }
+                }                     
             )
             .withColumns(
                 {   
@@ -199,21 +243,39 @@ def extract_locus_tag_gene(spark, input_file: str, output_file: str="locus_and_g
 
     record = SeqIO.read(input_file, 'gb')
 
-    for f in record.features:
-        if f.type=="gene":
-            if "locus_tag" in f.qualifiers:
-                locus_tag_list.append(f.qualifiers['locus_tag'][0])
-            else:
-                locus_tag_list.append('')
-            if "gene" in f.qualifiers:
-                    gene_list.append(f.qualifiers['gene'][0])
-            else:
-                gene_list.append('')
+    gene_value = assess_file_content(record)
 
-    assert len(gene_list) == len(locus_tag_list), 'Error Fatal!'
+    if gene_value == True:
+        for f in record.features:
+            if f.type=="gene":
+                if "locus_tag" in f.qualifiers:
+                    locus_tag_list.append(f.qualifiers['locus_tag'][0])
+                else:
+                    locus_tag_list.append('')
+                if "gene" in f.qualifiers:
+                        gene_list.append(f.qualifiers['gene'][0])
+                else:
+                    gene_list.append('')
 
-    return spark.createDataFrame([[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)], ['name', 'gene', 'locus_tag']).coalesce(1).write.mode("append").parquet(output_file)
+        assert len(gene_list) == len(locus_tag_list), 'Error Fatal!'
 
+        return spark.createDataFrame([[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)], ['name', 'gene', 'locus_tag']).coalesce(1).write.mode("append").parquet(output_file)
+
+    else:
+        for f in record.features:
+            if f.type=="CDS":
+                if "protein_id" in f.qualifiers:
+                    locus_tag_list.append(f.qualifiers['protein_id'][0][:-2])
+                    gene_list.append(f.qualifiers['protein_id'][0][:-2])
+                else:
+                    locus_tag_list.append('')
+                    gene_list.append('')
+
+        assert len(gene_list) == len(locus_tag_list), 'Error Fatal!'
+
+        return spark.createDataFrame([[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)], ['name', 'gene', 'locus_tag']).coalesce(1).write.mode("append").parquet(output_file)
+         
+                                
 
 def gene_presence_table(spark, locus_input: str= "locus_and_gene", blastn_input: str= 'blastn_summary', output_file: str='gene_uniqueness'):
     """ Create a datframe with all the query to a same genome and save result as parquet"""
@@ -238,9 +300,9 @@ def gene_presence_table(spark, locus_input: str= "locus_and_gene", blastn_input:
 def gene_uniqueness(spark, record_name: list, path_to_dataset: str='gene_uniqueness'):
     """Calculate percentage of the presence of a given gene over the displayed sequences"""
 
-    gene_uniqueness_df = spark.read.parquet(path_to_dataset).filter((F.col('name').isin(record_name)) & (F.col('query_genome_name').isin(record_name)))
+    gene_uniqueness_df = spark.read.parquet(path_to_dataset).filter((F.col('name').isin(record_name)) & (F.col('source_genome_name').isin(record_name)))
     total_seq = gene_uniqueness_df.select(F.count_distinct(F.col('query_genome_id')).alias('count')).collect()[0][0]
-    return gene_uniqueness_df.withColumn('total_seq', F.lit(total_seq)).groupby('name', 'gene', 'locus_tag', 'total_seq').count().withColumn('perc_presence', F.col('count')/F.col('total_seq')*100)
+    return gene_uniqueness_df.withColumn('total_seq', F.lit(total_seq)).groupby('name', 'gene', 'locus_tag', 'total_seq').count().withColumn('perc_presence', (F.col('count')-1)/(F.col('total_seq')-1)*100)
 
 
 
