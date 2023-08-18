@@ -1,4 +1,4 @@
-from dagster import asset, Field, op, graph
+from dagster import asset, Field, op, graph, In, Out, graph_asset
 
 import os
 import glob
@@ -6,12 +6,34 @@ import re
 import shutil
 
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 from pathlib import Path
 from functools import reduce
 from typing import List
 from pyspark.sql import SparkSession
 
 import pyspark.sql.functions as F
+
+
+# @op(
+#     name = "assess_file_content",
+#     ins={"genome": In(SeqRecord)},
+#     out={'gene_value': Out(bool)},
+#     description="Assess wether the genbank file contains gene or only CDS",
+# )
+# def _assess_file_content(genome) -> bool:
+#     """Assess wether the genbank file contains gene or only CDS"""
+
+#     gene_count = 0
+#     gene_value = False
+#     for feature in genome.features:
+#             if feature.type == "gene":
+#                 gene_count = gene_count+1
+#                 if gene_count > 1:
+#                     gene_value = True
+#                     break
+    
+#     return gene_value
 
 
 genbank_folder_config = {
@@ -165,7 +187,7 @@ def create_blast_db(context, genbank_to_fasta):
     for input in genbank_to_fasta:
         output_dir = f'{context.op_config["blast_db_directory"]}/{Path(input).stem}'
         os.system(
-            f"makeblastdb -in {input} -input_type fasta -dbtype nucl -out {outpu_dir}"
+            f"makeblastdb -in {input} -input_type fasta -dbtype nucl -out {output_dir}"
         )
         db.append(output_dir)
     return db
@@ -180,8 +202,11 @@ def create_blast_db(context, genbank_to_fasta):
 def get_blastn(context, genbank_to_fasta, create_blast_db):
     blastn_summary = []
     for query in genbank_to_fasta:
+        context.log.info(f"Query {query}")
         for database in create_blast_db:
+            context.log.info(f"Database {database}")
             output_dir = f'{context.op_config["blastn_directory"]}/{Path(query).stem}_vs_{Path(database).stem}'
+            context.log.info(f"Output directory {output_dir}")
             os.system(
                 f"blastn -query {query} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
             )
@@ -359,5 +384,122 @@ def parse_blastn(context, get_blastn):
                     F.round(F.col("identity") / F.col("align_len") * 100, 3),
                 )
             ).coalesce(1).write.mode("append").parquet(output_file)
+
+    return f'{output_file} has been updated'
+
+
+locus_and_gene_folder_config = {
+    "locus_and_gene_directory": Field(
+        str,
+        description="Path to folder containing the database for the blastn",
+        default_value="/usr/src/data_folder/gene_identity/locus_and_gene",
+    ),
+}
+
+@asset(
+    config_schema={**genbank_folder_config, **locus_and_gene_folder_config},
+    description="Create a dataframe containing the information relative to gene and save it as parquet file",
+    compute_kind="Biopython",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def extract_locus_tag_gene(context, sequence_sorting):
+    """Create a dataframe containing the information relative to gene and save it as parquet file"""
+
+    def _assess_file_content(genome) -> bool:
+        """Assess wether the genbank file contains gene or only CDS"""
+
+        gene_count = 0
+        gene_value = False
+        for feature in genome.features:
+                if feature.type == "gene":
+                    gene_count = gene_count+1
+                    if gene_count > 1:
+                        gene_value = True
+                        break
+        
+        return gene_value
+
+    spark = SparkSession.builder.getOrCreate()
+
+    output_file = context.op_config["locus_and_gene_directory"]
+
+    path = context.op_config["spbetaviruses_directory"]
+
+    for acc in sequence_sorting:
+        file = f"{path}/{acc}.gb"
+
+        gene_list = []
+        locus_tag_list = []
+
+        record = SeqIO.read(file, "genbank")
+
+        gene_value = _assess_file_content(record)
+
+        if gene_value == True:
+            for f in record.features:
+                if f.type=="gene":
+                    if "locus_tag" in f.qualifiers:
+                        locus_tag_list.append(f.qualifiers['locus_tag'][0])
+                    else:
+                        locus_tag_list.append('')
+                    if "gene" in f.qualifiers:
+                            gene_list.append(f.qualifiers['gene'][0])
+                    else:
+                        gene_list.append('')
+
+            assert len(gene_list) == len(locus_tag_list), 'Error Fatal!'
+
+            spark.createDataFrame([[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)], ['name', 'gene', 'locus_tag']).coalesce(1).write.mode("append").parquet(output_file)
+
+        else:
+            for f in record.features:
+                if f.type=="CDS":
+                    if "protein_id" in f.qualifiers:
+                        locus_tag_list.append(f.qualifiers['protein_id'][0][:-2])
+                        gene_list.append(f.qualifiers['protein_id'][0][:-2])
+                    else:
+                        locus_tag_list.append('')
+                        gene_list.append('')
+
+            assert len(gene_list) == len(locus_tag_list), 'Error Fatal!'
+
+            spark.createDataFrame([[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)], ['name', 'gene', 'locus_tag']).coalesce(1).write.mode("append").parquet(output_file)
+
+    return f'{output_file} has been updated'
+
+
+gene_uniqueness_folder_config = {
+    "gene_uniqueness_directory": Field(
+        str,
+        description="Path to folder containing the parquet files containing the information on the uniqueness of the genes",
+        default_value="/usr/src/data_folder/gene_identity/gene_uniqueness",
+    ),
+}
+
+@asset(
+    config_schema={**blastn_summary_config, **locus_and_gene_folder_config, **gene_uniqueness_folder_config},
+    description="Create a datframe with all the query to a same genome and save result as parquet file",
+    compute_kind="Pyspark",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def gene_presence_table(context, extract_locus_tag_gene, parse_blastn):
+    """ Create a datframe with all the query to a same genome and save result as parquet"""
+
+    spark = SparkSession.builder.getOrCreate()
+    output_file = context.op_config["gene_uniqueness_directory"]
+
+    # Load data
+    full_locus_df = spark.read.parquet(context.op_config["locus_and_gene_directory"])
+
+    blastn_df = spark.read.parquet(context.op_config["blastn_summary_dataframe"])
+
+    # Column selector
+
+    _query_col = [c for c in blastn_df.columns if c.startswith('query_')]
+    _source_col = [c for c in blastn_df.columns if c.startswith('source_')]
+    all_df = full_locus_df.join(blastn_df.select(*_query_col, *_source_col).withColumnRenamed('query_genome_name', 'name').withColumnRenamed('query_locus_tag', 'locus_tag'), ['name', 'locus_tag'], 'left')
+
+    
+    all_df.coalesce(1).write.mode("append").parquet(output_file)
 
     return f'{output_file} has been updated'
