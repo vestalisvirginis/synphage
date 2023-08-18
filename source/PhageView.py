@@ -143,7 +143,7 @@ class Diagram:
             # (empty tracks 2 and 4 add useful white space to emphasise the cross links
             # and also serve to make the tracks vertically more compressed)
             gd_track_for_features = gd_diagram.new_track(
-                2 * i - 1,
+                i, #2 * i - 1,
                 name=record_name,
                 greytrack=True,
                 greytrack_labels=1,
@@ -213,19 +213,19 @@ class Diagram:
                                 & (F.col("locus_tag") == feature.qualifiers["locus_tag"][0])
                             ).select("perc_presence").collect()[0][0]
                         if perc == 0:
-                            gene_color = colors.HexColor('#440154')
+                            gene_color = colors.HexColor('#fde725')      #gene_color = colors.HexColor('#440154')
                         elif 0 < perc <= 20:
-                            gene_color = colors.HexColor('#443983')
+                            gene_color = colors.HexColor('#90d743')      #gene_color = colors.HexColor('#443983')
                         elif 20 < perc <= 40:
-                            gene_color = colors.HexColor('#31688e')
+                            gene_color = colors.HexColor('#35b779')      #gene_color = colors.HexColor('#31688e')
                         elif 40 < perc <= 60:
                             gene_color = colors.HexColor('#21918c')
                         elif 60 < perc <= 80:
-                            gene_color = colors.HexColor('#35b779')
+                            gene_color = colors.HexColor('#31688e')       #gene_color = colors.HexColor('#35b779')
                         elif 80 < perc < 100:
-                            gene_color = colors.HexColor('#90d743')
+                            gene_color = colors.HexColor('#443983')       #gene_color = colors.HexColor('#90d743')
                         elif perc == 100:
-                            gene_color = colors.HexColor('#fde725')
+                            gene_color = colors.HexColor('#440154')        #gene_color = colors.HexColor('#fde725')
                         else:
                             gene_color = colors.black
                     except:
@@ -262,19 +262,19 @@ class Diagram:
                                 & (F.col("locus_tag") == feature.qualifiers["protein_id"][0][:-2])
                             ).select("perc_presence").collect()[0][0]
                         if perc == 0:
-                            gene_color = colors.HexColor('#440154')
+                            gene_color = colors.HexColor('#fde725')      #gene_color = colors.HexColor('#440154')
                         elif 0 < perc <= 20:
-                            gene_color = colors.HexColor('#443983')
+                            gene_color = colors.HexColor('#90d743')      #gene_color = colors.HexColor('#443983')
                         elif 20 < perc <= 40:
-                            gene_color = colors.HexColor('#31688e')
+                            gene_color = colors.HexColor('#35b779')      #gene_color = colors.HexColor('#31688e')
                         elif 40 < perc <= 60:
                             gene_color = colors.HexColor('#21918c')
                         elif 60 < perc <= 80:
-                            gene_color = colors.HexColor('#35b779')
+                            gene_color = colors.HexColor('#31688e')       #gene_color = colors.HexColor('#35b779')
                         elif 80 < perc < 100:
-                            gene_color = colors.HexColor('#90d743')
+                            gene_color = colors.HexColor('#443983')       #gene_color = colors.HexColor('#90d743')
                         elif perc == 100:
-                            gene_color = colors.HexColor('#fde725')
+                            gene_color = colors.HexColor('#440154')        #gene_color = colors.HexColor('#fde725')
                         else:
                             gene_color = colors.black
                     except:

@@ -1,4 +1,4 @@
-from dagster_pyspark import pyspark_resource
+#from dagster_pyspark import pyspark_resource
 
 from .ncbi_resource import ncbi_resource
 #from .parquet_io_manager import local_partitioned_parquet_io_manager
