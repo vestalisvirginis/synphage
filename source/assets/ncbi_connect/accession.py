@@ -86,7 +86,7 @@ download_folder_config = {
     "output_directory": Field(
         str,
         description="Path to folder",
-        default_value="/usr/src/data_folder/genome_download",
+        default_value="/usr/src/data_folder/phage_view_data/genome_download",
     )
 }
 

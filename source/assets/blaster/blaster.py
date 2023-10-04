@@ -40,12 +40,12 @@ genbank_folder_config = {
     "phage_download_directory": Field(
         str,
         description="Path to folder containing the genebank sequence files",
-        default_value="/usr/src/data_folder/genome_download",
+        default_value="/usr/src/data_folder/phage_view_data/genome_download",
     ),
     "spbetaviruses_directory": Field(
         str,
         description="Path to folder containing the genebank sequence files",
-        default_value="/usr/src/data_folder/genbank_spbetaviruses",
+        default_value="/usr/src/data_folder/phage_view_data/genbank_spbetaviruses",
     ),
 }
 
@@ -108,7 +108,7 @@ fasta_folder_config = {
     "fasta_directory": Field(
         str,
         description="Path to folder containing the fasta sequence files",
-        default_value="/usr/src/data_folder/gene_identity/fasta",
+        default_value="/usr/src/data_folder/phage_view_data/gene_identity/fasta",
     ),
 }
 
@@ -166,12 +166,12 @@ blastn_folder_config = {
     "blast_db_directory": Field(
         str,
         description="Path to folder containing the database for the blastn",
-        default_value="/usr/src/data_folder/gene_identity/blastn_database",
+        default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn_database",
     ),
     "blastn_directory": Field(
         str,
         description="Path to folder containing the blastn output files",
-        default_value="/usr/src/data_folder/gene_identity/blastn",
+        default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn",
     ),
 }
 
@@ -219,7 +219,7 @@ blastn_summary_config = {
     "blastn_summary_dataframe": Field(
         str,
         description="Dataframe containing all the blastn parsed results",
-        default_value="/usr/src/data_folder/gene_identity/blastn_summary",
+        default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn_summary",
     ),
 }
 
@@ -392,7 +392,7 @@ locus_and_gene_folder_config = {
     "locus_and_gene_directory": Field(
         str,
         description="Path to folder containing the database for the blastn",
-        default_value="/usr/src/data_folder/gene_identity/locus_and_gene",
+        default_value="/usr/src/data_folder/phage_view_data/gene_identity/locus_and_gene",
     ),
 }
 
@@ -472,7 +472,7 @@ gene_uniqueness_folder_config = {
     "gene_uniqueness_directory": Field(
         str,
         description="Path to folder containing the parquet files containing the information on the uniqueness of the genes",
-        default_value="/usr/src/data_folder/gene_identity/gene_uniqueness",
+        default_value="/usr/src/data_folder/phage_view_data/gene_identity/gene_uniqueness",
     ),
 }
 
