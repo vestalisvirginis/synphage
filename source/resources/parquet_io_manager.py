@@ -19,3 +19,28 @@
 # @io_manager
 # def local_partitioned_parquet_io_manager(init_context):
 #     return LocalParquetIOManager()
+
+import os
+
+from dagster import ConfigurableIOManager
+
+
+class LocalParquetIOManager(ConfigurableIOManager):
+    base_dir: str
+    folder: str = 'table'
+
+    # def _create_table_directory(self):
+    #     return "/".join([context.resource_config["base_dir"], folder])
+
+    def _get_path(self, context):
+        # return os.path.join(*context.asset_key.path)
+        #return "/".join([context.resource_config["base_dir"], self.folder, *context.asset_key.path])
+        return "/".join([context.resource_config["base_dir"], self.folder, context.name])
+
+    def handle_output(self, context, obj):
+        obj.write.mode("overwrite").parquet(self._get_path(context))
+
+    def load_input(self, context):
+        spark = SparkSession.builder.getOrCreate()
+        return spark.read.parquet(self._get_path(context.upstream_output))
+ 
