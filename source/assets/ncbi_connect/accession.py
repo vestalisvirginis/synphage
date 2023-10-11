@@ -100,7 +100,7 @@ def downloaded_genomes(context) -> List[str]:
 
 ncbi_query_config_fetch = {
     "database": Field(str, description="Database identifier", default_value="nuccore"),
-    "rettype": Field(str, description="File format", default_value="gb"),  #gbwithparts
+    "rettype": Field(str, description="File format", default_value="gb"),  # gbwithparts
     # "batch": Field(int, description="Options for acc", default_value=10)
 }
 
