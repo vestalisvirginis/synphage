@@ -20,5 +20,7 @@ The program will automatically create the following folder architecture in the p
 |   |-- gene_presence  
 |--synteny  
 |   |-- gene_uniqueness  
-|   |-- graph  
+|   |-- graph
+|--fs
+
 

@@ -1,4 +1,4 @@
-from dagster import asset, Field, op, graph, In, Out, graph_asset, MetadataValue, EnvVar
+from dagster import asset, Field, op, graph, In, Out, graph_asset, MetadataValue, AutoMaterializePolicy
 
 import os
 import glob
@@ -50,6 +50,7 @@ genbank_folder_config = {
         # default_value="/usr/src/data_folder/phage_view_data/genbank_spbetaviruses",
         default_value="/usr/src/data_folder/jaka_data/genbank",
     ),
+
 }
 
 
@@ -108,17 +109,22 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
     )
 
 
-genbank_config = {
+sqc_folder_config = {
     "genbank_dir": Field(
         str,
         description="Path to folder containing the genbank files",
         default_value="genbank",
     ),
+    "fasta_dir": Field(
+        str,
+        description="Path to folder containing the fasta sequence files",
+        default_value="gene_identity/fasta",
+    ),
 }
 
 
 @asset(
-    config_schema={**genbank_config},
+    config_schema={**sqc_config},
     description="""List the sequences available in the genbank folder and return a list""",
     compute_kind="Python",
     io_manager_key="io_manager",
@@ -157,16 +163,10 @@ def list_genbank_files(context) -> List[str]:
     return files
 
 
-fasta_folder_config = {
-    "fasta_dir": Field(
-        str,
-        description="Path to folder containing the fasta sequence files",
-        default_value="gene_identity/fasta",
-    ),
-}
+
 
 @asset(
-    config_schema={**genbank_config, **fasta_folder_config},
+    config_schema={**sqc_folder_config},
     description="""Parse genebank file and create a file containing every genes in the fasta format.
     Note: The sequence start and stop indexes are `-1` on the fasta file 1::10  --> [0:10] included/excluded.""",
     compute_kind="Biopython",
@@ -251,7 +251,7 @@ blastn_folder_config = {
 
 
 @asset(
-    config_schema={**fasta_folder_config, **blastn_folder_config},
+    config_schema={**sqc_folder_config, **blastn_folder_config},
     description="Receive a fasta file as input and create a database for blast in the output directory",
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
@@ -269,7 +269,7 @@ def create_blast_db(context, genbank_to_fasta):
 
 
 @asset(
-    config_schema={**fasta_folder_config, **blastn_folder_config},
+    config_schema={**sqc_folder_config, **blastn_folder_config},
     description="Perform blastn between sequence and database and return results as json",
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},

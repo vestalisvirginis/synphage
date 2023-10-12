@@ -19,6 +19,6 @@ class LocalParquetIOManager(ConfigurableIOManager):
     def handle_output(self, context, obj):
         obj.write.mode("overwrite").parquet(self._get_path(context))
 
-    def load_input(self, context):
+    def load_input(self, context):  # context: InputContext
         spark = SparkSession.builder.getOrCreate()
         return spark.read.parquet(self._get_path(context.upstream_output))
