@@ -8,6 +8,7 @@ import shutil
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from pathlib import Path
+from datetime import datetime
 from functools import reduce
 from typing import List
 from pyspark.sql import SparkSession, DataFrame
@@ -40,13 +41,13 @@ genbank_folder_config = {
     "phage_download_directory": Field(
         str,
         description="Path to folder containing the genebank sequence files",
-        #default_value="/usr/src/data/phage_view_data/genome_download",
+        # default_value="/usr/src/data/phage_view_data/genome_download",
         default_value="/usr/src/data_folder/jaka_data/genome_download",
     ),
     "spbetaviruses_directory": Field(
         str,
         description="Path to folder containing the genebank sequence files",
-        #default_value="/usr/src/data_folder/phage_view_data/genbank_spbetaviruses",
+        # default_value="/usr/src/data_folder/phage_view_data/genbank_spbetaviruses",
         default_value="/usr/src/data_folder/jaka_data/genbank",
     ),
 }
@@ -107,11 +108,60 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
     )
 
 
+genbank_config = {
+    "genbank_dir": Field(
+        str,
+        description="Path to folder containing the genbank files",
+        default_value="genbank",
+    ),
+}
+
+
+@asset(
+    config_schema={**genbank_config},
+    description="""List the sequences available in the genbank folder and return a list""",
+    compute_kind="Python",
+    io_manager_key="io_manager",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def list_genbank_files(context) -> List[str]:
+    files = list(
+        map(
+            lambda x: Path(x).stem,
+            os.listdir(
+                "/".join(
+                    [
+                        os.getenv(EnvVar("PHAGY_DIRECTORY")),
+                        context.op_config["genbank_dir"],
+                    ]
+                )
+            ),
+        )
+    )
+
+    time = datetime.now()
+    context.add_output_metadata(
+        metadata={
+            "text_metadata": f"The list of genbank files has been updated {time.isoformat()} (UTC).",
+            "path": "/".join(
+                [
+                    EnvVar("PHAGY_DIRECTORY"),
+                    context.op_config["genbank_dir"],
+                ]
+            ),
+            "num_files": len(files),
+            "preview": files,
+        }
+    )
+
+    return files
+
+
 fasta_folder_config = {
     "fasta_directory": Field(
         str,
         description="Path to folder containing the fasta sequence files",
-        #default_value="/usr/src/data_folder/phage_view_data/gene_identity/fasta",
+        # default_value="/usr/src/data_folder/phage_view_data/gene_identity/fasta",
         default_value="/usr/src/data_folder/jaka_data/gene_identity/fasta",
     ),
 }
@@ -129,14 +179,14 @@ def genbank_to_fasta(context, sequence_sorting) -> List[str]:
     # Check files that have already been processed
 
     # Process new files
-    #context.log.info(f"Number of file to process: {len(sequence_sorting)}")
+    # context.log.info(f"Number of file to process: {len(sequence_sorting)}")
 
     path = context.op_config["spbetaviruses_directory"]
 
     fasta_files = []
-    #for acc in sequence_sorting:
-    for file in glob.glob(f'{path}/*.gb'):
-        #file = f"{path}/{acc}.gb"
+    # for acc in sequence_sorting:
+    for file in glob.glob(f"{path}/*.gb"):
+        # file = f"{path}/{acc}.gb"
         output_dir = f'{context.op_config["fasta_directory"]}/{Path(file).stem}.fna'
         fasta_files.append(output_dir)
 
@@ -173,13 +223,13 @@ blastn_folder_config = {
     "blast_db_directory": Field(
         str,
         description="Path to folder containing the database for the blastn",
-        #default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn_database",
+        # default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn_database",
         default_value="/usr/src/data_folder/jaka_data/gene_identity/blastn_database",
     ),
     "blastn_directory": Field(
         str,
         description="Path to folder containing the blastn output files",
-        #default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn",
+        # default_value="/usr/src/data_folder/phage_view_data/gene_identity/blastn",
         default_value="/usr/src/data_folder/jaka_data/gene_identity/blastn",
     ),
 }
@@ -441,6 +491,7 @@ locus_and_gene_folder_config = {
     ),
 }
 
+
 @asset(
     config_schema={**genbank_folder_config, **locus_and_gene_folder_config},
     description="Create a dataframe containing the information relative to gene and save it as parquet file",
@@ -471,13 +522,13 @@ def extract_locus_tag_gene(context, sequence_sorting):
 
     spark = SparkSession.builder.getOrCreate()
 
-    #output_file = context.op_config["locus_and_gene_directory"]
+    # output_file = context.op_config["locus_and_gene_directory"]
 
     path = context.op_config["spbetaviruses_directory"]
 
-    for file in glob.glob(f'{path}/*.gb'):
-    #for acc in sequence_sorting:
-        #file = f"{path}/{acc}.gb"
+    for file in glob.glob(f"{path}/*.gb"):
+        # for acc in sequence_sorting:
+        # file = f"{path}/{acc}.gb"
 
         gene_list = []
         locus_tag_list = []
@@ -504,7 +555,7 @@ def extract_locus_tag_gene(context, sequence_sorting):
                 [[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)],
                 ["name", "gene", "locus_tag"],
             )
-            #.coalesce(1).write.mode("append").parquet(output_file)
+            # .coalesce(1).write.mode("append").parquet(output_file)
 
         else:
             for f in record.features:
@@ -522,11 +573,10 @@ def extract_locus_tag_gene(context, sequence_sorting):
                 [[record.name, g, l] for g, l in zip(gene_list, locus_tag_list)],
                 ["name", "gene", "locus_tag"],
             )
-            #.coalesce(1).write.mode("append").parquet(output_file)
+            # .coalesce(1).write.mode("append").parquet(output_file)
 
-    #return f"{output_file} has been updated"
+    # return f"{output_file} has been updated"
     return df
-
 
 
 # gene_uniqueness_folder_config = {
@@ -596,4 +646,6 @@ def gene_presence_table(context, extract_locus_tag_gene, parse_blastn):  # parse
     all_df.coalesce(1).write.mode("append").parquet(output_file)
 
     return f"{output_file} has been updated"
-   # return all_df
+
+
+# return all_df
