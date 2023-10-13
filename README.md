@@ -22,5 +22,3 @@ The program will automatically create the following folder architecture in the p
 |   |-- gene_uniqueness  
 |   |-- graph
 |--fs
-
-

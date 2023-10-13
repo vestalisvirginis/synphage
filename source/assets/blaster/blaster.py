@@ -1,4 +1,4 @@
-from dagster import asset, Field, op, graph, In, Out, graph_asset, MetadataValue, AutoMaterializePolicy
+from dagster import asset, Field, op, graph, In, Out, graph_asset, MetadataValue, AutoMaterializePolicy, EnvVar, job, Config
 
 import os
 import glob
@@ -15,6 +15,54 @@ from pyspark.sql import SparkSession, DataFrame
 
 import pyspark.sql.functions as F
 
+from dagster import op, job, Config, sensor, RunRequest, RunConfig
+
+class FileConfig(Config):     
+    filename: str
+ 
+
+@op
+def process_file(context, config: FileConfig):
+    context.log.info(config.filename)
+
+
+@job
+def log_file_job():
+    process_file()
+
+
+@sensor(job=log_file_job)
+def my_directory_sensor():
+    for filename in os.listdir('./data_folder/experimenting/genbank/'):
+        filepath = os.path.join('./data_folder/experimenting/genbank/', filename)
+        if os.path.isfile(filepath):
+            yield RunRequest(
+            run_key=filename,
+            run_config=RunConfig(
+            ops={"process_file": FileConfig(filename=filename)}
+            ),
+            )
+
+@sensor(job=log_file_job)
+def my_directory_sensor_cursor(context):
+    last_mtime = float(context.cursor) if context.cursor else 0
+
+    max_mtime = last_mtime
+    for filename in os.listdir(MY_DIRECTORY):
+        filepath = os.path.join(MY_DIRECTORY, filename)
+        if os.path.isfile(filepath):
+            fstats = os.stat(filepath)
+            file_mtime = fstats.st_mtime
+            if file_mtime <= last_mtime:
+                continue
+
+            # the run key should include mtime if we want to kick off new runs based on file modifications
+            run_key = f"{filename}:{file_mtime}"
+            run_config = {"ops": {"process_file": {"config": {"filename": filename}}}}
+            yield RunRequest(run_key=run_key, run_config=run_config)
+            max_mtime = max(max_mtime, file_mtime)
+
+    context.update_cursor(str(max_mtime))
 
 # @op(
 #     name = "assess_file_content",
@@ -109,6 +157,13 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
     )
 
 
+def _rename_file_ext(file) -> None:
+    """Change file extension when '.gbk' for '.gb'"""
+    path = Path(file)
+    if path.suffix == '.gbk':
+        return path.rename(path.with_suffix('.gb'))
+
+
 sqc_folder_config = {
     "genbank_dir": Field(
         str,
@@ -124,7 +179,7 @@ sqc_folder_config = {
 
 
 @asset(
-    config_schema={**sqc_config},
+    config_schema={**sqc_folder_config},
     description="""List the sequences available in the genbank folder and return a list""",
     compute_kind="Python",
     io_manager_key="io_manager",
@@ -145,10 +200,17 @@ def list_genbank_files(context) -> List[str]:
         )
     )
 
+    # new_files = set(files).difference(list_genbank_files)
+
+    # for file in new_files:
+    #     _rename_file_ext(file)
+
     time = datetime.now()
     context.add_output_metadata(
         metadata={
             "text_metadata": f"The list of genbank files has been updated {time.isoformat()} (UTC).",
+            # "num_new_files": len(new_files),
+            # "new_files": new_files,
             "path": "/".join(
                 [
                     EnvVar("PHAGY_DIRECTORY"),
@@ -161,7 +223,6 @@ def list_genbank_files(context) -> List[str]:
     )
 
     return files
-
 
 
 
@@ -276,7 +337,7 @@ def create_blast_db(context, genbank_to_fasta):
 )
 def get_blastn(context, genbank_to_fasta, create_blast_db):
     path = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")),context.op_config["blastn_dir"]])
-    blastn_summary = []
+    blastn_files = []
     for query in genbank_to_fasta:
         context.log.info(f"Query {query}")
         for database in create_blast_db:
@@ -286,17 +347,20 @@ def get_blastn(context, genbank_to_fasta, create_blast_db):
             os.system(
                 f"blastn -query {query} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
             )
-            blastn_summary.append(output_dir)
+            blastn_files.append(output_dir)
             context.log.info(f"{Path(output_dir)} processed successfully")
-    return blastn_summary
+    return blastn_files
 
 
-blastn_summary_config = {
+table_config = {
     "output_folder": Field(
         str,
         description="Path to folder where the files will be saved",
         default_value="table",
     ),
+}
+
+blastn_summary_config = {
     "name": Field(
         str,
         description="Path to folder where the files will be saved",
@@ -306,7 +370,7 @@ blastn_summary_config = {
 
 
 @asset(
-    config_schema=blastn_summary_config,
+    config_schema={**table_config, **blastn_summary_config},
     description="Extract blastn information and save them into a Dataframe",
     #io_manager_key="parquet_io_manager",
     compute_kind="Pyspark",
