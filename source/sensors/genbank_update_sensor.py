@@ -1,24 +1,12 @@
 from dagster import (
-    asset,
-    op,
-    multi_asset,
-    AssetOut,
-    graph_asset,
-    Output,
-    define_asset_job,
-    AssetSelection,
-    job,
-    Definitions,
     sensor,
     RunConfig,
     RunRequest,
-    Config,
     SensorDefinition,
     SkipReason,
 )
 import os
-from pathlib import Path
-import pickle
+
 from source.assets.status import FileConfig
 
 
@@ -51,7 +39,7 @@ from source.assets.status import FileConfig
 #     return my_directory_sensor_cursor
 
 
-def genbank_file_update_sensor(job):  # -> SensorDefinition:
+def genbank_file_update_sensor(job) -> SensorDefinition:
     """Returns a sensor that launches the given job when the HN "comments" and "stories" tables have
     both been updated.
     """
