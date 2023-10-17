@@ -17,7 +17,10 @@ class LocalParquetIOManager(ConfigurableIOManager):
         # return "/".join([context.resource_config["base_dir"], context.op_config["output_folder"], context.op_config["name"]]) AttributeError: 'OutputContext' object has no attribute 'op_config'
 
     def handle_output(self, context, obj):
-        obj.coalesce(1).write.mode("append").parquet(self._get_path(context))
+        if context.metadata["parquet_managment"] == "overwrite":
+            obj.coalesce(1).write.mode("overwrite").parquet(self._get_path(context))
+        else:
+            obj.coalesce(1).write.mode("append").parquet(self._get_path(context))
 
     def load_input(self, context):  # context: InputContext
         spark = SparkSession.builder.getOrCreate()
