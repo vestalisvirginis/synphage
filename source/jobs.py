@@ -7,9 +7,9 @@ asset_job_sensor = genbank_file_update_sensor(
     define_asset_job(
         "load_job",
         AssetSelection.groups("Status")
-        # | (
-        #     AssetSelection.groups("Blaster")
-        #     & AssetSelection.keys("genbank_to_fasta").downstream()
-        # ),
+        | (
+            AssetSelection.groups("Blaster")
+            & AssetSelection.keys("process_asset").downstream()
+        ),
     )
 )

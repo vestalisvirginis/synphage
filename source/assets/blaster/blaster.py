@@ -133,7 +133,7 @@ sqc_folder_config = {
     Note: The sequence start and stop indexes are `-1` on the fasta file 1::10  --> [0:10] included/excluded.""",
     compute_kind="Biopython",
     io_manager_key="io_manager",
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    #auto_materialize_policy=AutoMaterializePolicy.eager(),
     metadata={"owner": "Virginie Grosboillot"},
 )
 def genbank_to_fasta(context, process_asset) -> str:
@@ -217,7 +217,7 @@ blastn_folder_config = {
     config_schema={**sqc_folder_config, **blastn_folder_config},
     description="Receive a fasta file as input and create a database for blast in the output directory",
     compute_kind="Blastn",
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    #auto_materialize_policy=AutoMaterializePolicy.eager(),
     metadata={"owner": "Virginie Grosboillot"},
 )
 def create_blast_db(context, genbank_to_fasta):
@@ -247,7 +247,7 @@ def create_blast_db(context, genbank_to_fasta):
     config_schema={**sqc_folder_config, **blastn_folder_config},
     description="Perform blastn between sequence and database and return results as json",
     compute_kind="Blastn",
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    #auto_materialize_policy=AutoMaterializePolicy.eager(),
     metadata={"owner": "Virginie Grosboillot"},
 )
 def get_blastn(context, genbank_to_fasta, create_blast_db):
@@ -293,11 +293,11 @@ blastn_summary_config = {
 
 @multi_asset(
     config_schema={**file_config, **table_config, **blastn_summary_config},
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
     outs={
         "parse_blastn": AssetOut(
             is_required=True,
             description="Extract blastn information and save them into a Dataframe",
+            #auto_materialize_policy=AutoMaterializePolicy.eager(),
             io_manager_key="parquet_io_manager",
             metadata={
                 "output_folder": "table",
@@ -309,6 +309,7 @@ blastn_summary_config = {
         "history": AssetOut(
             is_required=True,
             description="keep track of processed files",
+            #auto_materialize_policy=AutoMaterializePolicy.eager(),
             io_manager_key="io_manager",
             metadata={
                 "owner": "Virginie Grosboillot",
@@ -551,7 +552,7 @@ locus_and_gene_folder_config = {
         **sqc_folder_config,
     },
     description="Create a dataframe containing the information relative to gene and save it as parquet file",
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    #auto_materialize_policy=AutoMaterializePolicy.eager(),
     io_manager_key="parquet_io_manager",
     compute_kind="Biopython",
     metadata={
@@ -685,7 +686,7 @@ gene_uniqueness_folder_config = {
         **gene_uniqueness_folder_config,
     },
     description="Create a datframe with all the query to a same genome and save result as parquet file",
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    #auto_materialize_policy=AutoMaterializePolicy.eager(),
     io_manager_key="parquet_io_manager",
     compute_kind="Pyspark",
     metadata={
