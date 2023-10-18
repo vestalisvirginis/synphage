@@ -22,6 +22,7 @@ import os
 import glob
 import re
 import shutil
+import pickle
 
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
@@ -127,32 +128,47 @@ sqc_folder_config = {
 }
 
 
-@asset(
+@multi_asset(
     config_schema={**sqc_folder_config},
-    description="""Parse genebank file and create a file containing every genes in the fasta format.
-    Note: The sequence start and stop indexes are `-1` on the fasta file 1::10  --> [0:10] included/excluded.""",
+    outs = {
+        "new_fasta_file": AssetOut(
+            is_required=True,
+            description="""Return the path for last created fasta file. Parse genebank file and create a file containing every genes in the fasta format.
+            Note: The sequence start and stop indexes are `-1` on the fasta file 1::10  --> [0:10] included/excluded.""",
+            io_manager_key="io_manager",
+            metadata={
+                "owner": "Virginie Grosboillot",
+            },
+        ),
+        "history_fasta_files": AssetOut(
+            is_required=True,
+            description="Update the list of sequences available in the fasta folder",
+            io_manager_key="io_manager",
+            metadata={
+                "owner": "Virginie Grosboillot",
+            },
+        ),
+    },
     compute_kind="Biopython",
-    io_manager_key="io_manager",
-    #auto_materialize_policy=AutoMaterializePolicy.eager(),
-    metadata={"owner": "Virginie Grosboillot"},
+    op_tags={"blaster": "short_process"},
 )
-def genbank_to_fasta(context, process_asset) -> str:
-    context.log.info(f"The following file {process_asset} is being processed")
+def genbank_to_fasta(context, standardised_ext_file): # -> str:
+    context.log.info(f"The following file {Path(standardised_ext_file).stem} is being processed")
 
     # Paths to read and store the data
-    path_in = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
-    )
+    # path_in = "/".join(
+    #     [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
+    # )
     path_out = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["fasta_dir"]]
     )
-    context.log.info(path_in)
+    # context.log.info(path_in)
     context.log.info(path_out)
 
     os.makedirs(path_out, exist_ok=True)
 
     # Genbank to fasta
-    file = f"{path_in}/{Path(process_asset).stem}.gb"
+    file = standardised_ext_file
     context.log.info(file)
     output_dir = f"{path_out}/{Path(file).stem}.fna"
     context.log.info(output_dir)
@@ -180,23 +196,32 @@ def genbank_to_fasta(context, process_asset) -> str:
 
     fasta_files = list(
         map(
-            lambda x: Path(x).stem,
+            lambda x: f"{path_out}/{x}",
             os.listdir(path_out),
         )
     )
-
+    context.log.info(fasta_files)
     time = datetime.now()
     context.add_output_metadata(
+        output_name="new_fasta_file",
         metadata={
-            "text_metadata": f"The list of genbank files has been updated {time.isoformat()} (UTC).",
-            "processed_file": process_asset,
+            "text_metadata": f"The list of fasta files has been updated {time.isoformat()} (UTC).",
+            "processed_file": Path(standardised_ext_file).stem,
+            "path": path_out,
+        }
+    )
+    context.add_output_metadata(
+        output_name="history_fasta_files",
+        metadata={
+            "text_metadata": f"The list of fasta files has been updated {time.isoformat()} (UTC).",
+            "processed_file": Path(standardised_ext_file).stem,
             "path": path_out,
             "num_files": len(fasta_files),
             "preview": fasta_files,
         }
     )
 
-    return output_dir
+    return output_dir, fasta_files
 
 
 blastn_folder_config = {
@@ -218,9 +243,10 @@ blastn_folder_config = {
     description="Receive a fasta file as input and create a database for blast in the output directory",
     compute_kind="Blastn",
     #auto_materialize_policy=AutoMaterializePolicy.eager(),
+    op_tags={"blaster": "compute_intense"},
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_blast_db(context, genbank_to_fasta):
+def create_blast_db(context, new_fasta_file):
     path = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["blast_db_dir"]]
     )
@@ -228,10 +254,10 @@ def create_blast_db(context, genbank_to_fasta):
     os.makedirs(path, exist_ok=True)
     # db = []
     # for input in genbank_to_fasta:
-    output_dir = f"{path}/{Path(genbank_to_fasta).stem}"
+    output_dir = f"{path}/{Path(new_fasta_file).stem}"
     context.log.info(output_dir)
     os.system(
-        f"makeblastdb -in {genbank_to_fasta} -input_type fasta -dbtype nucl -out {output_dir}"
+        f"makeblastdb -in {new_fasta_file} -input_type fasta -dbtype nucl -out {output_dir}"
     )
     context.log.info("finished process")
     # db.append(output_dir)
@@ -239,6 +265,15 @@ def create_blast_db(context, genbank_to_fasta):
     db = set(map(lambda x: f"{path}/{Path(x).stem}", os.listdir(path)))
 
     context.log.info(f"list of db: {set([Path(p).stem for p in db])}")
+
+    time = datetime.now()
+    context.add_output_metadata(
+        metadata={
+            "text_metadata": f"The list of dbs has been updated {time.isoformat()} (UTC).",
+            "processed_file": Path(new_fasta_file).stem,
+            "path": path,
+        }
+    )
 
     return db
 
@@ -248,30 +283,45 @@ def create_blast_db(context, genbank_to_fasta):
     description="Perform blastn between sequence and database and return results as json",
     compute_kind="Blastn",
     #auto_materialize_policy=AutoMaterializePolicy.eager(),
+    op_tags={"blaster": "compute_intense"},
     metadata={"owner": "Virginie Grosboillot"},
 )
-def get_blastn(context, genbank_to_fasta, create_blast_db):
+def get_blastn(context, history_fasta_files, create_blast_db):
     path = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["blastn_dir"]]
     )
     context.log.info(path)
     os.makedirs(path, exist_ok=True)
 
+    fasta_files = pickle.load(open('data_folder/experimenting/fs/history_fasta_files', 'rb'))
     blastn_files = []
-    # for query in genbank_to_fasta:
-    context.log.info(f"Query {genbank_to_fasta}")
-    for database in create_blast_db:
-        context.log.info(f"Database {database}")
-        output_dir = f"{path}/{Path(genbank_to_fasta).stem}_vs_{Path(database).stem}"
-        context.log.info(f"Output directory {output_dir}")
-        os.system(
-            f"blastn -query {genbank_to_fasta} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
-        )
-        blastn_files.append(output_dir)
-        context.log.info(f"{Path(output_dir)} processed successfully")
+    for query in fasta_files:
+        context.log.info(f"Query {query}")
+        for database in create_blast_db:
+            context.log.info(f"Database {database}")
+            output_dir = f"{path}/{Path(query).stem}_vs_{Path(database).stem}"
+            context.log.info(f"Output directory {output_dir}")
+            # if os.path.exists(output_dir):
+            #     context.log.info("already")
+            os.system(
+                f"blastn -query {query} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
+            )
+            blastn_files.append(output_dir)
+            context.log.info(f"{Path(output_dir)} processed successfully")
 
-        full_list = set(map(lambda x: f"{path}/{Path(x).stem}", os.listdir(path)))
-    return full_list
+    
+    full_list = [Path(x).stem for x in blastn_files]
+
+    time = datetime.now()
+    context.add_output_metadata(
+        metadata={
+            "text_metadata": f"The list of blasted sequneces has been updated {time.isoformat()} (UTC).",
+            "processed_files": full_list,
+            "path": path,
+        }
+    )
+
+    return blastn_files
 
 
 table_config = {
@@ -329,13 +379,20 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
             "history",
         ]
     )
+
     if os.path.exists(history_path):
         context.log.info("path exist")
         history = pickle.load(open(history_path, "rb"))
+        context.log.info(f"History: {history}")
     else:
+        context.log.info("path does not exist")
         history = []
+        
+        
+    context.log.info(f"History: {history}")
 
     files_to_process = list(set(full_list).difference(history))
+    context.log.info(f"History: {files_to_process}")
 
     # path = "/".join(
     #     [
@@ -347,190 +404,249 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
     # Instantiate the SparkSession
     spark = SparkSession.builder.getOrCreate()
 
+
     # Parse the json file to return a DataFrame
     # for json_file in get_blastn:
-    json_file = files_to_process[0]
-    context.log.info(f"File in process: {json_file}")
-    df = (
-        spark.read.option("multiline", "true")
-        .json(json_file)
-        .select(F.explode("BlastOutput2.report.results.search").alias("search"))
-    )
-
-    keys_list = ["query_id", "query_title", "query_len", "message", "hits"]
-    keys_no_message = ["query_id", "query_title", "query_len", "hits"]
-    hits_list = ["num", "description", "len", "hsps"]
-    description_item = "title"
-    hsps_list = [
-        "num",
-        "evalue",
-        "identity",
-        "query_from",
-        "query_to",
-        "query_strand",
-        "hit_from",
-        "hit_to",
-        "hit_strand",
-        "align_len",
-        "gaps",
-    ]
-
-    try:
+    if files_to_process:
+        json_file = files_to_process[0]
+        context.log.info(f"File in process: {json_file}")
+        context.log.info(f"history: {history}")
+        context.log.info(f"type history: {type(history)}")
+        history.append(json_file)
+        context.log.info(f"Updated history: {history}")
         df = (
-            reduce(
-                lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
-                [i for i in hsps_list],
-                reduce(
-                    lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
-                    [i for i in hits_list],
-                    reduce(
-                        lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
-                        [i for i in keys_list],
-                        df,
-                    ).filter(F.col("message").isNull()),
-                )
-                .withColumn("source", F.col("description").getItem(description_item)[0])
-                .withColumnRenamed("num", "number_of_hits"),
-            )
-            .drop("search", "hits", "description", "hsps")
-            .withColumns(
-                {
-                    "query_genome_name": F.regexp_extract("query_title", r"^\w+", 0),
-                    "query_genome_id": F.regexp_extract("query_title", r"\w+\.\d", 0),
-                    "query_gene": F.regexp_extract("query_title", r"\| (\w+) \|", 1),
-                    "query_locus_tag": F.regexp_extract(
-                        "query_title", r" (\w+) \| \[", 1
-                    ),
-                    "query_start_end": F.regexp_extract(
-                        "query_title", r"(\[\d+\:\d+\])", 0
-                    ),
-                    "query_gene_strand": F.regexp_extract(
-                        "query_title", r"(\((\+|\-)\))", 0
-                    ),
-                }
-            )
-            .withColumns(
-                {
-                    "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
-                    "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
-                    "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
-                    "source_locus_tag": F.regexp_extract("source", r" (\w+) \| \[", 1),
-                    "source_start_end": F.regexp_extract(
-                        "source", r"(\[\d+\:\d+\])", 0
-                    ),
-                    "source_gene_strand": F.regexp_extract(
-                        "source", r"(\((\+|\-)\))", 0
-                    ),
-                }
-            )
-            .withColumn(
-                "percentage_of_identity",
-                F.round(F.col("identity") / F.col("align_len") * 100, 3),
-            )
+            spark.read.option("multiline", "true")
+            .json(json_file)
+            .select(F.explode("BlastOutput2.report.results.search").alias("search"))
         )
-        # .coalesce(1).write.mode("append").parquet(path)
-        context.log.info(f"File processed: {json_file}")
-        # context.add_output_metadata(
-        #     metadata={
-        #         "text_metadata": "The blastn_summary parquet file has been updated",
-        #         "processed_file": json_file,
-        #         "path": "/".join(
-        #             [
-        #                 os.getenv(EnvVar("PHAGY_DIRECTORY")),
-        #                 context.op_config["output_folder"],
-        #                 context.op_config["name"],
-        #             ]
-        #         ),
-        #     #         "path2": os.path.abspath(__file__),
-        #     #         # "path": path,
-        #         "num_records": df.count(),  # Metadata can be any key-value pair
-        #         "preview": MetadataValue.md(df.toPandas().head().to_markdown()),
-        #     #         # The `MetadataValue` class has useful static methods to build Metadata
-        #         }
-        #     )
-        return df, history.append(json_file)
 
-    except:
-        df = (
-            reduce(
-                lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
-                [i for i in hsps_list],
+        keys_list = ["query_id", "query_title", "query_len", "message", "hits"]
+        keys_no_message = ["query_id", "query_title", "query_len", "hits"]
+        hits_list = ["num", "description", "len", "hsps"]
+        description_item = "title"
+        hsps_list = [
+            "num",
+            "evalue",
+            "identity",
+            "query_from",
+            "query_to",
+            "query_strand",
+            "hit_from",
+            "hit_to",
+            "hit_strand",
+            "align_len",
+            "gaps",
+        ]
+
+        try:
+            df = (
                 reduce(
-                    lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
-                    [i for i in hits_list],
+                    lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
+                    [i for i in hsps_list],
                     reduce(
-                        lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
-                        [i for i in keys_no_message],
-                        df,
-                    ),
+                        lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
+                        [i for i in hits_list],
+                        reduce(
+                            lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
+                            [i for i in keys_list],
+                            df,
+                        ).filter(F.col("message").isNull()),
+                    )
+                    .withColumn("source", F.col("description").getItem(description_item)[0])
+                    .withColumnRenamed("num", "number_of_hits"),
                 )
-                .withColumn("source", F.col("description").getItem(description_item)[0])
-                .withColumnRenamed("num", "number_of_hits"),
+                .drop("search", "hits", "description", "hsps")
+                .withColumns(
+                    {
+                        "query_genome_name": F.regexp_extract("query_title", r"^\w+", 0),
+                        "query_genome_id": F.regexp_extract("query_title", r"\w+\.\d", 0),
+                        "query_gene": F.regexp_extract("query_title", r"\| (\w+) \|", 1),
+                        "query_locus_tag": F.regexp_extract(
+                            "query_title", r" (\w+) \| \[", 1
+                        ),
+                        "query_start_end": F.regexp_extract(
+                            "query_title", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "query_gene_strand": F.regexp_extract(
+                            "query_title", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumns(
+                    {
+                        "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
+                        "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
+                        "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
+                        "source_locus_tag": F.regexp_extract("source", r" (\w+) \| \[", 1),
+                        "source_start_end": F.regexp_extract(
+                            "source", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "source_gene_strand": F.regexp_extract(
+                            "source", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumn(
+                    "percentage_of_identity",
+                    F.round(F.col("identity") / F.col("align_len") * 100, 3),
+                )
             )
-            .drop("search", "hits", "description", "hsps")
-            .withColumns(
-                {
-                    "query_genome_name": F.regexp_extract("query_title", r"^\w+", 0),
-                    "query_genome_id": F.regexp_extract("query_title", r"\w+\.\d", 0),
-                    "query_gene": F.regexp_extract("query_title", r"\| (\w+) \|", 1),
-                    "query_locus_tag": F.regexp_extract(
-                        "query_title", r" (\w+) \| \[", 1
+            # .coalesce(1).write.mode("append").parquet(path)
+            context.log.info(f"File processed: {json_file}")
+            # context.add_output_metadata(
+            #     metadata={
+            #         "text_metadata": "The blastn_summary parquet file has been updated",
+            #         "processed_file": json_file,
+            #         "path": "/".join(
+            #             [
+            #                 os.getenv(EnvVar("PHAGY_DIRECTORY")),
+            #                 context.op_config["output_folder"],
+            #                 context.op_config["name"],
+            #             ]
+            #         ),
+            #     #         "path2": os.path.abspath(__file__),
+            #     #         # "path": path,
+            #         "num_records": df.count(),  # Metadata can be any key-value pair
+            #         "preview": MetadataValue.md(df.toPandas().head().to_markdown()),
+            #     #         # The `MetadataValue` class has useful static methods to build Metadata
+            #         }
+            #     )
+            time = datetime.now()
+            context.add_output_metadata(
+                output_name="parse_blastn",
+                metadata={
+                    "text_metadata": f"The blastn_summary parquet file has been updated {time.isoformat()} (UTC).",
+                    "processed_file": Path(json_file).stem,
+                    "path": "/".join(
+                        [
+                            os.getenv(EnvVar("PHAGY_DIRECTORY")),
+                            context.op_config["output_folder"],
+                            context.op_config["name"],
+                        ]
                     ),
-                    "query_start_end": F.regexp_extract(
-                        "query_title", r"(\[\d+\:\d+\])", 0
-                    ),
-                    "query_gene_strand": F.regexp_extract(
-                        "query_title", r"(\((\+|\-)\))", 0
-                    ),
+                    "num_records": df.count(),
+                    "preview": MetadataValue.md(df.toPandas().head().to_markdown()),
                 }
             )
-            .withColumns(
-                {
-                    "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
-                    "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
-                    "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
-                    "source_locus_tag": F.regexp_extract("source", r" (\w+) \| \[", 1),
-                    "source_start_end": F.regexp_extract(
-                        "source", r"(\[\d+\:\d+\])", 0
-                    ),
-                    "source_gene_strand": F.regexp_extract(
-                        "source", r"(\((\+|\-)\))", 0
-                    ),
+            context.add_output_metadata(
+                output_name="history",
+                metadata={
+                    "text_metadata": f"A new json file has been processed {time.isoformat()} (UTC).",
+                    "processed_file": Path(json_file).stem,
+                    "path": history_path,
+                    "num_files": len(history),
+                    "preview": history,
                 }
             )
-            .withColumn(
-                "percentage_of_identity",
-                F.round(F.col("identity") / F.col("align_len") * 100, 3),
+            return df, history
+
+        except:
+            df = (
+                reduce(
+                    lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
+                    [i for i in hsps_list],
+                    reduce(
+                        lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
+                        [i for i in hits_list],
+                        reduce(
+                            lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
+                            [i for i in keys_no_message],
+                            df,
+                        ),
+                    )
+                    .withColumn("source", F.col("description").getItem(description_item)[0])
+                    .withColumnRenamed("num", "number_of_hits"),
+                )
+                .drop("search", "hits", "description", "hsps")
+                .withColumns(
+                    {
+                        "query_genome_name": F.regexp_extract("query_title", r"^\w+", 0),
+                        "query_genome_id": F.regexp_extract("query_title", r"\w+\.\d", 0),
+                        "query_gene": F.regexp_extract("query_title", r"\| (\w+) \|", 1),
+                        "query_locus_tag": F.regexp_extract(
+                            "query_title", r" (\w+) \| \[", 1
+                        ),
+                        "query_start_end": F.regexp_extract(
+                            "query_title", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "query_gene_strand": F.regexp_extract(
+                            "query_title", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumns(
+                    {
+                        "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
+                        "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
+                        "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
+                        "source_locus_tag": F.regexp_extract("source", r" (\w+) \| \[", 1),
+                        "source_start_end": F.regexp_extract(
+                            "source", r"(\[\d+\:\d+\])", 0
+                        ),
+                        "source_gene_strand": F.regexp_extract(
+                            "source", r"(\((\+|\-)\))", 0
+                        ),
+                    }
+                )
+                .withColumn(
+                    "percentage_of_identity",
+                    F.round(F.col("identity") / F.col("align_len") * 100, 3),
+                )
             )
-        )
-        # .coalesce(1).write.mode("append").parquet(path)
-        context.log.info(f"File processed: {json_file}")
+            # .coalesce(1).write.mode("append").parquet(path)
+            context.log.info(f"File processed: {json_file}")
 
-        # context.add_output_metadata(
-        #     metadata={
-        #         "text_metadata": "The blastn_summary parquet file has been updated",
-        #         "processed_file": json_file,
-        #         "path": "/".join(
-        #             [
-        #                 os.getenv(EnvVar("PHAGY_DIRECTORY")),
-        #                 context.op_config["output_folder"],
-        #                 context.op_config["name"],
-        #             ]
-        #         ),
-        #     #         "path2": os.path.abspath(__file__),
-        #     #         # "path": path,
-        #         "num_records": df.count(),  # Metadata can be any key-value pair
-        #         "preview": MetadataValue.md(df.toPandas().head().to_markdown()),
-        #     #         # The `MetadataValue` class has useful static methods to build Metadata
-        #         }
-        #     )
+            # context.add_output_metadata(
+            #     metadata={
+            #         "text_metadata": "The blastn_summary parquet file has been updated",
+            #         "processed_file": json_file,
+            #         "path": "/".join(
+            #             [
+            #                 os.getenv(EnvVar("PHAGY_DIRECTORY")),
+            #                 context.op_config["output_folder"],
+            #                 context.op_config["name"],
+            #             ]
+            #         ),
+            #     #         "path2": os.path.abspath(__file__),
+            #     #         # "path": path,
+            #         "num_records": df.count(),  # Metadata can be any key-value pair
+            #         "preview": MetadataValue.md(df.toPandas().head().to_markdown()),
+            #     #         # The `MetadataValue` class has useful static methods to build Metadata
+            #         }
+            #     )
+            time = datetime.now()
+            context.add_output_metadata(
+                output_name="parse_blastn",
+                metadata={
+                    "text_metadata": f"The blastn_summary parquet file has been updated {time.isoformat()} (UTC).",
+                    "processed_file": Path(json_file).stem,
+                    "path": "/".join(
+                        [
+                            os.getenv(EnvVar("PHAGY_DIRECTORY")),
+                            context.op_config["output_folder"],
+                            context.op_config["name"],
+                        ]
+                    ),
+                    "num_records": df.count(),
+                    "preview": MetadataValue.md(df.toPandas().head().to_markdown()),
+                }
+            )
+            context.add_output_metadata(
+                output_name="history",
+                metadata={
+                    "text_metadata": f"A new json file has been processed {time.isoformat()} (UTC).",
+                    "processed_file": Path(json_file).stem,
+                    "path": history_path,
+                    "num_files": len(history),
+                    "preview": history,
+                }
+            )
+            return df, history
 
-        return df, history.append(json_file)
 
-
-# @asset
-# def processed_blastn_history(context, history):
-#     return history
+    # @asset
+    # def processed_blastn_history(context, history):
+    #     return history
 
 
 locus_and_gene_folder_config = {
@@ -562,7 +678,7 @@ locus_and_gene_folder_config = {
         "owner": "Virginie Grosboillot",
     },
 )
-def extract_locus_tag_gene(context, process_asset):
+def extract_locus_tag_gene(context, standardised_ext_file):
     """Create a dataframe containing the information relative to gene and save it as parquet file"""
 
     def _assess_file_content(genome) -> bool:
@@ -596,7 +712,7 @@ def extract_locus_tag_gene(context, process_asset):
 
     # for file in glob.glob(f"{path}/*.gb"):
     # for acc in list_genbank_files:
-    file = f"{path}/{Path(process_asset).stem}.gb"
+    file = standardised_ext_file
 
     gene_list = []
     locus_tag_list = []

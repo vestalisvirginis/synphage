@@ -1,10 +1,13 @@
 from dagster import (
     asset,
+    multi_asset,
     op,
     graph_asset,
     Config,
     Field,
     EnvVar,
+    AssetOut,
+    RetryPolicy,
 )
 
 import os
@@ -29,7 +32,12 @@ class FileConfig(Config):
     filename: str
 
 
-@op
+@op(
+    retry_policy=RetryPolicy(
+        max_retries=3,
+        delay=0.2,  # 200ms
+    )
+)
 def process_file(context, config: FileConfig):
     """Print file name on console"""
     context.log.info(config.filename)
@@ -60,23 +68,38 @@ sqc_folder_config = {
 }
 
 
-@asset(
+@multi_asset(
     config_schema={**sqc_folder_config},
-    description="""Update the list of sequences available in the genbank folder""",
+    outs = {
+        "standardised_ext_file": AssetOut(
+            is_required=True,
+            description="Return the newly processed file relative path with standardised extention",
+            io_manager_key="io_manager",
+            metadata={
+                "owner": "Virginie Grosboillot",
+            },
+        ),
+        "list_genbank_files": AssetOut(
+            is_required=True,
+            description="Update the list of sequences available in the genbank folder",
+            io_manager_key="io_manager",
+            metadata={
+                "owner": "Virginie Grosboillot",
+            },
+        ),
+    },
     compute_kind="Python",
-    io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
 )
-def list_genbank_files(context, process_asset) -> List[str]:
+def list_genbank_files(context, process_asset): #-> List[str]:
     context.log.info(f"The following file {process_asset} is being processed")
 
-    # filepath = "/".join(
-    #     [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
-    # )
+    filepath = "/".join(
+        [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
+    )
 
     # Standarise file extension
-    # new_path = _standardise_file_extention(filepath)
-    new_path = _standardise_file_extention(process_asset)
+    new_path = _standardise_file_extention(filepath)
+    # new_path = _standardise_file_extention(process_asset)
     new_file = new_path.stem
 
     # Load already processed files
@@ -99,8 +122,18 @@ def list_genbank_files(context, process_asset) -> List[str]:
     # Update file list
     files.append(new_file)
 
+    # Asset metadata
     time = datetime.now()
     context.add_output_metadata(
+        output_name="standardised_ext_file",
+        metadata={
+            "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
+            "processed_file": new_file,
+            "path": path,
+        }
+    )
+    context.add_output_metadata(
+        output_name="list_genbank_files",
         metadata={
             "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
             "processed_file": new_file,
@@ -109,4 +142,4 @@ def list_genbank_files(context, process_asset) -> List[str]:
             "updated_list": files,
         }
     )
-    return files
+    return new_path, files
