@@ -279,39 +279,46 @@ def create_blast_db(context, new_fasta_file):
 
 
 @asset(
-    config_schema={**sqc_folder_config, **blastn_folder_config},
+    config_schema={**blastn_folder_config},
     description="Perform blastn between sequence and database and return results as json",
     compute_kind="Blastn",
-    #auto_materialize_policy=AutoMaterializePolicy.eager(),
     op_tags={"blaster": "compute_intense"},
     metadata={"owner": "Virginie Grosboillot"},
 )
 def get_blastn(context, history_fasta_files, create_blast_db):
+
+    # Blastn json file directory - create directory if not yet existing
     path = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["blastn_dir"]]
     )
-    context.log.info(path)
     os.makedirs(path, exist_ok=True)
 
-    fasta_files = pickle.load(open('data_folder/experimenting/fs/history_fasta_files', 'rb'))
-    blastn_files = []
+    # History
+    history_path = "/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), 'get_blastn'])
+    if os.path.exists(history_path):
+        context.log.info("path exist")
+        blastn_history = pickle.load(open(history_path, "rb"))
+    else:
+        context.log.info("path do not exist")
+        blastn_history = []
+    context.log.info(blastn_history)
+
+    # Blast each query against every databases
+    fasta_files = history_fasta_files
+
     for query in fasta_files:
-        context.log.info(f"Query {query}")
         for database in create_blast_db:
-            context.log.info(f"Database {database}")
             output_dir = f"{path}/{Path(query).stem}_vs_{Path(database).stem}"
-            context.log.info(f"Output directory {output_dir}")
-            # if os.path.exists(output_dir):
-            #     context.log.info("already")
-            os.system(
-                f"blastn -query {query} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
-            )
-            blastn_files.append(output_dir)
-            context.log.info(f"{Path(output_dir)} processed successfully")
-
+            if output_dir not in blastn_history:
+                os.system(
+                    f"blastn -query {query} -db {database} -evalue 1e-3 -dust no -out {output_dir} -outfmt 15"
+                )
+                blastn_history .append(output_dir)
+                context.log.info(f"{Path(output_dir)} processed successfully")
     
-    full_list = [Path(x).stem for x in blastn_files]
+    full_list = [Path(x).stem for x in blastn_history]
 
+    # Asset metadata
     time = datetime.now()
     context.add_output_metadata(
         metadata={
@@ -321,7 +328,7 @@ def get_blastn(context, history_fasta_files, create_blast_db):
         }
     )
 
-    return blastn_files
+    return blastn_history
 
 
 table_config = {
