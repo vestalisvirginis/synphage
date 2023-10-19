@@ -10,7 +10,7 @@ class LocalParquetIOManager(ConfigurableIOManager):
         return "/".join(
             [
                 context.resource_config["base_dir"],
-                context.metadata["output_folder"],
+                context.metadata["tables"],
                 context.metadata["name"],
             ]
         )

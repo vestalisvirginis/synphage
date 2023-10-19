@@ -1,5 +1,4 @@
 from dagster import (
-    asset,
     multi_asset,
     op,
     graph_asset,
@@ -12,11 +11,8 @@ from dagster import (
 
 import os
 import pickle
-import json
 from pathlib import Path
 from datetime import datetime
-from typing import List
-from Bio import SeqIO
 
 
 def _standardise_file_extention(file) -> None:
@@ -70,7 +66,7 @@ sqc_folder_config = {
 
 @multi_asset(
     config_schema={**sqc_folder_config},
-    outs = {
+    outs={
         "standardised_ext_file": AssetOut(
             is_required=True,
             description="Return the newly processed file relative path with standardised extention",
@@ -90,7 +86,7 @@ sqc_folder_config = {
     },
     compute_kind="Python",
 )
-def list_genbank_files(context, process_asset): #-> List[str]:
+def list_genbank_files(context, process_asset):  # -> List[str]:
     context.log.info(f"The following file {process_asset} is being processed")
 
     filepath = "/".join(
@@ -130,7 +126,7 @@ def list_genbank_files(context, process_asset): #-> List[str]:
             "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
             "processed_file": new_file,
             "path": path,
-        }
+        },
     )
     context.add_output_metadata(
         output_name="list_genbank_files",
@@ -140,6 +136,6 @@ def list_genbank_files(context, process_asset): #-> List[str]:
             "path": path,
             "num_files": len(files),
             "updated_list": files,
-        }
+        },
     )
     return new_path, files
