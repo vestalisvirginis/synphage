@@ -1,20 +1,31 @@
 from dagster import AssetSelection, define_asset_job, ScheduleDefinition
 
-from .sensors import genbank_file_update_sensor
+# from .sensors import genbank_file_update_sensor
 
-
-asset_job_sensor = genbank_file_update_sensor(
-    define_asset_job(
-        name="load_job",
-        selection=AssetSelection.groups("Status")
-        | (
-            AssetSelection.groups("Blaster")
-            & AssetSelection.keys("process_asset").downstream()
+blasting_job = define_asset_job(
+    name="blasting_job",
+    selection=AssetSelection.groups("Status")
+    | (
+        AssetSelection.groups("Blaster")
+        & AssetSelection.keys("new_fasta_files").required_multi_asset_neighbors().downstream()
         )
-        | AssetSelection.keys("extract_locus_tag_gene"),
-        tags={"dagster/priority": "0"},
-    )
 )
+
+
+
+
+# asset_job_sensor = genbank_file_update_sensor(
+#     define_asset_job(
+#         name="load_job",
+#         selection=AssetSelection.groups("Status")
+#         | (
+#             AssetSelection.groups("Blaster")
+#             & AssetSelection.keys("process_asset").downstream()
+#         )
+#         | AssetSelection.keys("extract_locus_tag_gene"),
+#         tags={"dagster/priority": "0"},
+#     )
+# )
 
 
 # Job triggering the json files parsing

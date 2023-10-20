@@ -7,7 +7,9 @@ from .assets import (
     status_assets,
     tables_assets,
 )
-from .jobs import asset_job_sensor, parsing_schedule, uniq_schedule
+# from .jobs import asset_job_sensor, parsing_schedule, uniq_schedule
+from .jobs import blasting_job
+
 from .resources import RESOURCES_LOCAL
 
 
@@ -24,12 +26,12 @@ resources_by_deployment_name = {
     "local": RESOURCES_LOCAL,
 }
 
-all_schedules = [parsing_schedule, uniq_schedule]
+# all_schedules = [parsing_schedule, uniq_schedule]
 
 defs = Definitions(
     assets=all_assets,
     resources=resources_by_deployment_name["local"],
-    sensors=[asset_job_sensor],
-    # jobs=[tables_job],
-    schedules=all_schedules,
+    # sensors=[asset_job_sensor],
+    jobs=[blasting_job],
+    # schedules=all_schedules,
 )
