@@ -1,16 +1,13 @@
 from dagster import (
     multi_asset,
-    op,
-    graph_asset,
-    Config,
     Field,
     EnvVar,
     AssetOut,
-    RetryPolicy,
 )
 
 import os
 import pickle
+import glob
 from pathlib import Path
 from datetime import datetime
 
@@ -22,6 +19,7 @@ def _standardise_file_extention(file) -> None:
         return path.rename(path.with_suffix(".gb"))
     else:
         return path
+
 
 # ______ Used for the sensor
 
@@ -45,7 +43,7 @@ def _standardise_file_extention(file) -> None:
 # def process_asset():
 #     return process_file()
 
-#______________
+# ______________
 
 
 sqc_folder_config = {
@@ -90,13 +88,8 @@ sqc_folder_config = {
     compute_kind="Python",
 )
 def list_genbank_files(context):  # -, process_asset - > List[str]:
-
     # List files in the genbank directory
-    gb_path = "/".join(
-        [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]]
-    )
-
-    
+    gb_path = "/".join([os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]])
 
     # filepath = "/".join(
     #     [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
@@ -119,24 +112,21 @@ def list_genbank_files(context):  # -, process_asset - > List[str]:
         files = []
     context.log.info(files)
 
-
     new_files = []
     new_paths = []
-    for file in os.listdir(gb_path):
+    for file in glob.glob(f'{gb_path}/*.gb*'):  #os.listdir(gb_path):
         if Path(file).stem not in files:
             context.log.info(f"The following file {file} is being processed")
-            filepath = "/".join([gb_path, file])
+            #filepath = "/".join([gb_path, file])
             # Standarise file extension
-            new_path = _standardise_file_extention(filepath)
+            new_path = _standardise_file_extention(file)
             # new_path = _standardise_file_extention(process_asset)
             new_paths.append(new_path)
             new_files.append(new_path.stem)
 
-
     # Update file list
     for new_file in new_files:
         files.append(new_file)
-
 
     # Asset metadata
     time = datetime.now()

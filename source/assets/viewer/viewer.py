@@ -61,15 +61,13 @@ def _assess_file_content(genome) -> bool:  # Duplicated function
     return gene_value
 
 
-
 def _get_sqc_identity_from_csv(file_path):
-
     spark = SparkSession.builder.getOrCreate()
 
-    df = spark.read.csv(file_path).select('_c0', F.col('_c1').cast("int"))
+    df = spark.read.csv(file_path).select("_c0", F.col("_c1").cast("int"))
 
     sqc_dict = {}
-    [sqc_dict.update({x:y}) for x,y in df.toLocalIterator()]
+    [sqc_dict.update({x: y}) for x, y in df.toLocalIterator()]
 
     return sqc_dict
 
@@ -85,19 +83,20 @@ class CheckOrientation(enum.Enum):
     metadata={"owner": "Virginie Grosboillot"},
 )
 def create_genome(context):
-
-    context.log.info('get path')
+    context.log.info("get path")
     context.log.info(os.getenv(EnvVar("PHAGY_DIRECTORY")))
     context.log.info(os.getenv(EnvVar("SEQUENCE_FILE")))
-    path = '/'.join([os.getenv(EnvVar("PHAGY_DIRECTORY")), os.getenv(EnvVar("SEQUENCE_FILE"))])
+    path = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), os.getenv(EnvVar("SEQUENCE_FILE"))]
+    )
     context.log.info(path)
 
     if os.path.exists(path):
         sequences = _get_sqc_identity_from_csv(path)
     else:
-        'The file format is not recognised'
+        "The file format is not recognised"
 
-    for k,v in sequences.items():
+    for k, v in sequences.items():
         # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
         if isinstance(v, int):
             sequences[k] = CheckOrientation(v).name
@@ -114,7 +113,7 @@ def create_genome(context):
     )
     return sequences
 
-    
+
 # @dataclass
 # class Genome:
 #     path: str
@@ -179,9 +178,6 @@ def create_genome(context):
 # }
 
 
-
-
-
 def _read_seq(path: str, orientation: str) -> SeqRecord.SeqRecord:
     """Read sequence according to genome orientation"""
     if orientation == CheckOrientation.SEQUENCE.name:
@@ -207,7 +203,7 @@ def _get_feature(
 
 # class Genome(Config):
 #     genomes: Dict[str, CheckOrientation]
-    # genomes: Dict[str = Field(description= "Path to the genome"), CheckOrientation = Field(description= "For displaying the sequence in the rigth orientation")]
+# genomes: Dict[str = Field(description= "Path to the genome"), CheckOrientation = Field(description= "For displaying the sequence in the rigth orientation")]
 
 
 #     # @property
@@ -245,9 +241,7 @@ class Diagram(Config):
     graph_start: int = 0
     graph_end: Optional[int] = None
     output_folder: str = "synteny"
-    blastn_dir: str = (
-        "blastn_summary"
-    )
+    blastn_dir: str = "blastn_summary"
     uniq_dir: str = "gene_uniqueness"
 
 
@@ -281,25 +275,29 @@ gene_uniqueness_folder_config = {
     ),
 }
 
+
 @asset(
-    #config_schema={**gene_uniqueness_folder_config},
+    # config_schema={**gene_uniqueness_folder_config},
     description="Transform a list of genomes into a genome diagram",
     compute_kind="Biopython",
     metadata={
-                "tables": "table",
-                "name": "blastn_summary",
-                "name2": "gene_uniqueness",
-                "parquet_managment": "append",
-                "owner": "Virginie Grosboillot",
-            },
+        "tables": "table",
+        "name": "blastn_summary",
+        "name2": "gene_uniqueness",
+        "parquet_managment": "append",
+        "owner": "Virginie Grosboillot",
+    },
 )
 def create_graph(
     context, create_genome, extract_locus_tag_gene, parse_blastn, config: Diagram
 ):  # parse_blastn
-
-    output_folder= "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
-    blastn_dir= "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "blastn_summary"])
-    uniq_dir= "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "gene_uniqueness"])
+    output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
+    blastn_dir = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "blastn_summary"]
+    )
+    uniq_dir = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "gene_uniqueness"]
+    )
     colour_dir = "/".join([output_folder, "colour_table"])
 
     # Initiate SparkSession
@@ -314,9 +312,8 @@ def create_graph(
     for k, v in create_genome.items():
         record = _read_seq(k, v)
         context.log.info(f"Orientation: {record}")
-        #context.log.info(f"Orientation: {orientation}")
+        # context.log.info(f"Orientation: {orientation}")
         records[record.name] = record
-    
 
     record_names = [rec for rec in records.keys()]
     comparison_tuples = [
@@ -359,7 +356,7 @@ def create_graph(
         assert record_name not in feature_sets
         feature_sets[record_name] = gd_track_for_features.new_set()
         seq_order[record_name] = i
-    
+
     context.log.info("Seq order has been determined")
 
     # We add dummy features to the tracks for each cross-link BEFORE we add the
@@ -407,7 +404,7 @@ def create_graph(
     context.log.info("Cross-links have been appended")
 
     gene_color_palette = gene_uniqueness(spark, record_names, uniq_dir)
-    gene_color_palette.write.mode('overwrite').parquet(colour_dir)
+    gene_color_palette.write.mode("overwrite").parquet(colour_dir)
 
     context.log.info("Colour palette has been determined")
 
@@ -566,7 +563,10 @@ def create_graph(
 
     path_output = f"{output_folder}/{name}.{fmt}"
     # return gd_diagram.write(f"{config.output_folder}/{name}.{fmt}", config.output_format)
-    return gd_diagram.write(path_output, config.output_format)
+    gd_diagram.write('demo_diagram.svg', config.output_format)
+    #return gd_diagram.write(path_output, config.output_format)
+
+    return 'Done'
 
 
 #         self,

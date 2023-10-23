@@ -7,8 +7,9 @@ from .assets import (
     status_assets,
     tables_assets,
 )
+
 # from .jobs import asset_job_sensor, parsing_schedule, uniq_schedule
-from .jobs import blasting_job
+from .jobs import blasting_job, transform
 
 from .resources import RESOURCES_LOCAL
 
@@ -32,6 +33,6 @@ defs = Definitions(
     assets=all_assets,
     resources=resources_by_deployment_name["local"],
     # sensors=[asset_job_sensor],
-    jobs=[blasting_job],
+    jobs=[blasting_job, transform],
     # schedules=all_schedules,
 )

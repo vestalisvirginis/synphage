@@ -1,7 +1,4 @@
 from dagster import (
-    op,
-    Out,
-    Config,
     asset,
     Field,
     multi_asset,
@@ -108,13 +105,12 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
     # Parse the json file to return a DataFrame
     # for json_file in get_blastn:
     if files_to_process:
-        #json_file = files_to_process[0]
+        # json_file = files_to_process[0]
         new_files = []
         # context.log.info(f"history: {history}")
         # context.log.info(f"type history: {type(history)}")
-        
-        for json_file in files_to_process:
 
+        for json_file in files_to_process:
             context.log.info(f"File in process: {json_file}")
 
             context.log.info(f"Updated history: {history}")
@@ -145,67 +141,83 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
 
             try:
                 df = (
-                    reduce(
-                        lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
-                        [i for i in hsps_list],
+                    (
                         reduce(
-                            lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
-                            [i for i in hits_list],
+                            lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
+                            [i for i in hsps_list],
                             reduce(
-                                lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
-                                [i for i in keys_list],
-                                df,
-                            ).filter(F.col("message").isNull()),
+                                lambda df, i: df.withColumn(
+                                    i, F.col("hits").getItem(i)[0]
+                                ),
+                                [i for i in hits_list],
+                                reduce(
+                                    lambda df, i: df.withColumn(
+                                        i, F.col("search").getItem(i)
+                                    ),
+                                    [i for i in keys_list],
+                                    df,
+                                ).filter(F.col("message").isNull()),
+                            )
+                            .withColumn(
+                                "source",
+                                F.col("description").getItem(description_item)[0],
+                            )
+                            .withColumnRenamed("num", "number_of_hits"),
+                        )
+                        .drop("search", "hits", "description", "hsps")
+                        .withColumns(
+                            {
+                                "query_genome_name": F.regexp_extract(
+                                    "query_title", r"^\w+", 0
+                                ),
+                                "query_genome_id": F.regexp_extract(
+                                    "query_title", r"\w+\.\d", 0
+                                ),
+                                "query_gene": F.regexp_extract(
+                                    "query_title", r"\| (\w+) \|", 1
+                                ),
+                                "query_locus_tag": F.regexp_extract(
+                                    "query_title", r" (\w+) \| \[", 1
+                                ),
+                                "query_start_end": F.regexp_extract(
+                                    "query_title", r"(\[\d+\:\d+\])", 0
+                                ),
+                                "query_gene_strand": F.regexp_extract(
+                                    "query_title", r"(\((\+|\-)\))", 0
+                                ),
+                            }
+                        )
+                        .withColumns(
+                            {
+                                "source_genome_name": F.regexp_extract(
+                                    "source", r"^\w+", 0
+                                ),
+                                "source_genome_id": F.regexp_extract(
+                                    "source", r"\w+\.\d", 0
+                                ),
+                                "source_gene": F.regexp_extract(
+                                    "source", r"\| (\w+) \|", 1
+                                ),
+                                "source_locus_tag": F.regexp_extract(
+                                    "source", r" (\w+) \| \[", 1
+                                ),
+                                "source_start_end": F.regexp_extract(
+                                    "source", r"(\[\d+\:\d+\])", 0
+                                ),
+                                "source_gene_strand": F.regexp_extract(
+                                    "source", r"(\((\+|\-)\))", 0
+                                ),
+                            }
                         )
                         .withColumn(
-                            "source", F.col("description").getItem(description_item)[0]
+                            "percentage_of_identity",
+                            F.round(F.col("identity") / F.col("align_len") * 100, 3),
                         )
-                        .withColumnRenamed("num", "number_of_hits"),
                     )
-                    .drop("search", "hits", "description", "hsps")
-                    .withColumns(
-                        {
-                            "query_genome_name": F.regexp_extract(
-                                "query_title", r"^\w+", 0
-                            ),
-                            "query_genome_id": F.regexp_extract(
-                                "query_title", r"\w+\.\d", 0
-                            ),
-                            "query_gene": F.regexp_extract(
-                                "query_title", r"\| (\w+) \|", 1
-                            ),
-                            "query_locus_tag": F.regexp_extract(
-                                "query_title", r" (\w+) \| \[", 1
-                            ),
-                            "query_start_end": F.regexp_extract(
-                                "query_title", r"(\[\d+\:\d+\])", 0
-                            ),
-                            "query_gene_strand": F.regexp_extract(
-                                "query_title", r"(\((\+|\-)\))", 0
-                            ),
-                        }
-                    )
-                    .withColumns(
-                        {
-                            "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
-                            "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
-                            "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
-                            "source_locus_tag": F.regexp_extract(
-                                "source", r" (\w+) \| \[", 1
-                            ),
-                            "source_start_end": F.regexp_extract(
-                                "source", r"(\[\d+\:\d+\])", 0
-                            ),
-                            "source_gene_strand": F.regexp_extract(
-                                "source", r"(\((\+|\-)\))", 0
-                            ),
-                        }
-                    )
-                    .withColumn(
-                        "percentage_of_identity",
-                        F.round(F.col("identity") / F.col("align_len") * 100, 3),
-                    )
-                ).coalesce(1).write.mode("append").parquet(path)
+                    .coalesce(1)
+                    .write.mode("append")
+                    .parquet(path)
+                )
                 # context.log.info(f"File processed: {json_file}")
                 # context.add_output_metadata(
                 #     metadata={
@@ -254,70 +266,86 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
                 # )
                 # return df, history
                 # return df
-            
+
             except:
                 df = (
-                    reduce(
-                        lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
-                        [i for i in hsps_list],
+                    (
                         reduce(
-                            lambda df, i: df.withColumn(i, F.col("hits").getItem(i)[0]),
-                            [i for i in hits_list],
+                            lambda df, i: df.withColumn(i, F.col("hsps").getItem(i)[0]),
+                            [i for i in hsps_list],
                             reduce(
-                                lambda df, i: df.withColumn(i, F.col("search").getItem(i)),
-                                [i for i in keys_no_message],
-                                df,
-                            ),
+                                lambda df, i: df.withColumn(
+                                    i, F.col("hits").getItem(i)[0]
+                                ),
+                                [i for i in hits_list],
+                                reduce(
+                                    lambda df, i: df.withColumn(
+                                        i, F.col("search").getItem(i)
+                                    ),
+                                    [i for i in keys_no_message],
+                                    df,
+                                ),
+                            )
+                            .withColumn(
+                                "source",
+                                F.col("description").getItem(description_item)[0],
+                            )
+                            .withColumnRenamed("num", "number_of_hits"),
+                        )
+                        .drop("search", "hits", "description", "hsps")
+                        .withColumns(
+                            {
+                                "query_genome_name": F.regexp_extract(
+                                    "query_title", r"^\w+", 0
+                                ),
+                                "query_genome_id": F.regexp_extract(
+                                    "query_title", r"\w+\.\d", 0
+                                ),
+                                "query_gene": F.regexp_extract(
+                                    "query_title", r"\| (\w+) \|", 1
+                                ),
+                                "query_locus_tag": F.regexp_extract(
+                                    "query_title", r" (\w+) \| \[", 1
+                                ),
+                                "query_start_end": F.regexp_extract(
+                                    "query_title", r"(\[\d+\:\d+\])", 0
+                                ),
+                                "query_gene_strand": F.regexp_extract(
+                                    "query_title", r"(\((\+|\-)\))", 0
+                                ),
+                            }
+                        )
+                        .withColumns(
+                            {
+                                "source_genome_name": F.regexp_extract(
+                                    "source", r"^\w+", 0
+                                ),
+                                "source_genome_id": F.regexp_extract(
+                                    "source", r"\w+\.\d", 0
+                                ),
+                                "source_gene": F.regexp_extract(
+                                    "source", r"\| (\w+) \|", 1
+                                ),
+                                "source_locus_tag": F.regexp_extract(
+                                    "source", r" (\w+) \| \[", 1
+                                ),
+                                "source_start_end": F.regexp_extract(
+                                    "source", r"(\[\d+\:\d+\])", 0
+                                ),
+                                "source_gene_strand": F.regexp_extract(
+                                    "source", r"(\((\+|\-)\))", 0
+                                ),
+                            }
                         )
                         .withColumn(
-                            "source", F.col("description").getItem(description_item)[0]
+                            "percentage_of_identity",
+                            F.round(F.col("identity") / F.col("align_len") * 100, 3),
                         )
-                        .withColumnRenamed("num", "number_of_hits"),
                     )
-                    .drop("search", "hits", "description", "hsps")
-                    .withColumns(
-                        {
-                            "query_genome_name": F.regexp_extract(
-                                "query_title", r"^\w+", 0
-                            ),
-                            "query_genome_id": F.regexp_extract(
-                                "query_title", r"\w+\.\d", 0
-                            ),
-                            "query_gene": F.regexp_extract(
-                                "query_title", r"\| (\w+) \|", 1
-                            ),
-                            "query_locus_tag": F.regexp_extract(
-                                "query_title", r" (\w+) \| \[", 1
-                            ),
-                            "query_start_end": F.regexp_extract(
-                                "query_title", r"(\[\d+\:\d+\])", 0
-                            ),
-                            "query_gene_strand": F.regexp_extract(
-                                "query_title", r"(\((\+|\-)\))", 0
-                            ),
-                        }
-                    )
-                    .withColumns(
-                        {
-                            "source_genome_name": F.regexp_extract("source", r"^\w+", 0),
-                            "source_genome_id": F.regexp_extract("source", r"\w+\.\d", 0),
-                            "source_gene": F.regexp_extract("source", r"\| (\w+) \|", 1),
-                            "source_locus_tag": F.regexp_extract(
-                                "source", r" (\w+) \| \[", 1
-                            ),
-                            "source_start_end": F.regexp_extract(
-                                "source", r"(\[\d+\:\d+\])", 0
-                            ),
-                            "source_gene_strand": F.regexp_extract(
-                                "source", r"(\((\+|\-)\))", 0
-                            ),
-                        }
-                    )
-                    .withColumn(
-                        "percentage_of_identity",
-                        F.round(F.col("identity") / F.col("align_len") * 100, 3),
-                    )
-                ).coalesce(1).write.mode("append").parquet(path)
+                    .coalesce(1)
+                    .write.mode("append")
+                    .parquet(path)
+                )
                 # context.log.info(f"File processed: {json_file}")
 
                 # context.add_output_metadata(
@@ -338,18 +366,17 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
                 #     #         # The `MetadataValue` class has useful static methods to build Metadata
                 #         }
                 #     )
-                
+
                 # return df, history
                 # return df
 
             context.log.info(f"DataFRame has been generated")
 
-
             new_files.append(Path(json_file).stem)
 
         history = history + new_files
 
-    df = spark.read.parquet('data_folder/experimenting/table/blastn_summary')
+    df = spark.read.parquet("data_folder/experimenting/table/blastn_summary")
 
     time = datetime.now()
     context.add_output_metadata(
@@ -378,11 +405,7 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
         },
     )
 
-    return 'DataFrame has been updated', history   
-
-        
-
-        
+    return "DataFrame has been updated", history
 
     # @asset
     # def processed_blastn_history(context, history):

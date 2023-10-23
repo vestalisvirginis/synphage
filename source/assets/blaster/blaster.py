@@ -135,8 +135,6 @@ sqc_folder_config = {
     op_tags={"blaster": "compute_intense"},
 )
 def genbank_to_fasta(context, standardised_ext_file):  # -> str:
-    
-
     # Paths to read and store the data
     # path_in = "/".join(
     #     [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
@@ -161,7 +159,6 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
         context.log.info("path do not exist")
         fasta_files = []
     context.log.info(fasta_files)
-    
 
     # context.log.info(path_in)
     context.log.info(path_out)
@@ -172,20 +169,20 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
     new_fasta_paths = []
     for file in standardised_ext_file:
         if Path(file).stem not in fasta_files:
-            context.log.info(
-                f"The following file {file} is being processed"
-            )
+            context.log.info(f"The following file {file} is being processed")
 
             # Genbank to fasta
-            #file = standardised_ext_file
-            #context.log.info(file)
+            # file = standardised_ext_file
+            # context.log.info(file)
             output_dir = f"{path_out}/{Path(file).stem}.fna"
             context.log.info(output_dir)
             genome = SeqIO.read(file, "genbank")
             genome_records = list(SeqIO.parse(file, "genbank"))
 
             with open(output_dir, "w") as f:
-                gene_features = list(filter(lambda x: x.type == "gene", genome.features))
+                gene_features = list(
+                    filter(lambda x: x.type == "gene", genome.features)
+                )
                 for feature in gene_features:
                     for seq_record in genome_records:
                         f.write(
@@ -199,17 +196,17 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
                                 else "None",
                                 feature.qualifiers["locus_tag"][0],
                                 feature.location,
-                                seq_record.seq[feature.location.start : feature.location.end],
+                                seq_record.seq[
+                                    feature.location.start : feature.location.end
+                                ],
                             )
                         )
             new_fasta_files.append(Path(file).stem)
             new_fasta_paths.append(output_dir)
 
-    
     context.log.info(fasta_files)
 
     fasta_files = fasta_files + new_fasta_files
-
 
     time = datetime.now()
     context.add_output_metadata(
@@ -283,7 +280,7 @@ def create_blast_db(context, new_fasta_files):
             "text_metadata": f"The list of dbs has been updated {time.isoformat()} (UTC).",
             "processed_files": db,
             "path": path,
-            "preview": list(set([Path(p).stem for p in all_db]))
+            "preview": list(set([Path(p).stem for p in all_db])),
         }
     )
 
@@ -319,11 +316,13 @@ def get_blastn(context, history_fasta_files, create_blast_db):
     context.log.info(blastn_history)
 
     # Blast each query against every databases
-    fasta_path =  "/".join(
+    fasta_path = "/".join(
         [os.getenv("PHAGY_DIRECTORY"), context.op_config["fasta_dir"]]
     )
     context.log.info(fasta_path)
-    fasta_files = list(map(lambda x: f"{fasta_path}/{Path(x).stem}.fna", os.listdir(fasta_path)))
+    fasta_files = list(
+        map(lambda x: f"{fasta_path}/{Path(x).stem}.fna", os.listdir(fasta_path))
+    )
 
     for query in fasta_files:
         for database in create_blast_db:
