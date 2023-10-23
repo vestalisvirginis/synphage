@@ -1,9 +1,11 @@
-from dagster import asset, Field, Config
+from dagster import asset, Field, Config, EnvVar, MetadataValue
 
 import enum
 import hashlib
+import os
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Dict, Any, Union, Literal, Optional
 from pathlib import Path
 from Bio import SeqIO, SeqRecord
@@ -57,6 +59,59 @@ def _assess_file_content(genome) -> bool:  # Duplicated function
                 break
 
     return gene_value
+
+
+def _get_sqc_identity_from_csv(file_path):
+    spark = SparkSession.builder.getOrCreate()
+
+    df = spark.read.csv(file_path).select("_c0", F.col("_c1").cast("int"))
+
+    sqc_dict = {}
+    [sqc_dict.update({x: y}) for x, y in df.toLocalIterator()]
+
+    return sqc_dict
+
+
+class CheckOrientation(enum.Enum):
+    SEQUENCE = 0
+    REVERSE = 1
+
+
+@asset(
+    description="Return a dict from the sequence paths and their orientation.",
+    compute_kind="Python",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def create_genome(context):
+    context.log.info("get path")
+    context.log.info(os.getenv(EnvVar("PHAGY_DIRECTORY")))
+    context.log.info(os.getenv(EnvVar("SEQUENCE_FILE")))
+    path = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), os.getenv(EnvVar("SEQUENCE_FILE"))]
+    )
+    context.log.info(path)
+
+    if os.path.exists(path):
+        sequences = _get_sqc_identity_from_csv(path)
+    else:
+        "The file format is not recognised"
+
+    for k, v in sequences.items():
+        # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
+        if isinstance(v, int):
+            sequences[k] = CheckOrientation(v).name
+
+    # Asset metadata
+    time = datetime.now()
+    context.add_output_metadata(
+        metadata={
+            "text_metadata": f"Dictionnary of sequences to plot {time.isoformat()} (UTC).",
+            "num_sqcs": len(sequences),
+            "path": path,
+            "sequences": MetadataValue.json(sequences),
+        }
+    )
+    return sequences
 
 
 # @dataclass
@@ -123,14 +178,9 @@ def _assess_file_content(genome) -> bool:  # Duplicated function
 # }
 
 
-class CheckOrientation(enum.Enum):
-    SEQUENCE = 0
-    REVERSE = 1
-
-
-def _read_seq(path: str, orientation: CheckOrientation) -> SeqRecord.SeqRecord:
+def _read_seq(path: str, orientation: str) -> SeqRecord.SeqRecord:
     """Read sequence according to genome orientation"""
-    if orientation.name == CheckOrientation.SEQUENCE.name:
+    if orientation == CheckOrientation.SEQUENCE.name:
         return SeqIO.read(path, "gb")
     else:
         return SeqIO.read(path, "gb").reverse_complement(name=True)
@@ -151,9 +201,9 @@ def _get_feature(
     raise KeyError(id)
 
 
-class Genome(Config):
-    genomes: Dict[str, CheckOrientation]
-    # genomes: Dict[str = Field(description= "Path to the genome"), CheckOrientation = Field(description= "For displaying the sequence in the rigth orientation")]
+# class Genome(Config):
+#     genomes: Dict[str, CheckOrientation]
+# genomes: Dict[str = Field(description= "Path to the genome"), CheckOrientation = Field(description= "For displaying the sequence in the rigth orientation")]
 
 
 #     # @property
@@ -183,9 +233,6 @@ class Genome(Config):
 
 
 class Diagram(Config):
-    # def __init__(self):
-    # genomes: Dict[str,Genome]
-    genomes: Genome
     title: str = "diagram"
     output_format: str = "SVG"
     graph_format: str = "linear"
@@ -193,11 +240,9 @@ class Diagram(Config):
     graph_fragments: int = 1
     graph_start: int = 0
     graph_end: Optional[int] = None
-    output_folder: str = "/usr/src/data_folder/phage_view_data/synteny"
-    blastn_dir: str = (
-        "/usr/src/data_folder/phage_view_data/gene_identity/blastn_summary"
-    )
-    uniq_dir: str = "/usr/src/data_folder/phage_view_data/gene_identity/gene_uniqueness"
+    output_folder: str = "synteny"
+    blastn_dir: str = "blastn_summary"
+    uniq_dir: str = "gene_uniqueness"
 
 
 #     # def __repr__(self):
@@ -217,17 +262,44 @@ class Diagram(Config):
 #     #     """Add a new genome in the Diagram class"""
 #     #     Genome(path, orientation) >> self._genome
 #     #     return self
+gene_uniqueness_folder_config = {
+    "output_folder": Field(
+        str,
+        description="Path to folder where the files will be saved",
+        default_value="table",
+    ),
+    "name": Field(
+        str,
+        description="Path to folder where the files will be saved",
+        default_value="gene_uniqueness",
+    ),
+}
 
 
 @asset(
-    # config_schema={**synteny_folder_config},
+    # config_schema={**gene_uniqueness_folder_config},
     description="Transform a list of genomes into a genome diagram",
     compute_kind="Biopython",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={
+        "tables": "table",
+        "name": "blastn_summary",
+        "name2": "gene_uniqueness",
+        "parquet_managment": "append",
+        "owner": "Virginie Grosboillot",
+    },
 )
 def create_graph(
-    context, extract_locus_tag_gene, parse_blastn, config: Diagram
+    context, create_genome, extract_locus_tag_gene, parse_blastn, config: Diagram
 ):  # parse_blastn
+    output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
+    blastn_dir = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "blastn_summary"]
+    )
+    uniq_dir = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "gene_uniqueness"]
+    )
+    colour_dir = "/".join([output_folder, "colour_table"])
+
     # Initiate SparkSession
     spark = SparkSession.builder.getOrCreate()
 
@@ -237,8 +309,10 @@ def create_graph(
     # Read sequences for each genome and assign them in a variable
     records = {}
 
-    for k, v in config.genomes.genomes.items():
+    for k, v in create_genome.items():
         record = _read_seq(k, v)
+        context.log.info(f"Orientation: {record}")
+        # context.log.info(f"Orientation: {orientation}")
         records[record.name] = record
 
     record_names = [rec for rec in records.keys()]
@@ -258,6 +332,7 @@ def create_graph(
     feature_sets = {}
     max_len = 0
 
+    context.log.info("Graph has been instantiated")
     seq_order = {}
     track_list = [i for i in range(1, 2 * len(records), 2)]
 
@@ -282,6 +357,8 @@ def create_graph(
         feature_sets[record_name] = gd_track_for_features.new_set()
         seq_order[record_name] = i
 
+    context.log.info("Seq order has been determined")
+
     # We add dummy features to the tracks for each cross-link BEFORE we add the
     # arrow features for the genes. This ensures the genes appear on top:
     for X, Y, X_vs_Y in comparison_tuples:
@@ -292,7 +369,7 @@ def create_graph(
         set_Y = feature_sets[Y]
 
         X_vs_Y = (
-            spark.read.parquet(config.blastn_dir)
+            spark.read.parquet(blastn_dir)
             .filter(
                 (F.col("source_genome_name") == X) & (F.col("query_genome_name") == Y)
             )
@@ -324,12 +401,17 @@ def create_graph(
             )
             gd_diagram.cross_track_links.append(CrossLink(F_x, F_y, color, border))
 
-    gene_color_palette = gene_uniqueness(spark, record_names, config.uniq_dir)
-    gene_color_palette.write.parquet("data_folder/phage_view_data/synteny/colour_table")
+    context.log.info("Cross-links have been appended")
+
+    gene_color_palette = gene_uniqueness(spark, record_names, uniq_dir)
+    gene_color_palette.write.mode("overwrite").parquet(colour_dir)
+
+    context.log.info("Colour palette has been determined")
+
     for record_name, record in records.items():
         gd_feature_set = feature_sets[record_name]
 
-        gene_value = assess_file_content(record)
+        gene_value = _assess_file_content(record)
         if gene_value == True:
             for feature in record.features:
                 if feature.type != "gene":
@@ -457,6 +539,8 @@ def create_graph(
                     # label_strand=1,
                 )
 
+    context.log.info("Colours have been applied")
+
     if isinstance(config.graph_end, int):
         graph_end = config.graph_end
     else:
@@ -470,14 +554,19 @@ def create_graph(
         end=graph_end,
     )
 
+    context.log.info("Graph has been drawn")
+
     if config.output_format == "SVG":
         fmt = "svg"
     else:
         fmt = "png"
 
-    path_output = f"{config.output_folder}/{name}.{fmt}"
+    path_output = f"{output_folder}/{name}.{fmt}"
     # return gd_diagram.write(f"{config.output_folder}/{name}.{fmt}", config.output_format)
-    return gd_diagram.write(path_output, config.output_format)
+    gd_diagram.write('demo_diagram.svg', config.output_format)
+    #return gd_diagram.write(path_output, config.output_format)
+
+    return 'Done'
 
 
 #         self,

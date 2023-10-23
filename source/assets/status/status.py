@@ -1,16 +1,13 @@
 from dagster import (
     multi_asset,
-    op,
-    graph_asset,
-    Config,
     Field,
     EnvVar,
     AssetOut,
-    RetryPolicy,
 )
 
 import os
 import pickle
+import glob
 from pathlib import Path
 from datetime import datetime
 
@@ -24,25 +21,29 @@ def _standardise_file_extention(file) -> None:
         return path
 
 
-class FileConfig(Config):
-    filename: str
+# ______ Used for the sensor
+
+# class FileConfig(Config):
+#     filename: str
 
 
-@op(
-    retry_policy=RetryPolicy(
-        max_retries=3,
-        delay=0.2,  # 200ms
-    )
-)
-def process_file(context, config: FileConfig):
-    """Print file name on console"""
-    context.log.info(config.filename)
-    return config.filename
+# @op(
+#     retry_policy=RetryPolicy(
+#         max_retries=3,
+#         delay=0.2,  # 200ms
+#     )
+# )
+# def process_file(context, config: FileConfig):
+#     """Print file name on console"""
+#     context.log.info(config.filename)
+#     return config.filename
 
 
-@graph_asset()
-def process_asset():
-    return process_file()
+# @graph_asset()
+# def process_asset():
+#     return process_file()
+
+# ______________
 
 
 sqc_folder_config = {
@@ -86,17 +87,13 @@ sqc_folder_config = {
     },
     compute_kind="Python",
 )
-def list_genbank_files(context, process_asset):  # -> List[str]:
-    context.log.info(f"The following file {process_asset} is being processed")
+def list_genbank_files(context):  # -, process_asset - > List[str]:
+    # List files in the genbank directory
+    gb_path = "/".join([os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]])
 
-    filepath = "/".join(
-        [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
-    )
-
-    # Standarise file extension
-    new_path = _standardise_file_extention(filepath)
-    # new_path = _standardise_file_extention(process_asset)
-    new_file = new_path.stem
+    # filepath = "/".join(
+    #     [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
+    # )
 
     # Load already processed files
     path = "/".join(
@@ -115,8 +112,21 @@ def list_genbank_files(context, process_asset):  # -> List[str]:
         files = []
     context.log.info(files)
 
+    new_files = []
+    new_paths = []
+    for file in glob.glob(f'{gb_path}/*.gb*'):  #os.listdir(gb_path):
+        if Path(file).stem not in files:
+            context.log.info(f"The following file {file} is being processed")
+            #filepath = "/".join([gb_path, file])
+            # Standarise file extension
+            new_path = _standardise_file_extention(file)
+            # new_path = _standardise_file_extention(process_asset)
+            new_paths.append(new_path)
+            new_files.append(new_path.stem)
+
     # Update file list
-    files.append(new_file)
+    for new_file in new_files:
+        files.append(new_file)
 
     # Asset metadata
     time = datetime.now()
@@ -124,7 +134,8 @@ def list_genbank_files(context, process_asset):  # -> List[str]:
         output_name="standardised_ext_file",
         metadata={
             "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
-            "processed_file": new_file,
+            "processed_files": new_files,
+            "num_files": len(files),
             "path": path,
         },
     )
@@ -132,10 +143,9 @@ def list_genbank_files(context, process_asset):  # -> List[str]:
         output_name="list_genbank_files",
         metadata={
             "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
-            "processed_file": new_file,
             "path": path,
             "num_files": len(files),
             "updated_list": files,
         },
     )
-    return new_path, files
+    return new_paths, files
