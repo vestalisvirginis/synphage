@@ -69,7 +69,7 @@ def _get_sqc_identity_from_csv(_file_path):
     _sqc_dict = {}
     [_sqc_dict.update({_x: _y}) for _x, _y in _df.toLocalIterator()]
 
-    return __file__sqc_dict
+    return _sqc_dict
 
 
 class CheckOrientation(enum.Enum):
@@ -241,8 +241,8 @@ class Diagram(Config):
     graph_start: int = 0
     graph_end: Optional[int] = None
     output_folder: str = "synteny"
-    blastn_dir: str = "blastn_summary"
-    uniq_dir: str = "gene_uniqueness"
+    blastn_dir: str = "tables/blastn_summary.parquet"
+    uniq_dir: str = "tables/uniqueness.parquet"
 
 
 #     # def __repr__(self):
@@ -289,14 +289,14 @@ gene_uniqueness_folder_config = {
     },
 )
 def create_graph(
-    context, create_genome, extract_locus_tag_gene, parse_blastn, config: Diagram
-):  # parse_blastn
+    context, create_genome, config: Diagram
+):  # parse_blastn, extract_locus_tag_gene,
     _output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
     _blastn_dir = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "blastn_summary"]
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "tables", "blastn_summary.parquet"]
     )
     _uniq_dir = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "gene_uniqueness"]
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "tables", "uniqueness.parquet"]
     )
     _colour_dir = "/".join([_output_folder, "colour_table"])
 
@@ -544,7 +544,7 @@ def create_graph(
     if isinstance(config.graph_end, int):
         _graph_end = config.graph_end
     else:
-        _graph_end = max_len
+        _graph_end = _max_len
 
     _gd_diagram.draw(
         format=config.graph_format,
@@ -561,9 +561,10 @@ def create_graph(
     else:
         _fmt = "png"
 
-    _path_output = f"{_output_folder}/{_name}.{_fmt}"
+    _path_output = str(f"{_output_folder}/{_name}.{_fmt}")
     # return gd_diagram.write(f"{config.output_folder}/{name}.{fmt}", config.output_format)
-    _gd_diagram.write('demo_diagram.svg', config.output_format)
+    #_gd_diagram.write('demo_diagram.svg', config.output_format)
+    _gd_diagram.write(str(f"{_output_folder}/{_name}.{_fmt}"), config.output_format)
     #return gd_diagram.write(path_output, config.output_format)
 
     return 'Done'

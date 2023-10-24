@@ -8,6 +8,7 @@ from dagster import (
     DynamicOut,
     Nothing,
     In,
+    RunConfig,
 )
 
 import os
@@ -50,6 +51,7 @@ warnings.filterwarnings("ignore", category=ExperimentalWarning)
 class PipeConfig(Config):
     source: str
     target: str = None
+    table_dir: str = None
     file: str = "out.parquet"
 
 
@@ -67,12 +69,16 @@ def load(setup: PipeConfig):
 
 
 @op
-def parse_blastn(setup: PipeConfig, file: str):
+def parse_blastn(context, setup: PipeConfig, file: str):
     """Retrive sequence and metadata"""
-    query = open("sql/parse_blastn.sql").read()
+    query = open("source/sql/parse_blastn.sql").read()
     conn = duckdb.connect(":memory:")
     os.makedirs(setup.target, exist_ok=True)
-    conn.query(query.format(file)).pl().write_parquet(f"{setup.target}/{file}.parquet")
+    context.log.info(f"{setup.target}/{file}.parquet")
+    context.log.info(f"File: {file}")
+    source = Path(setup.source) / file
+    context.log.info(f"source: {source}")
+    conn.query(query.format(source)).pl().write_parquet(f"{setup.target}/{file}.parquet")
     return "OK"
 
 
@@ -80,7 +86,7 @@ def parse_blastn(setup: PipeConfig, file: str):
 def parse_locus(setup: PipeConfig, file: str):
     """Retrieve gene and locus metadata"""
     source = Path(setup.source) / file
-    target = Path(setup.target) / str(file+".parquet")
+    target = Path(setup.target) / str(Path(file).stem+".parquet")
     genome = SeqIO.read(str(source), "gb")
 
     # Ancilliary Functions
@@ -110,19 +116,36 @@ def parse_locus(setup: PipeConfig, file: str):
 @op(ins={"file": In(Nothing)})
 def append(setup: PipeConfig):
     """Consolidate in 1 parquet file"""
-    pl.read_parquet(f"{setup.target}/*.parquet").write_parquet(setup.file)
-    return setup.file
+    os.makedirs(setup.table_dir, exist_ok=True)
+    path_file = Path(setup.table_dir) / Path(setup.file)
+    pl.read_parquet(f"{setup.target}/*.parquet").write_parquet(path_file)
+    return path_file
 
 
 @op(ins={"blastn_all": In(asset_key=AssetKey("append_blastn")), "locus_all": In(asset_key=AssetKey("append_locus"))})
 def gene_presence(blastn_all, locus_all):
     """Consolidate gene and locus"""
     conn = duckdb.connect(":memory:")
-    query = open("sql/gene_presence.sql").read()
-    conn.query(query.format(blastn_all, locus_all)).pl().write_parquet("presence.parquet")
+    query = open("source/sql/gene_presence.sql").read()
+    conn.query(query.format(blastn_all, locus_all)).pl().write_parquet("data/tables/uniqueness.parquet")
 
 
-@job
+default_config = RunConfig(
+    ops={"blastn": PipeConfig(
+            source="data/gene_identity/blastn",
+            target="data/fs/blastn_parsing",
+            table_dir="data/tables",
+            file="blastn_summary.parquet"
+            ),
+        "locus": PipeConfig(
+            source="data/genbank",
+            target="data/fs/locus_parsing",
+            table_dir="data/tables",
+            file="locus_and_gene.parquet"
+        )}
+)
+
+@job(config=default_config)
 def transform():
     """GenBank into parquet"""
     config_blastn = setup.alias("blastn")()
@@ -179,4 +202,12 @@ uniq_schedule = ScheduleDefinition(
     job=uniq_job,
     cron_schedule="*/5 * * * *",  # every hour minute???
     tags={"dagster/priority": "2"},
+)
+
+
+# Job creating the graph
+
+synteny_job = define_asset_job(
+    name="synteny_job",
+    selection=AssetSelection.groups("Viewer"),
 )

@@ -134,7 +134,7 @@ sqc_folder_config = {
     compute_kind="Biopython",
     op_tags={"blaster": "compute_intense"},
 )
-def genbank_to_fasta(context, standardised_ext__file):  # -> str:
+def genbank_to_fasta(context, standardised_ext_file):  # -> str:
     # Paths to read and store the data
     # path_in = "/".join(
     #     [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
@@ -158,7 +158,7 @@ def genbank_to_fasta(context, standardised_ext__file):  # -> str:
     else:
         context.log.info("path do not exist")
         _fasta_files = []
-    context.log.info(fasta_files)
+    context.log.info(_fasta_files)
 
     # context.log.info(path_in)
     context.log.info(_path_out)
@@ -168,8 +168,8 @@ def genbank_to_fasta(context, standardised_ext__file):  # -> str:
     _new_fasta_files = []
     _new_fasta_paths = []
     for _file in standardised_ext_file:
-        if Path(_file).stem not in fasta_files:
-            context.log.info(f"The following _file {_file} is being processed")
+        if Path(_file).stem not in _fasta_files:
+            context.log.info(f"The following file {_file} is being processed")
 
             # Genbank to fasta
             # file = standardised_ext_file
@@ -201,7 +201,7 @@ def genbank_to_fasta(context, standardised_ext__file):  # -> str:
                                 ],
                             )
                         )
-            _new_fasta__files.append(Path(_file).stem)
+            _new_fasta_files.append(Path(_file).stem)
             _new_fasta_paths.append(_output_dir)
 
     context.log.info(_fasta_files)
@@ -304,7 +304,7 @@ def get_blastn(context, history_fasta_files, create_blast_db):
 
     # History
     _history_path = "/".join(
-        [os.getenv("PHAGY_DIRECTORY"), os.getenv("_FILE_SYSTEM"), "get_blastn"]
+        [os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), "get_blastn"]
     )
     context.log.info(_history_path)
     if os.path.exists(_history_path):

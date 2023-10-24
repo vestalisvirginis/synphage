@@ -1,4 +1,4 @@
-with blast as (select unnest(BlastOutput2) as item from read_json_auto('blastn/{}')),
+with blast as (select unnest(BlastOutput2) as item from read_json_auto('{}')),
     search as (
     SELECT 
         item->>'$.report.program' as program,
