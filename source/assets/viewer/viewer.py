@@ -23,21 +23,21 @@ from pydantic import Field
 
 
 def gene_uniqueness(
-    spark,
-    record_name: list,
-    path_to_dataset: str = "/usr/src/data_folder/phage_view_data/gene_identity/gene_uniqueness",
+    _spark,
+    _record_name: list,
+    _path_to_dataset: str = "/usr/src/data_folder/phage_view_data/gene_identity/gene_uniqueness",
 ):
     """Calculate percentage of the presence of a given gene over the displayed sequences"""
 
-    gene_uniqueness_df = spark.read.parquet(path_to_dataset).filter(
-        (F.col("name").isin(record_name))
-        & (F.col("source_genome_name").isin(record_name))
+    _gene_uniqueness_df = _spark.read.parquet(_path_to_dataset).filter(
+        (F.col("name").isin(_record_name))
+        & (F.col("source_genome_name").isin(_record_name))
     )
-    total_seq = gene_uniqueness_df.select(
+    _total_seq = _gene_uniqueness_df.select(
         F.count_distinct(F.col("name")).alias("count")
     ).collect()[0][0]
     return (
-        gene_uniqueness_df.withColumn("total_seq", F.lit(total_seq))
+        _gene_uniqueness_df.withColumn("total_seq", F.lit(_total_seq))
         .groupby("name", "gene", "locus_tag", "total_seq")
         .count()
         .withColumn(
@@ -46,30 +46,30 @@ def gene_uniqueness(
     )
 
 
-def _assess_file_content(genome) -> bool:  # Duplicated function
+def _assess_file_content(_genome) -> bool:  # Duplicated function
     """Assess wether the genbank file contains gene or only CDS"""
 
-    gene_count = 0
-    gene_value = False
-    for feature in genome.features:
-        if feature.type == "gene":
-            gene_count = gene_count + 1
-            if gene_count > 1:
-                gene_value = True
+    _gene_count = 0
+    _gene_value = False
+    for _feature in _genome.features:
+        if _feature.type == "gene":
+            _gene_count = _gene_count + 1
+            if _gene_count > 1:
+                _gene_value = True
                 break
 
-    return gene_value
+    return _gene_value
 
 
-def _get_sqc_identity_from_csv(file_path):
-    spark = SparkSession.builder.getOrCreate()
+def _get_sqc_identity_from_csv(_file_path):
+    _spark = SparkSession.builder.getOrCreate()
 
-    df = spark.read.csv(file_path).select("_c0", F.col("_c1").cast("int"))
+    _df = _spark.read.csv(_file_path).select("_c0", F.col("_c1").cast("int"))
 
-    sqc_dict = {}
-    [sqc_dict.update({x: y}) for x, y in df.toLocalIterator()]
+    _sqc_dict = {}
+    [_sqc_dict.update({_x: _y}) for _x, _y in _df.toLocalIterator()]
 
-    return sqc_dict
+    return __file__sqc_dict
 
 
 class CheckOrientation(enum.Enum):
@@ -86,32 +86,32 @@ def create_genome(context):
     context.log.info("get path")
     context.log.info(os.getenv(EnvVar("PHAGY_DIRECTORY")))
     context.log.info(os.getenv(EnvVar("SEQUENCE_FILE")))
-    path = "/".join(
+    _path = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), os.getenv(EnvVar("SEQUENCE_FILE"))]
     )
-    context.log.info(path)
+    context.log.info(_path)
 
-    if os.path.exists(path):
-        sequences = _get_sqc_identity_from_csv(path)
+    if os.path.exists(_path):
+        _sequences = _get_sqc_identity_from_csv(_path)
     else:
         "The file format is not recognised"
 
-    for k, v in sequences.items():
+    for _k, _v in _sequences.items():
         # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
-        if isinstance(v, int):
-            sequences[k] = CheckOrientation(v).name
+        if isinstance(_v, int):
+            _sequences[_k] = CheckOrientation(_v).name
 
     # Asset metadata
-    time = datetime.now()
+    _time = datetime.now()
     context.add_output_metadata(
         metadata={
-            "text_metadata": f"Dictionnary of sequences to plot {time.isoformat()} (UTC).",
-            "num_sqcs": len(sequences),
-            "path": path,
-            "sequences": MetadataValue.json(sequences),
+            "text_metadata": f"Dictionnary of sequences to plot {_time.isoformat()} (UTC).",
+            "num_sqcs": len(_sequences),
+            "path": _path,
+            "sequences": MetadataValue.json(_sequences),
         }
     )
-    return sequences
+    return _sequences
 
 
 # @dataclass
@@ -178,27 +178,27 @@ def create_genome(context):
 # }
 
 
-def _read_seq(path: str, orientation: str) -> SeqRecord.SeqRecord:
+def _read_seq(_path: str, _orientation: str) -> SeqRecord.SeqRecord:
     """Read sequence according to genome orientation"""
-    if orientation == CheckOrientation.SEQUENCE.name:
-        return SeqIO.read(path, "gb")
+    if _orientation == CheckOrientation.SEQUENCE.name:
+        return SeqIO.read(_path, "gb")
     else:
-        return SeqIO.read(path, "gb").reverse_complement(name=True)
+        return SeqIO.read(_path, "gb").reverse_complement(name=True)
 
 
 def _get_feature(
-    features, id, tags=("locus_tag", "gene", "old_locus_tag", "protein_id")
+    _features, _id, _tags=("locus_tag", "gene", "old_locus_tag", "protein_id")
 ):
     """Search list of SeqFeature objects for an identifier under the given tags."""
-    for f in features:
-        for key in tags:
+    for _f in _features:
+        for _key in _tags:
             # tag may not be present in this feature
-            for x in f.qualifiers.get(key, []):
-                if x == id:
-                    return f
-                elif x[:-2] == id:
-                    return f
-    raise KeyError(id)
+            for _x in _f.qualifiers.get(_key, []):
+                if _x == _id:
+                    return _f
+                elif _x[:-2] == _id:
+                    return _f
+    raise KeyError(_id)
 
 
 # class Genome(Config):
@@ -291,248 +291,248 @@ gene_uniqueness_folder_config = {
 def create_graph(
     context, create_genome, extract_locus_tag_gene, parse_blastn, config: Diagram
 ):  # parse_blastn
-    output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
-    blastn_dir = "/".join(
+    _output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
+    _blastn_dir = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "blastn_summary"]
     )
-    uniq_dir = "/".join(
+    _uniq_dir = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), "table", "gene_uniqueness"]
     )
-    colour_dir = "/".join([output_folder, "colour_table"])
+    _colour_dir = "/".join([_output_folder, "colour_table"])
 
     # Initiate SparkSession
     spark = SparkSession.builder.getOrCreate()
 
     # Set name for the diagram
-    name = config.title
+    _name = config.title
 
     # Read sequences for each genome and assign them in a variable
-    records = {}
+    _records = {}
 
-    for k, v in create_genome.items():
-        record = _read_seq(k, v)
-        context.log.info(f"Orientation: {record}")
+    for _k, _v in create_genome.items():
+        _record = _read_seq(_k, _v)
+        context.log.info(f"Orientation: {_record}")
         # context.log.info(f"Orientation: {orientation}")
-        records[record.name] = record
+        _records[_record.name] = _record
 
-    record_names = [rec for rec in records.keys()]
-    comparison_tuples = [
+    _record_names = [_rec for _rec in _records.keys()]
+    _comparison_tuples = [
         (
-            record_names[i],
-            record_names[i + 1],
-            f"{record_names[i]}_vs_{record_names[i+1]}",
+            _record_names[_i],
+            _record_names[_i + 1],
+            f"{_record_names[_i]}_vs_{_record_names[_i+1]}",
         )
-        for i in range(len(record_names))
-        if i + 1 < len(record_names)
+        for _i in range(len(_record_names))
+        if _i + 1 < len(_record_names)
     ]
-    context.log.info(f"List of the records name: {record_names}")
+    context.log.info(f"List of the records name: {_record_names}")
 
     # instanciate the graphic, features, seq_order
-    gd_diagram = GenomeDiagram.Diagram(name)
-    feature_sets = {}
-    max_len = 0
+    _gd_diagram = GenomeDiagram.Diagram(_name)
+    _feature_sets = {}
+    _max_len = 0
 
     context.log.info("Graph has been instantiated")
-    seq_order = {}
-    track_list = [i for i in range(1, 2 * len(records), 2)]
+    _seq_order = {}
+    _track_list = [_i for _i in range(1, 2 * len(_records), 2)]
 
-    for i, (record_name, record) in enumerate(records.items()):
+    for _i, (_record_name, _record) in enumerate(_records.items()):
         # Get the longest sequence
-        max_len = max(max_len, len(record))
+        _max_len = max(_max_len, len(_record))
         # Allocate tracks 5 (top), 3, 1 (bottom) for A, B, C
         # (empty tracks 2 and 4 add useful white space to emphasise the cross links
         # and also serve to make the tracks vertically more compressed)
-        gd_track_for_features = gd_diagram.new_track(
-            track_list[i],
-            name=record_name,
+        _gd_track_for_features = _gd_diagram.new_track(
+            _track_list[_i],
+            name=_record_name,
             greytrack=True,
             greytrack_labels=1,
             greytrack_font_color=colors.black,
             # axis_labels=True,
             height=0.5,
             start=0,
-            end=len(record),
+            end=len(_record),
         )
-        assert record_name not in feature_sets
-        feature_sets[record_name] = gd_track_for_features.new_set()
-        seq_order[record_name] = i
+        assert _record_name not in _feature_sets
+        _feature_sets[_record_name] = _gd_track_for_features.new_set()
+        _seq_order[_record_name] = _i
 
     context.log.info("Seq order has been determined")
 
     # We add dummy features to the tracks for each cross-link BEFORE we add the
     # arrow features for the genes. This ensures the genes appear on top:
-    for X, Y, X_vs_Y in comparison_tuples:
-        features_X = records[X].features
-        features_Y = records[Y].features
+    for _X, _Y, _X_vs_Y in _comparison_tuples:
+        _features_X = _records[_X].features
+        _features_Y = _records[_Y].features
 
-        set_X = feature_sets[X]
-        set_Y = feature_sets[Y]
+        _set_X = _feature_sets[_X]
+        _set_Y = _feature_sets[_Y]
 
-        X_vs_Y = (
-            spark.read.parquet(blastn_dir)
+        _X_vs_Y = (
+            spark.read.parquet(_blastn_dir)
             .filter(
-                (F.col("source_genome_name") == X) & (F.col("query_genome_name") == Y)
+                (F.col("source_genome_name") == _X) & (F.col("query_genome_name") == _Y)
             )
             .select("source_locus_tag", "query_locus_tag", "percentage_of_identity")
         )
 
-        for id_X, id_Y, perc in X_vs_Y.toLocalIterator():
-            color = colors.linearlyInterpolatedColor(
-                colors.white, colors.firebrick, 0, 100, perc
+        for _id_X, _id_Y, _perc in _X_vs_Y.toLocalIterator():
+            _color = colors.linearlyInterpolatedColor(
+                colors.white, colors.firebrick, 0, 100, _perc
             )
-            border = False
-            f_x = _get_feature(features_X, id_X)
-            F_x = set_X.add_feature(
+            _border = False
+            _f_x = _get_feature(_features_X, _id_X)
+            _F_x = _set_X.add_feature(
                 SeqFeature(
-                    SimpleLocation(f_x.location.start, f_x.location.end, strand=0)
+                    SimpleLocation(_f_x.location.start, _f_x.location.end, strand=0)
                 ),
-                color=color,
+                color=_color,
                 border=False,
                 flip=True,
             )
-            f_y = _get_feature(features_Y, id_Y)
-            F_y = set_Y.add_feature(
+            _f_y = _get_feature(_features_Y, _id_Y)
+            _F_y = _set_Y.add_feature(
                 SeqFeature(
-                    SimpleLocation(f_y.location.start, f_y.location.end, strand=0)
+                    SimpleLocation(_f_y.location.start, _f_y.location.end, strand=0)
                 ),
-                color=color,
+                color=_color,
                 border=False,
                 flip=True,
             )
-            gd_diagram.cross_track_links.append(CrossLink(F_x, F_y, color, border))
+            _gd_diagram.cross_track_links.append(CrossLink(_F_x, _F_y, _color, _border))
 
     context.log.info("Cross-links have been appended")
 
-    gene_color_palette = gene_uniqueness(spark, record_names, uniq_dir)
-    gene_color_palette.write.mode("overwrite").parquet(colour_dir)
+    _gene_color_palette = gene_uniqueness(spark, _record_names, _uniq_dir)
+    _gene_color_palette.write.mode("overwrite").parquet(_colour_dir)
 
     context.log.info("Colour palette has been determined")
 
-    for record_name, record in records.items():
-        gd_feature_set = feature_sets[record_name]
+    for _record_name, _record in _records.items():
+        _gd_feature_set = _feature_sets[_record_name]
 
-        gene_value = _assess_file_content(record)
-        if gene_value == True:
-            for feature in record.features:
-                if feature.type != "gene":
+        _gene_value = _assess_file_content(_record)
+        if _gene_value == True:
+            for _feature in _record.features:
+                if _feature.type != "gene":
                     # Exclude this feature
                     continue
                 try:
-                    perc = (
-                        gene_color_palette.filter(
-                            (F.col("name") == record_name)
-                            & (F.col("locus_tag") == feature.qualifiers["locus_tag"][0])
+                    _perc = (
+                        _gene_color_palette.filter(
+                            (F.col("name") == _record_name)
+                            & (F.col("locus_tag") == _feature.qualifiers["locus_tag"][0])
                         )
                         .select("perc_presence")
                         .collect()[0][0]
                     )
-                    if perc == 0:
-                        gene_color = colors.HexColor(
+                    if _perc == 0:
+                        _gene_color = colors.HexColor(
                             "#fde725"
                         )  # gene_color = colors.HexColor('#440154')
-                    elif 0 < perc <= 20:
-                        gene_color = colors.HexColor(
+                    elif 0 < _perc <= 20:
+                        _gene_color = colors.HexColor(
                             "#90d743"
                         )  # gene_color = colors.HexColor('#443983')
-                    elif 20 < perc <= 40:
-                        gene_color = colors.HexColor(
+                    elif 20 < _perc <= 40:
+                        _gene_color = colors.HexColor(
                             "#35b779"
                         )  # gene_color = colors.HexColor('#31688e')
-                    elif 40 < perc <= 60:
-                        gene_color = colors.HexColor("#21918c")
-                    elif 60 < perc <= 80:
-                        gene_color = colors.HexColor(
+                    elif 40 < _perc <= 60:
+                        _gene_color = colors.HexColor("#21918c")
+                    elif 60 < _perc <= 80:
+                        _gene_color = colors.HexColor(
                             "#31688e"
                         )  # gene_color = colors.HexColor('#35b779')
-                    elif 80 < perc < 100:
-                        gene_color = colors.HexColor(
+                    elif 80 < _perc < 100:
+                        _gene_color = colors.HexColor(
                             "#443983"
                         )  # gene_color = colors.HexColor('#90d743')
-                    elif perc == 100:
-                        gene_color = colors.HexColor(
+                    elif _perc == 100:
+                        _gene_color = colors.HexColor(
                             "#440154"
                         )  # gene_color = colors.HexColor('#fde725')
                     else:
-                        gene_color = colors.black
+                        _gene_color = colors.black
                 except:
-                    gene_color = colors.white
+                    _gene_color = colors.white
                 try:
-                    for k, v in feature.qualifiers.items():
-                        if k == "gene":
-                            name = v[0]
+                    for _k, _v in _feature.qualifiers.items():
+                        if _k == "gene":
+                            _name = _v[0]
                 except:
-                    for k, v in feature.qualifiers.items():
-                        if k == "locus_tag":
-                            name = v[0]
+                    for _k, _v in _feature.qualifiers.items():
+                        if _k == "locus_tag":
+                            _name = _v[0]
                 finally:
-                    name = ""
-                gd_feature_set.add_feature(
-                    feature,
+                    _name = ""
+                _gd_feature_set.add_feature(
+                    _feature,
                     sigil="BIGARROW",
-                    color=gene_color,
+                    color=_gene_color,
                     label=True,
-                    name=name,
+                    name=_name,
                     label_position="middle",
                     label_size=6,
                     label_angle=0,
                     label_strand=1,
                 )
         else:
-            for feature in record.features:
-                if feature.type != "CDS":
+            for _feature in _record.features:
+                if _feature.type != "CDS":
                     # Exclude this feature
                     continue
                 try:
-                    perc = (
-                        gene_color_palette.filter(
-                            (F.col("name") == record_name)
+                    _perc = (
+                        _gene_color_palette.filter(
+                            (F.col("name") == _record_name)
                             & (
                                 F.col("locus_tag")
-                                == feature.qualifiers["protein_id"][0][:-2]
+                                == _feature.qualifiers["protein_id"][0][:-2]
                             )
                         )
                         .select("perc_presence")
                         .collect()[0][0]
                     )
-                    if perc == 0:
-                        gene_color = colors.HexColor(
+                    if _perc == 0:
+                        _gene_color = colors.HexColor(
                             "#fde725"
                         )  # gene_color = colors.HexColor('#440154')
-                    elif 0 < perc <= 20:
-                        gene_color = colors.HexColor(
+                    elif 0 < _perc <= 20:
+                        _gene_color = colors.HexColor(
                             "#90d743"
                         )  # gene_color = colors.HexColor('#443983')
-                    elif 20 < perc <= 40:
-                        gene_color = colors.HexColor(
+                    elif 20 < _perc <= 40:
+                        _gene_color = colors.HexColor(
                             "#35b779"
                         )  # gene_color = colors.HexColor('#31688e')
-                    elif 40 < perc <= 60:
-                        gene_color = colors.HexColor("#21918c")
-                    elif 60 < perc <= 80:
-                        gene_color = colors.HexColor(
+                    elif 40 < _perc <= 60:
+                        _gene_color = colors.HexColor("#21918c")
+                    elif 60 < _perc <= 80:
+                        _gene_color = colors.HexColor(
                             "#31688e"
                         )  # gene_color = colors.HexColor('#35b779')
-                    elif 80 < perc < 100:
-                        gene_color = colors.HexColor(
+                    elif 80 < _perc < 100:
+                        _gene_color = colors.HexColor(
                             "#443983"
                         )  # gene_color = colors.HexColor('#90d743')
-                    elif perc == 100:
-                        gene_color = colors.HexColor(
+                    elif _perc == 100:
+                        _gene_color = colors.HexColor(
                             "#440154"
                         )  # gene_color = colors.HexColor('#fde725')
                     else:
-                        gene_color = colors.black
+                        _gene_color = colors.black
                 except:
-                    gene_color = colors.white
-                for k, v in feature.qualifiers.items():
-                    if k == "protein_id":
-                        name = v[0][:-2]
-                gd_feature_set.add_feature(
-                    feature,
+                    _gene_color = colors.white
+                for _k, _v in _feature.qualifiers.items():
+                    if _k == "protein_id":
+                        _name = _v[0][:-2]
+                _gd_feature_set.add_feature(
+                    _feature,
                     sigil="BIGARROW",
-                    color=gene_color,
+                    color=_gene_color,
                     # label=True,
-                    # name=name,
+                    # name=_name,
                     # label_position="middle",
                     # label_size=6,
                     # label_angle=0,
@@ -542,28 +542,28 @@ def create_graph(
     context.log.info("Colours have been applied")
 
     if isinstance(config.graph_end, int):
-        graph_end = config.graph_end
+        _graph_end = config.graph_end
     else:
-        graph_end = max_len
+        _graph_end = max_len
 
-    gd_diagram.draw(
+    _gd_diagram.draw(
         format=config.graph_format,
         pagesize=config.graph_pagesize,
         fragments=config.graph_fragments,
         start=config.graph_start,
-        end=graph_end,
+        end=_graph_end,
     )
 
     context.log.info("Graph has been drawn")
 
     if config.output_format == "SVG":
-        fmt = "svg"
+        _fmt = "svg"
     else:
-        fmt = "png"
+        _fmt = "png"
 
-    path_output = f"{output_folder}/{name}.{fmt}"
+    _path_output = f"{_output_folder}/{_name}.{_fmt}"
     # return gd_diagram.write(f"{config.output_folder}/{name}.{fmt}", config.output_format)
-    gd_diagram.write('demo_diagram.svg', config.output_format)
+    _gd_diagram.write('demo_diagram.svg', config.output_format)
     #return gd_diagram.write(path_output, config.output_format)
 
     return 'Done'

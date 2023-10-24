@@ -69,9 +69,9 @@ blastn_summary_config = {
 )
 def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
     # Check for not yet processed files:
-    full_list = get_blastn
+    _full_list = get_blastn
 
-    history_path = "/".join(
+    _history_path = "/".join(
         [
             os.getenv(EnvVar("PHAGY_DIRECTORY")),
             context.op_config["fs"],
@@ -79,20 +79,20 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
         ]
     )
 
-    if os.path.exists(history_path):
+    if os.path.exists(_history_path):
         context.log.info("path exist")
-        history = pickle.load(open(history_path, "rb"))
-        context.log.info(f"History: {history}")
+        _history = pickle.load(open(_history_path, "rb"))
+        context.log.info(f"History: {_history}")
     else:
         context.log.info("path does not exist")
-        history = []
+        _history = []
 
     # context.log.info(f"History: {history}")
 
-    files_to_process = list(set(full_list).difference(history))
+    _files_to_process = list(set(_full_list).difference(_history))
     # context.log.info(f"History: {files_to_process}")
 
-    path = "/".join(
+    _path = "/".join(
         [
             os.getenv(EnvVar("PHAGY_DIRECTORY")),
             context.op_config["tables"],
@@ -104,18 +104,18 @@ def parse_blastn(context, get_blastn):  # -> tuple([DataFrame, List[str]]):
 
     # Parse the json file to return a DataFrame
     # for json_file in get_blastn:
-    if files_to_process:
+    if _files_to_process:
         # json_file = files_to_process[0]
-        new_files = []
+        _new_files = []
         # context.log.info(f"history: {history}")
         # context.log.info(f"type history: {type(history)}")
 
-        for json_file in files_to_process:
-            context.log.info(f"File in process: {json_file}")
+        for _json_file in _files_to_process:
+            context.log.info(f"File in process: {_json_file}")
 
-            context.log.info(f"Updated history: {history}")
+            context.log.info(f"Updated history: {_history}")
 
-            df = (
+            _df = (
                 spark.read.option("multiline", "true")
                 .json(json_file)
                 .select(F.explode("BlastOutput2.report.results.search").alias("search"))

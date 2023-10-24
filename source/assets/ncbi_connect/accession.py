@@ -13,9 +13,9 @@ NucleotideRecord = namedtuple("NucleotideRecord", "dbname,menu,count,status")
 
 
 def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
-    origin = result["eGQueryResult"]
+    _origin = result["eGQueryResult"]
     return NucleotideRecord(
-        *first(filter(lambda x: x["DbName"] == dbname, origin)).values()
+        *first(filter(lambda x: x["DbName"] == dbname, _origin)).values()
     )
 
 
@@ -37,16 +37,16 @@ ncbi_query_config = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def accession_count(context) -> int:
-    query = context.resources.ncbi_connection.conn.egquery(
+    _query = context.resources.ncbi_connection.conn.egquery(
         term=context.op_config["keyword"]
     )
-    result = context.resources.ncbi_connection.conn.read(query)
-    nucleotide = _get_ncbi_count_result(result, context.op_config["database"])
-    num_rows = int(nucleotide.count)
+    _result = context.resources.ncbi_connection.conn.read(_query)
+    _nucleotide = _get_ncbi_count_result(_result, context.op_config["database"])
+    _num_rows = int(_nucleotide.count)
     context.log_event(
-        AssetObservation(asset_key="accession_count", metadata={"num_rows": num_rows})
+        AssetObservation(asset_key="accession_count", metadata={"num_rows": _num_rows})
     )
-    return num_rows
+    return _num_rows
 
 
 ncbi_query_config_search = {
@@ -65,21 +65,21 @@ ncbi_query_config_search = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def accession_ids(context, accession_count):
-    search = context.resources.ncbi_connection.conn.esearch(
+    _search = context.resources.ncbi_connection.conn.esearch(
         db=context.op_config["database"],
         term=context.op_config["keyword"],
         retmax=accession_count,
         usehistory=context.op_config["use_history"],
         idtype=context.op_config["idtype"],
     )
-    result = context.resources.ncbi_connection.conn.read(search)
+    _result = context.resources.ncbi_connection.conn.read(_search)
     context.log_event(
         AssetObservation(
-            asset_key="accession_ids", metadata={"num_rows": len(result["IdList"])}
+            asset_key="accession_ids", metadata={"num_rows": len(_result["IdList"])}
         )
     )
-    search.close()
-    return result
+    _search.close()
+    return _result
 
 
 download_folder_config = {
@@ -113,24 +113,24 @@ ncbi_query_config_fetch = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
-    A = set(accession_ids["IdList"])
-    B = set(downloaded_genomes)
-    C = A.difference(B)
-    context.log.info(f"Number of NOT Downloaded: {len(C)}")
-    path = context.op_config["output_directory"]
+    _A = set(accession_ids["IdList"])
+    _B = set(downloaded_genomes)
+    _C = _A.difference(_B)
+    context.log.info(f"Number of NOT Downloaded: {len(_C)}")
+    _path = context.op_config["output_directory"]
     # context.log.info(accession_ids["IdList"])
-    for entry in list(C):
-        r = context.resources.ncbi_connection.conn.efetch(
+    for _entry in list(C):
+        _r = context.resources.ncbi_connection.conn.efetch(
             db=context.op_config["database"],
-            id=entry,
+            id=_entry,
             rettype=context.op_config["rettype"],
             retmax=1,
             webenv=accession_ids["WebEnv"],
             query_key=accession_ids["QueryKey"],
         )
 
-        file_name = f"{path}/{entry}.gb"
-        with open(file_name, "w") as writer:
-            writer.write(r.read())
+        _file_name = f"{_path}/{_entry}.gb"
+        with open(_file_name, "w") as _writer:
+            _writer.write(_r.read())
 
-    return list(map(lambda x: f"{path}/{x}.gb", accession_ids["IdList"]))
+    return list(map(lambda x: f"{_path}/{x}.gb", accession_ids["IdList"]))

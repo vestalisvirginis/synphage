@@ -14,11 +14,11 @@ from datetime import datetime
 
 def _standardise_file_extention(file) -> None:
     """Change file extension when '.gbk' for '.gb'"""
-    path = Path(file)
-    if path.suffix == ".gbk":
-        return path.rename(path.with_suffix(".gb"))
+    _path = Path(file)
+    if _path.suffix == ".gbk":
+        return _path.rename(_path.with_suffix(".gb"))
     else:
-        return path
+        return _path
 
 
 # ______ Used for the sensor
@@ -89,14 +89,14 @@ sqc_folder_config = {
 )
 def list_genbank_files(context):  # -, process_asset - > List[str]:
     # List files in the genbank directory
-    gb_path = "/".join([os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]])
+    _gb_path = "/".join([os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]])
 
     # filepath = "/".join(
     #     [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
     # )
 
     # Load already processed files
-    path = "/".join(
+    _path = "/".join(
         [
             os.getenv(EnvVar("PHAGY_DIRECTORY")),
             context.op_config["fs"],
@@ -104,48 +104,48 @@ def list_genbank_files(context):  # -, process_asset - > List[str]:
         ]
     )
 
-    if os.path.exists(path):
+    if os.path.exists(_path):
         context.log.info("path exist")
-        files = pickle.load(open(path, "rb"))
+        _files = pickle.load(open(_path, "rb"))
     else:
         context.log.info("path do not exist")
-        files = []
-    context.log.info(files)
+        _files = []
+    context.log.info(_files)
 
-    new_files = []
-    new_paths = []
-    for file in glob.glob(f'{gb_path}/*.gb*'):  #os.listdir(gb_path):
-        if Path(file).stem not in files:
-            context.log.info(f"The following file {file} is being processed")
+    _new_files = []
+    _new_paths = []
+    for _file in glob.glob(f'{_gb_path}/*.gb*'):  #os.listdir(gb_path):
+        if Path(_file).stem not in _files:
+            context.log.info(f"The following file {_file} is being processed")
             #filepath = "/".join([gb_path, file])
             # Standarise file extension
-            new_path = _standardise_file_extention(file)
+            _new_path = _standardise_file_extention(_file)
             # new_path = _standardise_file_extention(process_asset)
-            new_paths.append(new_path)
-            new_files.append(new_path.stem)
+            _new_paths.append(_new_path)
+            _new_files.append(_new_path.stem)
 
     # Update file list
-    for new_file in new_files:
-        files.append(new_file)
+    for _new_file in _new_files:
+        _files.append(_new_file)
 
     # Asset metadata
-    time = datetime.now()
+    _time = datetime.now()
     context.add_output_metadata(
         output_name="standardised_ext_file",
         metadata={
-            "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
-            "processed_files": new_files,
-            "num_files": len(files),
-            "path": path,
+            "text_metadata": f"Last update of the genbank list {_time.isoformat()} (UTC).",
+            "processed_files": _new_files,
+            "num_files": len(_files),
+            "path": _path,
         },
     )
     context.add_output_metadata(
         output_name="list_genbank_files",
         metadata={
-            "text_metadata": f"Last update of the genbank list {time.isoformat()} (UTC).",
-            "path": path,
-            "num_files": len(files),
-            "updated_list": files,
+            "text_metadata": f"Last update of the genbank list {_time.isoformat()} (UTC).",
+            "path": _path,
+            "num_files": len(_files),
+            "updated_list": _files,
         },
     )
-    return new_paths, files
+    return _new_paths, _files
