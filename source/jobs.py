@@ -8,6 +8,7 @@ from dagster import (
     DynamicOut,
     Nothing,
     In,
+    RunConfig,
 )
 
 import os
@@ -31,84 +32,137 @@ blasting_job = define_asset_job(
 
 # Job parsing blastn files
 
-@op(out=DynamicOut())
-def load():
-    for file in os.listdir("data_folder/experimenting/gene_identity/blastn"): #get_blastn: #os.listdir("blastn"):
-        yield DynamicOutput(file, mapping_key=file)
+import os
+from dagster import op, job, DynamicOutput, DynamicOut, Definitions, Nothing, In, Config, AssetKey, ExperimentalWarning
+import polars as pl
+import duckdb
+from functools import partial, reduce
+from Bio import SeqIO
+from operator import methodcaller as mc
+from operator import attrgetter as at
+from operator import itemgetter as it
+from operator import eq
+from toolz import first, compose
+from pathlib import Path
+import warnings
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
+
+
+class PipeConfig(Config):
+    source: str
+    target: str = None
+    table_dir: str = None
+    file: str = "out.parquet"
 
 
 @op
-def parse(file: str):
-    query = """
-    with blast as (select unnest(BlastOutput2) as item from read_json_auto('{}')),
-    search as (
-    SELECT
-        item->>'$.report.program' as program,
-        item->>'$.report.version' as version,
-        item->>'$.report.reference' as reference,
-        item->>'$.report.search_target' as search_target,
-        item->>'$.report.params' as params,
-        item->>'$.report.results.search.query_id' as query_id,
-        item->>'$.report.results.search.query_title' as query_title,
-        item->>'$.report.results.search.query_len' as query_len,
-        item->>'$.report.results.search.hits' as hits,
-        item->>'$.report.results.search.hits'->0->'$.num' as number_of_hits,
-        item->>'$.report.results.search.hits'->0->'$.description'->0->>'$.title' as title,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.num' as num,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.bit_score' as bit_score,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.score' as score,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.evalue' as evalue,
-        cast(item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.identity' as float) as identity,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.query_from' as query_from,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.query_to' as query_to,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.query_strand' as query_strand,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.hit_from' as hit_from,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.hit_to' as hit_to,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.hit_strand' as hit_strand,
-        cast(item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.align_len' as float) as align_len,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.gaps' as gaps,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.qseq' as qseq,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.hseq' as hseq,
-        item->>'$.report.results.search.hits'->0->'$.hsps'->0->>'$.midline' as midline,
-        regexp_extract(query_title, '^\w+', 0) as query_genome_name,
-        regexp_extract(query_title, '\w+\.\d', 0) as query_genome_id,
-        regexp_extract(query_title, '\| (\w+) \|', 1) as query_gene,
-        regexp_extract(query_title, ' (\w+) \| \[', 1) as query_locus_tag,
-        regexp_extract(query_title, '(\[\d+\:\d+\])', 0) as query_start_end,
-        regexp_extract(query_title, '(\((\+|\-)\))', 0) as query_gene_strand,
-        regexp_extract(title, '^\w+', 0) as source_genome_name,
-        regexp_extract(title, '\w+\.\d', 0) as source_genome_id,
-        regexp_extract(title, '\| (\w+) \|', 1) as source_gene,
-        regexp_extract(title, ' (\w+) \| \[', 1) as source_locus_tag,
-        regexp_extract(title, '(\[\d+\:\d+\])', 0) as source_start_end,
-        regexp_extract(title, '(\((\+|\-)\))', 0) as source_gene_strand,
-        round((identity/align_len)*100,3) as percentage_of_identity
-    FROM
-        blast
-    where
-        json_array_length(hits) > 0
-    )
-    select
-    * exclude(params, hits)
-    from search
-    """
+def setup(config: PipeConfig) -> PipeConfig:
+    """Source/target dirs and    file output"""
+    return config
 
+
+@op(out=DynamicOut())
+def load(setup: PipeConfig):
+    """Load GenBank files"""
+    for file in os.listdir(setup.source):
+        yield DynamicOutput(file, mapping_key=file.replace(".", "_"))
+
+
+@op
+def parse_blastn(context, setup: PipeConfig, file: str):
+    """Retrive sequence and metadata"""
+    query = open("source/sql/parse_blastn.sql").read()
     conn = duckdb.connect(":memory:")
-    conn.query(query.format("data_folder/experimenting/gene_identity/blastn/"+file)).pl().write_parquet(f"data_folder/experimenting/tables/{file}.parquet")
+    os.makedirs(setup.target, exist_ok=True)
+    context.log.info(f"{setup.target}/{file}.parquet")
+    context.log.info(f"File: {file}")
+    source = Path(setup.source) / file
+    context.log.info(f"source: {source}")
+    conn.query(query.format(source)).pl().write_parquet(f"{setup.target}/{file}.parquet")
+    return "OK"
+
+
+@op
+def parse_locus(setup: PipeConfig, file: str):
+    """Retrieve gene and locus metadata"""
+    source = Path(setup.source) / file
+    target = Path(setup.target) / str(Path(file).stem+".parquet")
+    genome = SeqIO.read(str(source), "gb")
+
+    # Ancilliary Functions
+    _type = at("type")
+    _type_gene = compose(partial(eq, "gene"), _type)
+    _type_cds = compose(partial(eq, "CDS"), _type)
     
+    _locus = compose(first,  mc("get", "locus_tag", [""]), at("qualifiers"))
+    _gene = compose(first,  mc("get", "gene", [""]), at("qualifiers"))
+    _protein = compose(it(slice(-2)), first, mc("get", "protein_id", ""), at("qualifiers"))
+    _fn_gene = lambda x: (genome.name, _gene(x), _locus(x))
+    _fn_cds = lambda x: (genome.name, _protein(x), _protein(x))
+
+    # DataFrame structure
+    schema = ["name", "gene", "locus_tag"]
+
+    if set(map(_type, filter(_type_gene, genome.features))):
+        data = list(map(_fn_gene, filter(_type_gene, genome.features)))
+    elif set(map(_type, filter(_type_cds, genome.features))):
+        data = list(map(_fn_cds, filter(_type_cds, genome.features)))
+
+    os.makedirs(setup.target, exist_ok=True)
+    pl.DataFrame(data=data, schema=schema, orient="row").write_parquet(str(target))
     return "OK"
 
 
 @op(ins={"file": In(Nothing)})
-def append():
-    pl.read_parquet("data_folder/experimenting/tables/*.parquet").write_parquet("genes.parquet")
+def append(setup: PipeConfig):
+    """Consolidate in 1 parquet file"""
+    os.makedirs(setup.table_dir, exist_ok=True)
+    path_file = Path(setup.table_dir) / Path(setup.file)
+    pl.read_parquet(f"{setup.target}/*.parquet").write_parquet(path_file)
+    return path_file
 
 
-@job
+@op(ins={"blastn_all": In(asset_key=AssetKey("append_blastn")), "locus_all": In(asset_key=AssetKey("append_locus"))})
+def gene_presence(blastn_all, locus_all):
+    """Consolidate gene and locus"""
+    conn = duckdb.connect(":memory:")
+    query = open("source/sql/gene_presence.sql").read()
+    conn.query(query.format(blastn_all, locus_all)).pl().write_parquet("data/tables/uniqueness.parquet")
+
+
+default_config = RunConfig(
+    ops={"blastn": PipeConfig(
+            source="data/gene_identity/blastn",
+            target="data/fs/blastn_parsing",
+            table_dir="data/tables",
+            file="blastn_summary.parquet"
+            ),
+        "locus": PipeConfig(
+            source="data/genbank",
+            target="data/fs/locus_parsing",
+            table_dir="data/tables",
+            file="locus_and_gene.parquet"
+        )}
+)
+
+@job(config=default_config)
 def transform():
-    files = load()
-    results = files.map(parse)
-    append(results.collect())
+    """GenBank into parquet"""
+    config_blastn = setup.alias("blastn")()
+    files = load.alias("load_blastn")(config_blastn)
+    results = files.map(partial(parse_blastn, config_blastn))
+    blastn_all = append.alias("append_blastn")(config_blastn, results.collect())
+
+    config_locus = setup.alias("locus")()
+    files_locus = load.alias("load_locus")(config_locus)
+    results_locus = files_locus.map(partial(parse_locus, config_locus))
+    locus_all = append.alias("append_locus")(config_locus, results_locus.collect())
+
+    gene_presence(blastn_all=blastn_all, locus_all=locus_all)
+
+
+#defs = Definitions(jobs=[transform])
+
 
 
 # asset_job_sensor = genbank_file_update_sensor(
@@ -148,4 +202,12 @@ uniq_schedule = ScheduleDefinition(
     job=uniq_job,
     cron_schedule="*/5 * * * *",  # every hour minute???
     tags={"dagster/priority": "2"},
+)
+
+
+# Job creating the graph
+
+synteny_job = define_asset_job(
+    name="synteny_job",
+    selection=AssetSelection.groups("Viewer"),
 )

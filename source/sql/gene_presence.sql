@@ -1,0 +1,8 @@
+with blastn as (select COLUMNS('^(query|source)_.*$'), query_genome_name as name,query_locus_tag as locus_tag from read_parquet('{}')),
+     locus as (select * from read_parquet('{}'))
+select 
+    A.*, B.gene
+FROM 
+    blastn A
+LEFT JOIN
+    locus B using('name', 'locus_tag')
