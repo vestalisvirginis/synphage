@@ -17,32 +17,41 @@ from datetime import datetime
 from typing import List
 
 
-genbank_folder_config = {
-    "phage_download_directory": Field(
+file_config = {
+    "fs": Field(
         str,
-        description="Path to folder containing the genebank sequence _files",
-        # default_value="/usr/src/data/phage_view_data/genome_download",
-        default_value="/usr/src/data_folder/jaka_data/genome_download",
+        description="Path to folder containing the genbank _files",
+        default_value="fs",
     ),
-    "spbetaviruses_directory": Field(
+}
+
+sqc_folder_config = {
+    "sqc_download_dir": Field(
         str,
-        description="Path to folder containing the genebank sequence _files",
-        # default_value="/usr/src/data_folder/phage_view_data/genbank_spbetaviruses",
-        default_value="/usr/src/data_folder/jaka_data/genbank",
+        description="Path to folder containing the downloaded genbank sequences",
+        default_value="download",
+    ),
+    "genbank_dir": Field(
+        str,
+        description="Path to folder containing the genbank files",
+        default_value="genbank",
+    ),
+    "fasta_dir": Field(
+        str,
+        description="Path to folder containing the fasta sequence files",
+        default_value="gene_identity/fasta",
     ),
 }
 
 
 @asset(
-    config_schema={**genbank_folder_config},
-    # config_schema={**path_config},
-    description="Select for Spbetaviruses with complete genome sequence",
+    config_schema={**sqc_folder_config},
+    description="Select for phages with complete genome sequence",
     compute_kind="Biopython",
     metadata={"owner": "Virginie Grosboillot"},
 )
 def sequence_sorting(context, fetch_genome) -> List[str]:
     context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
-    # context.log.info(f" Files: {fetch_genome}")
 
     _complete_sequences = []
     for _file in fetch_genome:
@@ -57,7 +66,7 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
         for _p in SeqIO.parse(_file, "gb"):
             for _feature in _p.features:
                 if _feature.type == "source":
-                    for _v in feature.qualifiers.values():
+                    for _v in _feature.qualifiers.values():
                         if re.search("Bacillus subtilis", _v[0]):
                             _bacillus_sub_sequences.append(_file)
 
@@ -77,13 +86,14 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
 
     for _file in _genes_in_sequences:
         shutil.copy2(
-            _file, f'{context.op_config["spbetaviruses_directory"]}/{Path(_file).stem}.gb'
+            _file,
+            f'{context.op_config["genbank_dir"]}/{Path(_file).stem}.gb',
         )
 
     return list(
         map(
             lambda x: Path(x).stem,
-            os.listdir(context.op_config["spbetaviruses_directory"]),
+            os.listdir(context.op_config["genbank_dir"]),
         )
     )
 
@@ -101,28 +111,6 @@ def _assess_file_content(genome) -> bool:
                 break
 
     return gene_value
-
-
-file_config = {
-    "fs": Field(
-        str,
-        description="Path to folder containing the genbank _files",
-        default_value="fs",
-    ),
-}
-
-sqc_folder_config = {
-    "genbank_dir": Field(
-        str,
-        description="Path to folder containing the genbank files",
-        default_value="genbank",
-    ),
-    "fasta_dir": Field(
-        str,
-        description="Path to folder containing the fasta sequence files",
-        default_value="gene_identity/fasta",
-    ),
-}
 
 
 @multi_asset(
@@ -149,15 +137,11 @@ sqc_folder_config = {
     compute_kind="Biopython",
     op_tags={"blaster": "compute_intense"},
 )
-def genbank_to_fasta(context, standardised_ext_file):  # -> str:
+def genbank_to_fasta(context, standardised_ext_file):
     # Paths to read and store the data
-    # path_in = "/".join(
-    #     [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
-    # )
     _path_out = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["fasta_dir"]]
     )
-
     _path = "/".join(
         [
             os.getenv(EnvVar("PHAGY_DIRECTORY")),
@@ -175,7 +159,6 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
         _fasta_files = []
     context.log.info(_fasta_files)
 
-    # context.log.info(path_in)
     context.log.info(_path_out)
 
     os.makedirs(_path_out, exist_ok=True)
@@ -187,15 +170,12 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
             context.log.info(f"The following file {_file} is being processed")
 
             # Genbank to fasta
-            # file = standardised_ext_file
-            # context.log.info(_file)
             _output_dir = f"{_path_out}/{Path(_file).stem}.fna"
             context.log.info(_output_dir)
             _genome = SeqIO.read(_file, "genbank")
             _genome_records = list(SeqIO.parse(_file, "genbank"))
 
             if _assess_file_content(_genome) == True:
-
                 with open(_output_dir, "w") as _f:
                     _gene_features = list(
                         filter(lambda x: x.type == "gene", _genome.features)
@@ -219,7 +199,6 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
                                 )
                             )
             else:
-
                 with open(_output_dir, "w") as _f:
                     _gene_features = list(
                         filter(lambda x: x.type == "CDS", _genome.features)
@@ -289,7 +268,6 @@ blastn_folder_config = {
     config_schema={**sqc_folder_config, **blastn_folder_config},
     description="Receive a fasta _file as input and create a database for blast in the output directory",
     compute_kind="Blastn",
-    # auto_materialize_policy=AutoMaterializePolicy.eager(),
     op_tags={"blaster": "compute_intense"},
     metadata={"owner": "Virginie Grosboillot"},
 )
@@ -311,8 +289,6 @@ def create_blast_db(context, new_fasta_files):
         _db.append(_new_fasta_file)
 
     _all_db = list(set(map(lambda x: f"{_path}/{Path(x).stem}", os.listdir(_path))))
-
-    # context.log.info(f"list of db: {set([Path(p).stem for p in all_db])}")
 
     _time = datetime.now()
     context.add_output_metadata(
