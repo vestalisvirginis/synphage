@@ -88,6 +88,21 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
     )
 
 
+def _assess_file_content(genome) -> bool:
+    """Assess wether the genbank file contains gene or only CDS"""
+
+    gene_count = 0
+    gene_value = False
+    for feature in genome.features:
+        if feature.type == "gene":
+            gene_count = gene_count + 1
+            if gene_count > 1:
+                gene_value = True
+                break
+
+    return gene_value
+
+
 file_config = {
     "fs": Field(
         str,
@@ -147,7 +162,7 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
         [
             os.getenv(EnvVar("PHAGY_DIRECTORY")),
             context.op_config["fs"],
-            "history_fasta__files",
+            "history_fasta_files",
         ]
     )
 
@@ -179,28 +194,53 @@ def genbank_to_fasta(context, standardised_ext_file):  # -> str:
             _genome = SeqIO.read(_file, "genbank")
             _genome_records = list(SeqIO.parse(_file, "genbank"))
 
-            with open(_output_dir, "w") as _f:
-                _gene_features = list(
-                    filter(lambda x: x.type == "gene", _genome.features)
-                )
-                for _feature in _gene_features:
-                    for _seq_record in _genome_records:
-                        _f.write(
-                            ">%s | %s | %s | %s | %s | %s\n%s\n"
-                            % (
-                                _seq_record.name,
-                                _seq_record.id,
-                                _seq_record.description,
-                                _feature.qualifiers["gene"][0]
-                                if "gene" in _feature.qualifiers.keys()
-                                else "None",
-                                _feature.qualifiers["locus_tag"][0],
-                                _feature.location,
-                                _seq_record.seq[
-                                    _feature.location.start : _feature.location.end
-                                ],
+            if _assess_file_content(_genome) == True:
+
+                with open(_output_dir, "w") as _f:
+                    _gene_features = list(
+                        filter(lambda x: x.type == "gene", _genome.features)
+                    )
+                    for _feature in _gene_features:
+                        for _seq_record in _genome_records:
+                            _f.write(
+                                ">%s | %s | %s | %s | %s | %s\n%s\n"
+                                % (
+                                    _seq_record.name,
+                                    _seq_record.id,
+                                    _seq_record.description,
+                                    _feature.qualifiers["gene"][0]
+                                    if "gene" in _feature.qualifiers.keys()
+                                    else "None",
+                                    _feature.qualifiers["locus_tag"][0],
+                                    _feature.location,
+                                    _seq_record.seq[
+                                        _feature.location.start : _feature.location.end
+                                    ],
+                                )
                             )
-                        )
+            else:
+
+                with open(_output_dir, "w") as _f:
+                    _gene_features = list(
+                        filter(lambda x: x.type == "CDS", _genome.features)
+                    )
+                    for _feature in _gene_features:
+                        for _seq_record in _genome_records:
+                            _f.write(
+                                ">%s | %s | %s | %s | %s | %s\n%s\n"
+                                % (
+                                    _seq_record.name,
+                                    _seq_record.id,
+                                    _seq_record.description,
+                                    _feature.qualifiers["protein_id"][0],
+                                    _feature.qualifiers["protein_id"][0][:-2],
+                                    _feature.location,
+                                    _seq_record.seq[
+                                        _feature.location.start : _feature.location.end
+                                    ],
+                                )
+                            )
+
             _new_fasta_files.append(Path(_file).stem)
             _new_fasta_paths.append(_output_dir)
 
