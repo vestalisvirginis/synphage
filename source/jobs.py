@@ -1,7 +1,6 @@
 from dagster import (
     AssetSelection,
     define_asset_job,
-    ScheduleDefinition,
     op,
     job,
     DynamicOutput,
@@ -9,15 +8,28 @@ from dagster import (
     Nothing,
     In,
     RunConfig,
+    Config,
+    AssetKey,
+    ExperimentalWarning,
 )
 
 import os
 import duckdb
 import polars as pl
+from functools import partial
+from Bio import SeqIO
+from operator import methodcaller as mc
+from operator import attrgetter as at
+from operator import itemgetter as it
+from operator import eq
+from toolz import first, compose
+from pathlib import Path
+import warnings
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
-# from .sensors import genbank_file_update_sensor
-
+# Job 1 -> get the list of genbank to blastn
 blasting_job = define_asset_job(
     name="blasting_job",
     selection=AssetSelection.groups("Status")
@@ -30,22 +42,7 @@ blasting_job = define_asset_job(
 )
 
 
-# Job parsing blastn files
-
-import os
-from dagster import op, job, DynamicOutput, DynamicOut, Definitions, Nothing, In, Config, AssetKey, ExperimentalWarning
-import polars as pl
-import duckdb
-from functools import partial, reduce
-from Bio import SeqIO
-from operator import methodcaller as mc
-from operator import attrgetter as at
-from operator import itemgetter as it
-from operator import eq
-from toolz import first, compose
-from pathlib import Path
-import warnings
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
+# Job 2 parsing blastn files and locus -> create uniqueness DataFrame
 
 
 class PipeConfig(Config):
@@ -78,7 +75,9 @@ def parse_blastn(context, setup: PipeConfig, file: str):
     context.log.info(f"File: {file}")
     source = Path(setup.source) / file
     context.log.info(f"source: {source}")
-    conn.query(query.format(source)).pl().write_parquet(f"{setup.target}/{file}.parquet")
+    conn.query(query.format(source)).pl().write_parquet(
+        f"{setup.target}/{file}.parquet"
+    )
     return "OK"
 
 
@@ -86,17 +85,19 @@ def parse_blastn(context, setup: PipeConfig, file: str):
 def parse_locus(setup: PipeConfig, file: str):
     """Retrieve gene and locus metadata"""
     source = Path(setup.source) / file
-    target = Path(setup.target) / str(Path(file).stem+".parquet")
+    target = Path(setup.target) / str(Path(file).stem + ".parquet")
     genome = SeqIO.read(str(source), "gb")
 
     # Ancilliary Functions
     _type = at("type")
     _type_gene = compose(partial(eq, "gene"), _type)
     _type_cds = compose(partial(eq, "CDS"), _type)
-    
-    _locus = compose(first,  mc("get", "locus_tag", [""]), at("qualifiers"))
-    _gene = compose(first,  mc("get", "gene", [""]), at("qualifiers"))
-    _protein = compose(it(slice(-2)), first, mc("get", "protein_id", ""), at("qualifiers"))
+
+    _locus = compose(first, mc("get", "locus_tag", [""]), at("qualifiers"))
+    _gene = compose(first, mc("get", "gene", [""]), at("qualifiers"))
+    _protein = compose(
+        it(slice(-2)), first, mc("get", "protein_id", ""), at("qualifiers")
+    )
     _fn_gene = lambda x: (genome.name, _gene(x), _locus(x))
     _fn_cds = lambda x: (genome.name, _protein(x), _protein(x))
 
@@ -122,28 +123,38 @@ def append(setup: PipeConfig):
     return path_file
 
 
-@op(ins={"blastn_all": In(asset_key=AssetKey("append_blastn")), "locus_all": In(asset_key=AssetKey("append_locus"))})
+@op(
+    ins={
+        "blastn_all": In(asset_key=AssetKey("append_blastn")),
+        "locus_all": In(asset_key=AssetKey("append_locus")),
+    }
+)
 def gene_presence(blastn_all, locus_all):
     """Consolidate gene and locus"""
     conn = duckdb.connect(":memory:")
     query = open("source/sql/gene_presence.sql").read()
-    conn.query(query.format(blastn_all, locus_all)).pl().write_parquet("data/tables/uniqueness.parquet")
+    conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
+        "data/tables/uniqueness.parquet"
+    )
 
 
 default_config = RunConfig(
-    ops={"blastn": PipeConfig(
+    ops={
+        "blastn": PipeConfig(
             source="data/gene_identity/blastn",
             target="data/fs/blastn_parsing",
             table_dir="data/tables",
-            file="blastn_summary.parquet"
-            ),
+            file="blastn_summary.parquet",
+        ),
         "locus": PipeConfig(
             source="data/genbank",
             target="data/fs/locus_parsing",
             table_dir="data/tables",
-            file="locus_and_gene.parquet"
-        )}
+            file="locus_and_gene.parquet",
+        ),
+    }
 )
+
 
 @job(config=default_config)
 def transform():
@@ -161,51 +172,7 @@ def transform():
     gene_presence(blastn_all=blastn_all, locus_all=locus_all)
 
 
-#defs = Definitions(jobs=[transform])
-
-
-
-# asset_job_sensor = genbank_file_update_sensor(
-#     define_asset_job(
-#         name="load_job",
-#         selection=AssetSelection.groups("Status")
-#         | (
-#             AssetSelection.groups("Blaster")
-#             & AssetSelection.keys("process_asset").downstream()
-#         )
-#         | AssetSelection.keys("extract_locus_tag_gene"),
-#         tags={"dagster/priority": "0"},
-#     )
-# )
-
-
-# Job triggering the json files parsing
-parsing_job = define_asset_job(
-    name="parsing_job",
-    selection=AssetSelection.keys("parse_blastn").required_multi_asset_neighbors(),
-)
-
-parsing_schedule = ScheduleDefinition(
-    job=parsing_job,
-    cron_schedule="*/1 * * * *",  # every minute
-    tags={"dagster/priority": "1"},
-)
-
-
-# Job triggering the update of the last tables based on Locus_and_gene and blastn dataframes
-uniq_job = define_asset_job(
-    name="uniq_job",
-    selection=AssetSelection.keys("gene_presence_table"),
-)
-
-uniq_schedule = ScheduleDefinition(
-    job=uniq_job,
-    cron_schedule="*/5 * * * *",  # every hour minute???
-    tags={"dagster/priority": "2"},
-)
-
-
-# Job creating the graph
+# Job 3 -> creates the synteny diagram
 
 synteny_job = define_asset_job(
     name="synteny_job",
