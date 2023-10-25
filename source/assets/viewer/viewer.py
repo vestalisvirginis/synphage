@@ -452,7 +452,7 @@ def create_graph(context, create_genome, config: Diagram):
 
     # For metadata
     buffer = BytesIO()
-    _gd_diagram.write(buffer, 'png')
+    _gd_diagram.write(buffer, "png")
     image_data = base64.b64encode(buffer.getvalue())
 
     # Asset metadata
@@ -462,7 +462,9 @@ def create_graph(context, create_genome, config: Diagram):
             "num_sqcs": len(_records),
             "path": _path_output,
             "sequences": MetadataValue.json(_record_names),
-            "synteny_overview": MetadataValue.md(f"![img](data:image/png;base64,{image_data.decode()})")
+            "synteny_overview": MetadataValue.md(
+                f"![img](data:image/png;base64,{image_data.decode()})"
+            ),
         }
     )
 
