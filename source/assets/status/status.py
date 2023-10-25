@@ -21,31 +21,6 @@ def _standardise_file_extention(file) -> None:
         return _path
 
 
-# ______ Used for the sensor
-
-# class FileConfig(Config):
-#     filename: str
-
-
-# @op(
-#     retry_policy=RetryPolicy(
-#         max_retries=3,
-#         delay=0.2,  # 200ms
-#     )
-# )
-# def process_file(context, config: FileConfig):
-#     """Print file name on console"""
-#     context.log.info(config.filename)
-#     return config.filename
-
-
-# @graph_asset()
-# def process_asset():
-#     return process_file()
-
-# ______________
-
-
 sqc_folder_config = {
     "fs": Field(
         str,
@@ -87,13 +62,11 @@ sqc_folder_config = {
     },
     compute_kind="Python",
 )
-def list_genbank_files(context):  # -, process_asset - > List[str]:
+def list_genbank_files(context):
     # List files in the genbank directory
-    _gb_path = "/".join([os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]])
-
-    # filepath = "/".join(
-    #     [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"], process_asset]
-    # )
+    _gb_path = "/".join(
+        [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]]
+    )
 
     # Load already processed files
     _path = "/".join(
@@ -114,19 +87,17 @@ def list_genbank_files(context):  # -, process_asset - > List[str]:
 
     _new_files = []
     _new_paths = []
-    for _file in glob.glob(f'{_gb_path}/*.gb*'):  #os.listdir(gb_path):
+    for _file in glob.glob(f"{_gb_path}/*.gb*"):
         if Path(_file).stem not in _files:
             context.log.info(f"The following file {_file} is being processed")
-            #filepath = "/".join([gb_path, file])
-            # Standarise file extension
             _new_path = _standardise_file_extention(_file)
-            # new_path = _standardise_file_extention(process_asset)
+
+            # Update lists
             _new_paths.append(_new_path)
             _new_files.append(_new_path.stem)
 
     # Update file list
-    for _new_file in _new_files:
-        _files.append(_new_file)
+    _files = _files + _new_files
 
     # Asset metadata
     _time = datetime.now()
