@@ -84,16 +84,20 @@ def sequence_sorting(context, fetch_genome) -> List[str]:
         f"Number of sequences with gene features: {len(_genes_in_sequences)}"
     )
 
+    _gb_path = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genebank_dir"]]
+    )
+
     for _file in _genes_in_sequences:
         shutil.copy2(
             _file,
-            f'{context.op_config["genbank_dir"]}/{Path(_file).stem}.gb',
+            f"{_gb_path}/{Path(_file).stem}.gb",
         )
 
     return list(
         map(
             lambda x: Path(x).stem,
-            os.listdir(context.op_config["genbank_dir"]),
+            os.listdir(_gb_path),
         )
     )
 

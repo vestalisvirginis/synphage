@@ -1,8 +1,7 @@
-from dagster import asset, Field, AssetObservation
+from dagster import asset, Field, AssetObservation, EnvVar
 
 import os
 
-from Bio import Entrez
 from toolz import first
 from collections import namedtuple
 from typing import List
@@ -86,16 +85,17 @@ download_folder_config = {
     "output_directory": Field(
         str,
         description="Path to folder",
-        default_value="/usr/src/data_folder/phage_view_data/genome_download",
+        default_value="download",
     )
 }
 
 
 @asset(config_schema=download_folder_config, compute_kind="python")
 def downloaded_genomes(context) -> List[str]:
-    return list(
-        map(lambda x: Path(x).stem, os.listdir(context.op_config["output_directory"]))
+    _download_path = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["output_directory"]]
     )
+    return list(map(lambda x: Path(x).stem, os.listdir(_download_path)))
 
 
 ncbi_query_config_fetch = {
@@ -118,8 +118,8 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
     _C = _A.difference(_B)
     context.log.info(f"Number of NOT Downloaded: {len(_C)}")
     _path = context.op_config["output_directory"]
-    # context.log.info(accession_ids["IdList"])
-    for _entry in list(C):
+
+    for _entry in list(_C):
         _r = context.resources.ncbi_connection.conn.efetch(
             db=context.op_config["database"],
             id=_entry,
