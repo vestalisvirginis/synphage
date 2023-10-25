@@ -3,6 +3,6 @@ with blastn as (select COLUMNS('^(query|source)_.*$'), query_genome_name as name
 select 
     A.*, B.gene
 FROM 
-    blastn A
+    locus B
 LEFT JOIN
-    locus B using('name', 'locus_tag')
+    blastn A using('name', 'locus_tag')
