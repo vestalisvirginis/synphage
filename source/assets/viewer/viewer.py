@@ -1,13 +1,12 @@
 from dagster import asset, Field, Config, EnvVar, MetadataValue
 
 import enum
-import hashlib
 import os
+import base64
+from io import BytesIO
 
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Any, Union, Literal, Optional
-from pathlib import Path
+from typing import Optional
 from Bio import SeqIO, SeqRecord
 from Bio.Graphics import GenomeDiagram
 from reportlab.lib import colors
@@ -18,14 +17,10 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 
 
-# from typing_extension import Literal
-from pydantic import Field
-
-
 def gene_uniqueness(
     _spark,
     _record_name: list,
-    _path_to_dataset: str = "/usr/src/data_folder/phage_view_data/gene_identity/gene_uniqueness",
+    _path_to_dataset: str,
 ):
     """Calculate percentage of the presence of a given gene over the displayed sequences"""
 
@@ -114,70 +109,6 @@ def create_genome(context):
     return _sequences
 
 
-# @dataclass
-# class Genome:
-#     path: str
-#     orientation: CheckOrientation
-
-#     @property
-#     def key(self):
-#         return (
-#             hashlib.blake2s(
-#                 bytes(
-#                     f"{self.path}{self.orientation}",
-#                     "utf-8",
-#                 )
-#             )
-#             .hexdigest()
-#             .upper()
-#         )
-
-#     def __post_init__(self):
-#         if isinstance(self.orientation, int):
-#             # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
-#             self.orientation = CheckOrientation(self.orientation)
-
-#     def __repr__(self):
-#         return f"file: {Path(self.path).stem}, orientation: {self.orientation}"
-
-#     def __rshift__(self, genome_dict: Dict[str, Any]) -> Dict[str, Any]:
-#         genome_dict[self.key] = self
-#         return genome_dict
-
-
-# class Diagram:
-#     def __init__(self):
-#         self._genome: Dict[str:Genome] = {}
-#         self.rows = -1
-
-#     def __repr__(self):
-#         return f"Diagram(genomes:{self.sum})"
-
-#     @property
-#     def sum(self):
-#         """Collect of genomes"""
-#         return len(self._genome)
-
-#     @property
-#     def empty(self):
-#         """True when no rules are added in the check"""
-#         return len(self.rules) == 0
-
-#     def add_genome(self, path: str, orientation: int = 0):
-#         """Add a new genome in the Diagram class"""
-#         Genome(path, orientation) >> self._genome
-#         return self
-
-
-# synteny_folder_config = {
-#     "synteny_directory": Field(
-#         str,
-#         description="Path to folder containing the data for synteny visualisation",
-#         default_value="/usr/src/data_folder/phage_view_data/synteny",
-#     ),
-# }
-
-
 def _read_seq(_path: str, _orientation: str) -> SeqRecord.SeqRecord:
     """Read sequence according to genome orientation"""
     if _orientation == CheckOrientation.SEQUENCE.name:
@@ -201,37 +132,6 @@ def _get_feature(
     raise KeyError(_id)
 
 
-# class Genome(Config):
-#     genomes: Dict[str, CheckOrientation]
-# genomes: Dict[str = Field(description= "Path to the genome"), CheckOrientation = Field(description= "For displaying the sequence in the rigth orientation")]
-
-
-#     # @property
-#     # def key(self):
-#     #     return (
-#     #         hashlib.blake2s(
-#     #             bytes(
-#     #                 f"{self.path}{self.orientation}",
-#     #                 "utf-8",
-#     #             )
-#     #         )
-#     #         .hexdigest()
-#     #         .upper()
-#     #     )
-
-#     # def __post_init__(self):
-#     #     if isinstance(self.orientation, int):
-#     #         # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
-#     #         self.orientation = CheckOrientation(self.orientation)
-
-#     # def __repr__(self):
-#     #     return f"file: {Path(self.path).stem}, orientation: {self.orientation}"
-
-#     # def __rshift__(self, genome_dict: Dict[str, Any]) -> Dict[str, Any]:
-#     #     genome_dict[self.key] = self
-#     #     return genome_dict
-
-
 class Diagram(Config):
     title: str = "diagram"
     output_format: str = "SVG"
@@ -245,23 +145,6 @@ class Diagram(Config):
     uniq_dir: str = "tables/uniqueness.parquet"
 
 
-#     # def __repr__(self):
-#     #     return f"Diagram(genomes:{self.sum})"
-
-#     # @property
-#     # def sum(self):
-#     #     """Collect of genomes"""
-#     #     return len(self._genome)
-
-#     # @property
-#     # def empty(self):
-#     #     """True when no rules are added in the check"""
-#     #     return len(self.rules) == 0
-
-#     # def add_genome(self, path: str, orientation: int = 0):
-#     #     """Add a new genome in the Diagram class"""
-#     #     Genome(path, orientation) >> self._genome
-#     #     return self
 gene_uniqueness_folder_config = {
     "output_folder": Field(
         str,
@@ -277,7 +160,6 @@ gene_uniqueness_folder_config = {
 
 
 @asset(
-    # config_schema={**gene_uniqueness_folder_config},
     description="Transform a list of genomes into a genome diagram",
     compute_kind="Biopython",
     metadata={
@@ -288,9 +170,8 @@ gene_uniqueness_folder_config = {
         "owner": "Virginie Grosboillot",
     },
 )
-def create_graph(
-    context, create_genome, config: Diagram
-):  # parse_blastn, extract_locus_tag_gene,
+def create_graph(context, create_genome, config: Diagram):
+    # Define the paths
     _output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
     _blastn_dir = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), "tables", "blastn_summary.parquet"]
@@ -304,7 +185,10 @@ def create_graph(
     spark = SparkSession.builder.getOrCreate()
 
     # Set name for the diagram
-    _name = config.title
+    if os.getenv(EnvVar("TITLE")):
+        _name_graph = os.getenv(EnvVar("TITLE"))
+    else:
+        _name_graph = config.title
 
     # Read sequences for each genome and assign them in a variable
     _records = {}
@@ -312,7 +196,6 @@ def create_graph(
     for _k, _v in create_genome.items():
         _record = _read_seq(_k, _v)
         context.log.info(f"Orientation: {_record}")
-        # context.log.info(f"Orientation: {orientation}")
         _records[_record.name] = _record
 
     _record_names = [_rec for _rec in _records.keys()]
@@ -327,8 +210,8 @@ def create_graph(
     ]
     context.log.info(f"List of the records name: {_record_names}")
 
-    # instanciate the graphic, features, seq_order
-    _gd_diagram = GenomeDiagram.Diagram(_name)
+    # Instanciate the graphic, features, seq_order
+    _gd_diagram = GenomeDiagram.Diagram(_name_graph)
     _feature_sets = {}
     _max_len = 0
 
@@ -421,7 +304,10 @@ def create_graph(
                     _perc = (
                         _gene_color_palette.filter(
                             (F.col("name") == _record_name)
-                            & (F.col("locus_tag") == _feature.qualifiers["locus_tag"][0])
+                            & (
+                                F.col("locus_tag")
+                                == _feature.qualifiers["locus_tag"][0]
+                            )
                         )
                         .select("perc_presence")
                         .collect()[0][0]
@@ -459,19 +345,19 @@ def create_graph(
                 try:
                     for _k, _v in _feature.qualifiers.items():
                         if _k == "gene":
-                            _name = _v[0]
+                            _name_gene = _v[0]
                 except:
                     for _k, _v in _feature.qualifiers.items():
                         if _k == "locus_tag":
-                            _name = _v[0]
+                            _name_gene = _v[0]
                 finally:
-                    _name = ""
+                    _name_gene = ""
                 _gd_feature_set.add_feature(
                     _feature,
                     sigil="BIGARROW",
                     color=_gene_color,
                     label=True,
-                    name=_name,
+                    name=_name_gene,
                     label_position="middle",
                     label_size=6,
                     label_angle=0,
@@ -526,13 +412,13 @@ def create_graph(
                     _gene_color = colors.white
                 for _k, _v in _feature.qualifiers.items():
                     if _k == "protein_id":
-                        _name = _v[0][:-2]
+                        _name_gene = _v[0][:-2]
                 _gd_feature_set.add_feature(
                     _feature,
                     sigil="BIGARROW",
                     color=_gene_color,
                     # label=True,
-                    # name=_name,
+                    # name=_name_gene,
                     # label_position="middle",
                     # label_size=6,
                     # label_angle=0,
@@ -561,46 +447,23 @@ def create_graph(
     else:
         _fmt = "png"
 
-    _path_output = str(f"{_output_folder}/{_name}.{_fmt}")
-    # return gd_diagram.write(f"{config.output_folder}/{name}.{fmt}", config.output_format)
-    #_gd_diagram.write('demo_diagram.svg', config.output_format)
-    _gd_diagram.write(str(f"{_output_folder}/{_name}.{_fmt}"), config.output_format)
-    #return gd_diagram.write(path_output, config.output_format)
+    _path_output = str(f"{_output_folder}/{_name_graph}.{_fmt}")
+    _gd_diagram.write(_path_output, config.output_format)
 
-    return 'Done'
+    # For metadata
+    buffer = BytesIO()
+    _gd_diagram.write(buffer, 'png')
+    image_data = base64.b64encode(buffer.getvalue())
 
+    # Asset metadata
+    context.add_output_metadata(
+        metadata={
+            "text_metadata": "A synteny diagram had been created.",
+            "num_sqcs": len(_records),
+            "path": _path_output,
+            "sequences": MetadataValue.json(_record_names),
+            "synteny_overview": MetadataValue.md(f"![img](data:image/png;base64,{image_data.decode()})")
+        }
+    )
 
-#         self,
-#         spark,
-#         folder: str,
-#         blastn_path: str,
-#         gene_uniq_path: str,
-#         graph_title: str = "Title:",
-#     ):
-#         """Transform a list of genomes into a genome diagram"""
-
-
-#         # import numpy as np
-#         # transcriptomic_data =  list(np.random.uniform(low=5.0, high=18.0, size=(203, )))
-#         # transcriptomic = {'trans_name', transcriptomic_data}
-
-#         # nbr_add_tracks = len(transcriptomic)
-#         # graphTracks = [i for i in range(2*len(records)-1, nbr_add_tracks, 1)]
-
-#         # transcriptomic_sets = {}
-
-#         # for i, cond in zip(graphTracks, transcriptomic.keys()):
-#         #     gd_track_for_transcriptomic = gd_diagram.new_track(
-#         #         i,
-#         #         name=cond,
-#         #         greytrack=True,
-#         #         height=0.5,
-#         #         start=0,
-#         #         end=len(records['']),
-#         #     )
-#         #     assert cond not in transcriptomic_sets
-#         #     transcriptomic_sets[cond] = gd_track_for_transcriptomic.new_set()
-#         #     seq_order[cond] = i
-#         # for cond, data in transcriptomic.items():
-#         #     gd_transcriptomic_set = transcriptomic_sets[cond]
-#         #     gd_transcriptomic_set.new_graph(data, f'{cond}', style='line', colour=colors.violet) #'bar'
+    return "Done"
