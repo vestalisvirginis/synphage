@@ -1,4 +1,6 @@
-from dagster import resource
+from dagster import resource, EnvVar
+
+import os
 
 from Bio import Entrez
 
@@ -17,8 +19,6 @@ class NCBIConnection:
 @resource
 def ncbi_resource(init_context):
     return NCBIConnection(
-        # init_context.resource_config["email"],
-        # init_context.resource_config["api_key"]
-        "virginie.grosboillot@bf.uni-lj.si",
-        "8a016c7273a14c68d5f72af6f404024dfc08",
+        os.getenv(EnvVar("EMAIL")),
+        os.getenv(EnvVar("API_KEY")),
     )
