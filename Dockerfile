@@ -1,20 +1,36 @@
-FROM python:3.10.12
-
-RUN apt update -y
-RUN apt install wget -y
-RUN apt install tar -y
-RUN apt install ncbi-blast+ -y
-RUN apt install x11-xserver-utils -y
+FROM python:3.10.13
 
 WORKDIR /usr/src
 
-COPY requirements.txt .
+RUN mkdir -p /data/genbank
+RUN mkdir -p /data/results
+RUN mkdir -p /dagster
 
-RUN apt install openjdk-11-jdk -y
+# Create volumes
+VOLUME /data
+VOLUME /dagster
+
+# NCBI blast standalone
+RUN apt update -y
+RUN apt install ncbi-blast+ -y
+
+# Java Runtime
+RUN apt install openjdk-17-jdk -y
+
+# Libraries
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install synphage
 
-ENV DAGSTER_HOME=/usr/src/dagster_home/
+# Environment variables 
+# To run dagster
+ENV DAGSTER_HOME=/dagster
+# File config
+ENV PHAGY_DIRECTORY=/data
+ENV FILE_SYSTEM=$(PHAGY_DIRECTORY)/fs
+# NCBI Connect
+ENV EMAIL=""
+ENV API_KEY=""
 
-RUN mkdir -p /usr/src/data
-VOLUME /usr/src/data
+EXPOSE 3000
+
+CMD ["dagster", "dev", "-h", "0.0.0.0", "-p", "3000", "-m", "synphage"]
