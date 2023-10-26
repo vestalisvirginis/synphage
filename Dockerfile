@@ -1,10 +1,10 @@
-FROM python:3.10.13
+FROM python:3.10
 
 WORKDIR /usr/src
 
+RUN mkdir -p /dagster
 RUN mkdir -p /data/genbank
 RUN mkdir -p /data/results
-RUN mkdir -p /dagster
 
 # Create volumes
 VOLUME /data
@@ -19,7 +19,7 @@ RUN apt install openjdk-17-jdk -y
 
 # Libraries
 RUN pip install --upgrade pip
-RUN pip install synphage
+RUN pip install synphage dagster-webserver
 
 # Environment variables 
 # To run dagster
