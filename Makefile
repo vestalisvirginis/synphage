@@ -5,7 +5,7 @@ clean: # Remove workspace files
 	@rm -rf ./.pytest_cache
 	@rm -rf ./htmlcov
 	@rm -rf ./build
-	@rm -rf ./source.egg-info
+	@rm -rf ./synphage.egg-info
 	@rm -rf .coverage
 	@rm -rf .scannerwork
 	@rm -rf ./dist
@@ -14,14 +14,14 @@ clean: # Remove workspace files
 	@python -c "print('Cleaning: 👌')"
 
 black: # Format code
-	@black source
+	@black synphage
 
 flake: # Lint code
-	@flake8 --ignore=E501,W503,E731,E722 --max-cognitive-complexity=30 source
+	@flake8 --ignore=E501,W503,E731,E722 --max-cognitive-complexity=30 synphage
 	@python -c "print('Linting: 👌')"
 
 radon:
-	@radon cc source-a -nc
+	@radon cc synphage-a -nc
 	@python -c "print('Cyclomatic complexity: 👌')"
 	
 cov: # Run test and coverage
@@ -29,10 +29,10 @@ cov: # Run test and coverage
 	coverage xml -o temp/coverage.xml
 
 cloc: # Counts lines of code
-	cloc source
+	cloc synphage
 
 cloc_file: # Count the lines of code per file
-	@cloc --exclude-ext=json --by-file source | grep source | awk '{print $$1" "$$4}' | termgraph
+	@cloc --exclude-ext=json --by-file synphage | grep synphage | awk '{print $$1" "$$4}' | termgraph
 
 print: # Prints make targets
 	@grep --color '^[^#[:space:]].*:' Makefile
@@ -42,17 +42,17 @@ report: # Launches the coverage report
 	@python -m http.server --directory htmlcov
 
 type: # Verify static types
-	@mypy --install-types --non-interactive source
+	@mypy --install-types --non-interactive synphage
 	@python -c "print('Types: 👌')"
 
 # build: # Build wheel
 # 	@python setup.py bdist_wheel --universal
 
 # uninstall: # Remove wheel 
-# 	@pip uninstall -y source
+# 	@pip uninstall -y synphage
 
 # install: # Install build wheel
-# 	@pip install --find-links=dist source
+# 	@pip install --find-links=dist synphage
 
 # refresh: clean build uninstall install
 
