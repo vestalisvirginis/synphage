@@ -11,7 +11,7 @@ VOLUME /data
 VOLUME /dagster
 
 # NCBI blast standalone
-RUN apt update -y
+RUN apt update
 RUN apt install ncbi-blast+ -y
 
 # Java Runtime
