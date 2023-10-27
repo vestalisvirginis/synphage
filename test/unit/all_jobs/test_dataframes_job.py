@@ -1,7 +1,11 @@
-from synphage.jobs import PipeConfig
+import pytest
+
+from pydantic import ValidationError
+
+from synphage.jobs import PipeConfig, setup
 
 
-def test_pipeconfig():
+def test_pipeconfig_pos():
 
     assert callable(PipeConfig)
     configuration = PipeConfig(
@@ -14,6 +18,28 @@ def test_pipeconfig():
     assert hasattr(configuration, "target")
     assert hasattr(configuration, "table_dir")
     assert hasattr(configuration, "file")
+
+
+def test_pipeconfig_neg():
+    with pytest.raises(ValidationError, match='(type=value_error.missing)'):
+        PipeConfig()
+
+
+@pytest.mark.parametrize(
+    "config, result",
+    [[PipeConfig(source="a"), {'source': 'a', 'target': None, 'table_dir': None, 'file': 'out.parquet'}], [PipeConfig(source="a", target="b"), {'source': 'a', 'target': 'b', 'table_dir': None, 'file': 'out.parquet'}], [PipeConfig(source="a", target="b", table_dir="c"), {'source': 'a', 'target': 'b', 'table_dir': 'c', 'file': 'out.parquet'}], [PipeConfig(source="a", target="b", table_dir="c", file="d.parquet"), {'source': 'a', 'target': 'b', 'table_dir': 'c', 'file': 'd.parquet'}]],
+    ids=['source_value', 'target_value', 'table_dir', 'file'],
+)
+def test_pipeconfig_param(config, result):
+    configuration = config
+    assert configuration.dict() == result
+
+
+def test_setup():
+    test_config = PipeConfig(
+        source='a',
+    )
+
 
 #     dagster.validate_run_config(job_def, run_config=None)[source]
 
