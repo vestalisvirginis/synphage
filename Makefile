@@ -15,6 +15,7 @@ clean: # Remove workspace files
 
 black: # Format code
 	@black synphage
+	@black test
 
 flake: # Lint code
 	@flake8 --ignore=E501,W503,E731,E722 --max-cognitive-complexity=30 synphage
