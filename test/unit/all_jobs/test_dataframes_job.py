@@ -1,8 +1,18 @@
 import pytest
 
 from pydantic import ValidationError
+from dagster import RunConfig
 
-from synphage.jobs import PipeConfig, setup
+from synphage.jobs import (
+    PipeConfig,
+    #setup,
+    load, 
+    parse_blastn, 
+    parse_locus, 
+    append, 
+    gene_presence, 
+    transform,
+)
 
 
 def test_pipeconfig_pos():
@@ -35,37 +45,68 @@ def test_pipeconfig_param(config, result):
     assert configuration.dict() == result
 
 
-def test_setup():
-    test_config = PipeConfig(
-        source='a',
+# def test_setup():
+#     test_config = PipeConfig(
+#         source='a',
+#     )
+#     rs = setup(test_config)
+#     assert rs.dict() == {'source': 'a', 'target': None, 'table_dir': None, 'file': 'out.parquet'}
+
+
+@pytest.mark.skip(reason="no way of currently testing this")
+def test_load():
+    config = PipeConfig(source='test/fixtures/synthetic_data/genbank')
+    load(config)
+
+
+@pytest.mark.skip(reason="no way of currently testing this")
+def test_parse_blastn():
+    pass
+
+@pytest.mark.skip(reason="no way of currently testing this")
+def test_parse_locus():
+    pass
+
+@pytest.mark.skip(reason="no way of currently testing this")
+def test_append():
+    pass
+
+@pytest.mark.skip(reason="no way of currently testing this")
+def test_gene_presence():
+    pass 
+
+#@pytest.mark.skip(reason="no way of currently testing this")
+def test_transform():
+    test_config = RunConfig(
+        ops={
+            "blastn": PipeConfig(
+                source="test/fixtures/synthetic_data/blast_results",
+                target="test/fixtures/dataframes_job/blastn_parsing",
+                table_dir="test/fixtures/dataframes_job",
+                file="blastn_summary.parquet",
+            ),
+            "locus": PipeConfig(
+                source="test/fixtures/synthetic_data/genbank",
+                target="test/fixtures/dataframes_job/locus_parsing",
+                table_dir="test/fixtures/dataframes_job",
+                file="locus_and_gene.parquet",
+            ),
+        }
     )
+    results = transform.execute_in_process(test_config)
+
+    # return type is ExecuteInProcessResult
+    assert isinstance(result, ExecuteInProcessResult)
+    assert result.success
 
 
-#     dagster.validate_run_config(job_def, run_config=None)[source]
+# def test_job():
+#     result = do_math_job.execute_in_process()
 
-#     dagster.validate_run_config(job_def, run_config=None)[source]
-
-
-#     from dagster import validate_run_config, daily_partitioned_config
-# from datetime import datetime
-
-
-# @daily_partitioned_config(start_date=datetime(2020, 1, 1))
-# def my_partitioned_config(start: datetime, _end: datetime):
-#     return {
-#         "ops": {
-#             "process_data_for_date": {"config": {"date": start.strftime("%Y-%m-%d")}}
-#         }
-#     }
-
-
-# def test_my_partitioned_config():
-#     # assert that the decorated function returns the expected output
-#     run_config = my_partitioned_config(datetime(2020, 1, 3), datetime(2020, 1, 4))
-#     assert run_config == {
-#         "ops": {"process_data_for_date": {"config": {"date": "2020-01-03"}}}
-#     }
-
-#     # assert that the output of the decorated function is valid configuration for the
-#     # do_stuff_partitioned job
-#     assert validate_run_config(do_stuff_partitioned, run_config)
+#     # return type is ExecuteInProcessResult
+#     assert isinstance(result, ExecuteInProcessResult)
+#     assert result.success
+#     # inspect individual op result
+#     assert result.output_for_node("add_one") == 2
+#     assert result.output_for_node("add_two") == 3
+#     assert result.output_for_node("subtract") == -1
