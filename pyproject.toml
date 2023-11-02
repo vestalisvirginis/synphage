@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "dagster >= 1.5.2",
+    "dagster-webserver >= 1.5.2",
     "biopython >= 1.81",
     "reportlab >= 3.6.12",
     "rlPyCairo >= 0.3.0",
