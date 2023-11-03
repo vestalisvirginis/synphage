@@ -4,7 +4,6 @@ WORKDIR /usr/src
 
 RUN mkdir -p /dagster
 RUN mkdir -p /data/genbank
-RUN mkdir -p /data/results
 
 # Create volumes
 VOLUME /data
@@ -19,14 +18,14 @@ RUN apt install openjdk-17-jdk -y
 
 # Libraries
 RUN pip install --upgrade pip
-RUN pip install synphage dagster-webserver
+RUN pip install synphage==0.0.2
 
 # Environment variables 
 # To run dagster
 ENV DAGSTER_HOME=/dagster
 # File config
 ENV PHAGY_DIRECTORY=/data
-ENV FILE_SYSTEM=$(PHAGY_DIRECTORY)/fs
+ENV FILE_SYSTEM=fs
 # NCBI Connect
 ENV EMAIL=""
 ENV API_KEY=""
