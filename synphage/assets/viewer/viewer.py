@@ -172,6 +172,8 @@ gene_uniqueness_folder_config = {
 )
 def create_graph(context, create_genome, config: Diagram):
     # Define the paths
+        
+    _input_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "genbank"])
     _output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
     _blastn_dir = "/".join(
         [os.getenv(EnvVar("PHAGY_DIRECTORY")), "tables", "blastn_summary.parquet"]
@@ -194,7 +196,8 @@ def create_graph(context, create_genome, config: Diagram):
     _records = {}
 
     for _k, _v in create_genome.items():
-        _record = _read_seq(_k, _v)
+        _genbank_path = "/".join([_input_folder, _k])
+        _record = _read_seq(_genbank_path, _v)
         context.log.info(f"Orientation: {_record}")
         _records[_record.name] = _record
 
