@@ -138,18 +138,31 @@ def gene_presence(blastn_all, locus_all):
         "/data/tables/uniqueness.parquet"
     )
 
+
 "/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM")])
 default_config = RunConfig(
     ops={
         "blastn": PipeConfig(
             source="/".join([os.getenv("PHAGY_DIRECTORY"), "gene_identity/blastn"]),
-            target="/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), "blastn_parsing"]),
+            target="/".join(
+                [
+                    os.getenv("PHAGY_DIRECTORY"),
+                    os.getenv("FILE_SYSTEM"),
+                    "blastn_parsing",
+                ]
+            ),
             table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
             file="blastn_summary.parquet",
         ),
         "locus": PipeConfig(
             source="/".join([os.getenv("PHAGY_DIRECTORY"), "genbank"]),
-            target="/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), "locus_parsing"]),
+            target="/".join(
+                [
+                    os.getenv("PHAGY_DIRECTORY"),
+                    os.getenv("FILE_SYSTEM"),
+                    "locus_parsing",
+                ]
+            ),
             table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
             file="locus_and_gene.parquet",
         ),

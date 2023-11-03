@@ -5,25 +5,24 @@ from dagster import RunConfig
 
 from synphage.jobs import (
     PipeConfig,
-    #setup,
-    load, 
-    parse_blastn, 
-    parse_locus, 
-    append, 
-    gene_presence, 
+    # setup,
+    load,
+    parse_blastn,
+    parse_locus,
+    append,
+    gene_presence,
     transform,
 )
 
 
 def test_pipeconfig_pos():
-
     assert callable(PipeConfig)
     configuration = PipeConfig(
-        source="a", 
-        target="b", 
-        table_dir="c", 
+        source="a",
+        target="b",
+        table_dir="c",
         file="d.parquet",
-        )
+    )
     assert hasattr(configuration, "source")
     assert hasattr(configuration, "target")
     assert hasattr(configuration, "table_dir")
@@ -31,14 +30,31 @@ def test_pipeconfig_pos():
 
 
 def test_pipeconfig_neg():
-    with pytest.raises(ValidationError, match='(type=value_error.missing)'):
+    with pytest.raises(ValidationError, match="(type=value_error.missing)"):
         PipeConfig()
 
 
 @pytest.mark.parametrize(
     "config, result",
-    [[PipeConfig(source="a"), {'source': 'a', 'target': None, 'table_dir': None, 'file': 'out.parquet'}], [PipeConfig(source="a", target="b"), {'source': 'a', 'target': 'b', 'table_dir': None, 'file': 'out.parquet'}], [PipeConfig(source="a", target="b", table_dir="c"), {'source': 'a', 'target': 'b', 'table_dir': 'c', 'file': 'out.parquet'}], [PipeConfig(source="a", target="b", table_dir="c", file="d.parquet"), {'source': 'a', 'target': 'b', 'table_dir': 'c', 'file': 'd.parquet'}]],
-    ids=['source_value', 'target_value', 'table_dir', 'file'],
+    [
+        [
+            PipeConfig(source="a"),
+            {"source": "a", "target": None, "table_dir": None, "file": "out.parquet"},
+        ],
+        [
+            PipeConfig(source="a", target="b"),
+            {"source": "a", "target": "b", "table_dir": None, "file": "out.parquet"},
+        ],
+        [
+            PipeConfig(source="a", target="b", table_dir="c"),
+            {"source": "a", "target": "b", "table_dir": "c", "file": "out.parquet"},
+        ],
+        [
+            PipeConfig(source="a", target="b", table_dir="c", file="d.parquet"),
+            {"source": "a", "target": "b", "table_dir": "c", "file": "d.parquet"},
+        ],
+    ],
+    ids=["source_value", "target_value", "table_dir", "file"],
 )
 def test_pipeconfig_param(config, result):
     configuration = config
@@ -55,7 +71,7 @@ def test_pipeconfig_param(config, result):
 
 @pytest.mark.skip(reason="no way of currently testing this")
 def test_load():
-    config = PipeConfig(source='test/fixtures/synthetic_data/genbank')
+    config = PipeConfig(source="test/fixtures/synthetic_data/genbank")
     load(config)
 
 
@@ -63,19 +79,23 @@ def test_load():
 def test_parse_blastn():
     pass
 
+
 @pytest.mark.skip(reason="no way of currently testing this")
 def test_parse_locus():
     pass
+
 
 @pytest.mark.skip(reason="no way of currently testing this")
 def test_append():
     pass
 
+
 @pytest.mark.skip(reason="no way of currently testing this")
 def test_gene_presence():
-    pass 
+    pass
 
-#@pytest.mark.skip(reason="no way of currently testing this")
+
+# @pytest.mark.skip(reason="no way of currently testing this")
 def test_transform():
     test_config = RunConfig(
         ops={

@@ -172,7 +172,7 @@ gene_uniqueness_folder_config = {
 )
 def create_graph(context, create_genome, config: Diagram):
     # Define the paths
-        
+
     _input_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "genbank"])
     _output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
     _blastn_dir = "/".join(
