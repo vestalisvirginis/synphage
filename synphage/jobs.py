@@ -59,8 +59,9 @@ def setup(config: PipeConfig) -> PipeConfig:
 
 
 @op(out=DynamicOut())
-def load(setup: PipeConfig):
+def load(context, setup: PipeConfig):
     """Load GenBank files"""
+    context.log.info(setup.source)
     for file in os.listdir(setup.source):
         yield DynamicOutput(file, mapping_key=file.replace(".", "_"))
 
@@ -134,22 +135,22 @@ def gene_presence(blastn_all, locus_all):
     conn = duckdb.connect(":memory:")
     query = open("synphage/sql/gene_presence.sql").read()
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
-        "data/tables/uniqueness.parquet"
+        "/data/tables/uniqueness.parquet"
     )
 
-
+"/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM")])
 default_config = RunConfig(
     ops={
         "blastn": PipeConfig(
-            source="data/gene_identity/blastn",
-            target="data/fs/blastn_parsing",
-            table_dir="data/tables",
+            source="/".join([os.getenv("PHAGY_DIRECTORY"), "gene_identity/blastn"]),
+            target="/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), "blastn_parsing"]),
+            table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
             file="blastn_summary.parquet",
         ),
         "locus": PipeConfig(
-            source="data/genbank",
-            target="data/fs/locus_parsing",
-            table_dir="data/tables",
+            source="/".join([os.getenv("PHAGY_DIRECTORY"), "genbank"]),
+            target="/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), "locus_parsing"]),
+            table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
             file="locus_and_gene.parquet",
         ),
     }
