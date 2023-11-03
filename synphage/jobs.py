@@ -69,7 +69,9 @@ def load(context, setup: PipeConfig):
 @op
 def parse_blastn(context, setup: PipeConfig, file: str):
     """Retrive sequence and metadata"""
-    query = open("synphage/sql/parse_blastn.sql").read()
+    # _path_parse_blastn_sql = os.path.join(os.path.dirname(__file__), 'sql/parse_blastn.sql')
+    # context.log.info(f"sql_file: {_path_parse_blastn_sql}")
+    query = open('synphage/sql/parse_blastn.sql').read()
     conn = duckdb.connect(":memory:")
     os.makedirs(setup.target, exist_ok=True)
     context.log.info(f"{setup.target}/{file}.parquet")
@@ -130,10 +132,12 @@ def append(setup: PipeConfig):
         "locus_all": In(asset_key=AssetKey("append_locus")),
     }
 )
-def gene_presence(blastn_all, locus_all):
+def gene_presence(context, blastn_all, locus_all):
     """Consolidate gene and locus"""
     conn = duckdb.connect(":memory:")
-    query = open("synphage/sql/gene_presence.sql").read()
+    # _path_gene_presence_sql = os.path.join(os.path.dirname(__file__), 'sql/gene_presence.sql')
+    # context.log.info(f"sql_file: {_path_gene_presence_sql}")
+    query = open('synphage/sql/gene_presence.sql').read()
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
         "/data/tables/uniqueness.parquet"
     )
