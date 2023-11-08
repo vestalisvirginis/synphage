@@ -74,7 +74,59 @@ genome_3.gb,0
 
 ### Running Synphage
 
+`Synphage` uses [Dagster](https://dagster.io). In order to run synphage jobs, you need to start dagster first.
 
+
+#### Starting Dagster
+
+Set up the environment variable DAGSTER_HOME in order to keep a trace of your previous run. For more information, see [Dagster documentation](https://docs.dagster.io/deployment/dagster-instance). 
+
+```bash
+export DAGSTER_HOME=<dagster_home_directory>
+
+dagster dev -h 0.0.0.0 -p 3000 -m synphage
+```
+
+
+#### Running the jobs
+
+The current software is structured in three different jobs.
+ - `blasting_job` : create the blastn of each sequences against each sequences (results -> gene_identity folder)
+ - `transform` : create three tables from the blastn results and genbank files (results -> tables)
+ - `synteny_job` : create the synteny graph (results -> synteny)
+
+**Note:** Different synteny plots can be generated from the same set of genomes. In this case the two first jobs only need to be run once and the third job (`synteny_job`) can be triggered separately for each graphs.
+
+
+## Output
+
+### Generated data architecture
+
+```
+.
+├── <path_to_data_folder>/
+│   ├── genbank/
+│   ├── fs/
+│   ├── gene_identity/
+│   │   ├── fasta/
+│   │   ├── blastn_database/
+│   │   └── blastn/
+│   ├── tables/
+│   │   ├── blastn.parquet
+│   │   ├── locus_and_gene.parquet
+│   │   └── uniqueness.parquet
+│   └── synteny/
+│      ├── colour_table.parquet
+│      └── synteny_graph.svg
+└── ...
+```
+
+
+
+### Tables
+
+
+### Synteny plot
 
 
 ## Roadmap
