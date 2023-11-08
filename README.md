@@ -88,6 +88,7 @@ genome_3.gb,0
 
 ## Contributing 
 
+We accept different types of contributions, including some that don't require you to write a single line of code. For detailed instructions on how to get started with our project, see [CONTRIBUTING](CONTRIBUTING.md) file.
 
 
 ## Authors
