@@ -21,3 +21,6 @@ jobs:
         coverage xml -o coverage.xml
       env:
         PHAGY_DIRECTORY: ${{ env.PHAGY_DIRECTORY }}
+        FILE_SYSTEM: ${{ env.FILE_SYSTEM }}
+        EMAIL: ${{ secrets.EMAIL }}
+        API_KEY: ${{ secrets.API_KEY }}
