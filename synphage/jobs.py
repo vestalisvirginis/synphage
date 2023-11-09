@@ -143,7 +143,6 @@ def gene_presence(context, blastn_all, locus_all):
     )
 
 
-"/".join([os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM")])
 default_config = RunConfig(
     ops={
         "blastn": PipeConfig(
