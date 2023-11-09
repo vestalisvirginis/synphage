@@ -9,7 +9,7 @@ from pyspark.sql import SparkSession
 
 @pytest.fixture
 def mock_env_phagy_dir(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "/test/fixtures/synthetic_data")
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/synthetic_data")
 
 
 @pytest.fixture(scope="session")
