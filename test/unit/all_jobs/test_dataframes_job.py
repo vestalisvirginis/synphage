@@ -30,7 +30,7 @@ def test_pipeconfig_pos():
 
 
 def test_pipeconfig_neg():
-    with pytest.raises(ValidationError, match="(type=value_error.missing)"):
+    with pytest.raises(ValidationError, match="1 validation error for PipeConfig"):
         PipeConfig()
 
 
