@@ -4,7 +4,7 @@ import pytest
 
 from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
-from source.assets import Blaster as BLT
+from synphage.assets.blaster import blaster as BLT
 
 @pytest.mark.skip
 def test_file_conversion_positive_no_output():

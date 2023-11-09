@@ -14,6 +14,7 @@ In addition to show conserved genes across multiple sequences, the originality o
 
 ## Stats 
 [![PyPI version](https://badge.fury.io/py/synphage.svg)](https://badge.fury.io/py/synphage)
+[![ci](https://github.com/vestalisvirginis/synphage/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vestalisvirginis/synphage/actions/workflows/ci.yml)
 [![](https://img.shields.io/pypi/dm/synphage.svg?style=popout-square)](https://pypi.org/project/synphage/)
 [![License](https://img.shields.io/github/license/vestalisvirginis/synphage.svg?style=popout-square)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
