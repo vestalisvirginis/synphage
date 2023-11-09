@@ -19,3 +19,5 @@ jobs:
         pip install '.[test]'
         coverage run -m pytest test/unit
         coverage xml -o coverage.xml
+      env:
+        PHAGY_DIRECTORY: ${{ env.PHAGY_DIRECTORY }}
