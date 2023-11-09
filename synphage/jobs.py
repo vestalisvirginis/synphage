@@ -69,7 +69,9 @@ def load(context, setup: PipeConfig):
 @op
 def parse_blastn(context, setup: PipeConfig, file: str):
     """Retrive sequence and metadata"""
-    _path_parse_blastn_sql = os.path.join(os.path.dirname(__file__), 'sql/parse_blastn.sql')
+    _path_parse_blastn_sql = os.path.join(
+        os.path.dirname(__file__), "sql/parse_blastn.sql"
+    )
     context.log.info(f"sql_file: {_path_parse_blastn_sql}")
     query = open(_path_parse_blastn_sql).read()
     conn = duckdb.connect(":memory:")
@@ -135,7 +137,9 @@ def append(setup: PipeConfig):
 def gene_presence(context, blastn_all, locus_all):
     """Consolidate gene and locus"""
     conn = duckdb.connect(":memory:")
-    _path_gene_presence_sql = os.path.join(os.path.dirname(__file__), 'sql/gene_presence.sql')
+    _path_gene_presence_sql = os.path.join(
+        os.path.dirname(__file__), "sql/gene_presence.sql"
+    )
     context.log.info(f"sql_file: {_path_gene_presence_sql}")
     query = open(_path_gene_presence_sql).read()
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
