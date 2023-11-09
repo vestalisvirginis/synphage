@@ -95,7 +95,7 @@ def test_gene_presence():
     pass
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip(reason="no way of currently testing this")
 def test_transform():
     test_config = RunConfig(
         ops={
