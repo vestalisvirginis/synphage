@@ -41,7 +41,6 @@ htmlcov/
 .coverage.*
 .cache
 coverage.xml
-fixtures/
 
 # Jupyter Notebook
 .ipynb_checkpoints
