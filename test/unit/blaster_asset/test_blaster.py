@@ -6,6 +6,7 @@ from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
 from synphage.assets.blaster import blaster as BLT
 
+
 @pytest.mark.skip
 def test_file_conversion_positive_no_output():
     rs = BLT.genbank_to_fasta("tests/fixtures/synthetic_data/genbank/TT_000001.gb")

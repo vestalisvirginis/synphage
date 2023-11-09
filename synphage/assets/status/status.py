@@ -67,7 +67,7 @@ def list_genbank_files(context):
     _gb_path = "/".join(
         [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]]
     )
-
+    context.log.info(f"Genbank path: {_gb_path}")
     # Load already processed files
     _path = "/".join(
         [
