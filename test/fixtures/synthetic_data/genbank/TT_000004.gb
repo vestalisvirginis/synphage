@@ -1,6 +1,6 @@
 LOCUS       TT_000004                10000 bp    DNA     linear   CON 16-FEB-2023
 DEFINITION  Synthetic Phage Genome 4.
-ACCESSION   TT_000001 REGION: 1..10000
+ACCESSION   TT_000004 REGION: 1..10000
 VERSION     TT_000004.1
 DBLINK      BioProject: SYNTH4
             BioSample: SYNTH000004

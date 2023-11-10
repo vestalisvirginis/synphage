@@ -7,32 +7,7 @@ import pyspark.sql.functions as F
 from synphage.assets.blaster import blaster as BLT
 
 
-@pytest.mark.skip
-def test_file_conversion_positive_no_output():
-    rs = BLT.genbank_to_fasta("tests/fixtures/synthetic_data/genbank/TT_000001.gb")
-    assert isinstance(rs, str)
-    assert rs.endswith("TT_000001.fna has been written.")
-    assert [
-        row for row in open("tests/fixtures/synthetic_data/genbank/TT_000001.fna")
-    ] == [row for row in open("tests/fixtures/synthetic_data/fasta/TT_000001.fna")]
 
-
-@pytest.mark.skip
-def test_file_conversion_positive_w_output(tmp_path):
-    d = tmp_path / "fasta"
-    d.mkdir()
-    p = f"{d}/TT_000001.fna"
-    rs = BLT.genbank_to_fasta("tests/fixtures/synthetic_data/genbank/TT_000001.gb", p)
-    assert isinstance(rs, str)
-    assert rs.endswith(f"File {p} has been written.")
-
-
-@pytest.mark.skip
-def test_file_conversion_negative():
-    # empty file
-    # error in file
-    # wrong format (not genbank')
-    pass
 
 
 @pytest.mark.skip
