@@ -8,8 +8,8 @@ from pyspark.sql import SparkSession
 
 
 @pytest.fixture
-def mock_env_phagy_dir(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/synthetic_data")
+def mock_env_phagy_dir_blasting(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 
 
 @pytest.fixture(scope="session")
