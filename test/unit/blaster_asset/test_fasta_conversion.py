@@ -6,30 +6,34 @@ from dagster import materialize_to_memory, build_asset_context, asset
 from synphage.assets.blaster.blaster import genbank_to_fasta
 
 
-def test_genbank_to_fasta(mock_env_phagy_dir):
+TEST_DATA_GB_DIR = 'test/fixtures/assets_testing_folder/blasting/genbank/'
+TEST_DATA_FASTA_DIR = 'test/fixtures/assets_testing_folder/blasting/gene_identity/fasta/'
+
+
+def test_genbank_to_fasta(mock_env_phagy_dir_blasting):
     context = build_asset_context()
-    asset_input = [PosixPath('test/fixtures/synthetic_data/genbank/TT_000001.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000002.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000003.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000004.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000005.gb')]
+    asset_input = [PosixPath(f'{TEST_DATA_GB_DIR}TT_00000{i+1}.gb') for i in range(6)]
     result = genbank_to_fasta(context, asset_input)
     assert isinstance(result, tuple)
     assert isinstance(result[0], list)
-    assert len(result[0]) == 5
-    assert set(result[0]) == set(['test/fixtures/synthetic_data/gene_identity/fasta/TT_000001.fna', 'test/fixtures/synthetic_data/gene_identity/fasta/TT_000002.fna', 'test/fixtures/synthetic_data/gene_identity/fasta/TT_000003.fna', 'test/fixtures/synthetic_data/gene_identity/fasta/TT_000004.fna', 'test/fixtures/synthetic_data/gene_identity/fasta/TT_000005.fna'])
+    assert len(result[0]) == 6
+    assert set(result[0]) == set( [f'{TEST_DATA_FASTA_DIR}TT_00000{i+1}.fna' for i in range(6)])
     assert isinstance(result[1], list)
-    assert len(result[1]) == 5
-    assert set(result[1]) == set(['TT_000001', 'TT_000002', 'TT_000003', 'TT_000004', 'TT_000005'])
+    assert len(result[1]) == 6
+    assert set(result[1]) == set([f'TT_00000{i+1}' for i in range(6)])
 
 
-def test_genbank_to_fasta_assets():
+def test_genbank_to_fasta_assets(mock_env_phagy_dir_blasting):
     @asset(name="standardised_ext_file")
     def mock_upstream():
-        return  [PosixPath('test/fixtures/synthetic_data/genbank/TT_000001.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000002.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000003.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000004.gb'), PosixPath('test/fixtures/synthetic_data/genbank/TT_000005.gb')]
+        return  [PosixPath(f'{TEST_DATA_GB_DIR}TT_00000{i+1}.gb') for i in range(6)]
     assets = [genbank_to_fasta, mock_upstream]
     result = materialize_to_memory(assets)
     assert result.success
     new_fasta_files = result.output_for_node("genbank_to_fasta", "new_fasta_files")
     all_fasta_files = result.output_for_node("genbank_to_fasta", "history_fasta_files")
-    assert len(new_fasta_files) == 5
-    assert len(all_fasta_files) == 5
+    assert len(new_fasta_files) == 6
+    assert len(all_fasta_files) == 6
 
 
 @pytest.mark.skip

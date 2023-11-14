@@ -4,7 +4,7 @@ from pathlib import PosixPath
 from synphage.assets.status.status import list_genbank_files
 
 
-def test_list_genbank_files(mock_env_phagy_dir):
+def test_list_genbank_files(mock_env_phagy_dir_blasting):
     context = build_asset_context()
     result = list_genbank_files(context)
     assert isinstance(result, tuple)
@@ -16,7 +16,7 @@ def test_list_genbank_files(mock_env_phagy_dir):
     assert set(result[1]) == set(['TT_000001', 'TT_000002', 'TT_000003', 'TT_000004', 'TT_000005'])
 
 
-def test_status_assets(mock_env_phagy_dir):
+def test_status_assets(mock_env_phagy_dir_blasting):
     assets = [list_genbank_files]
     result = materialize_to_memory(assets)
     assert result.success
