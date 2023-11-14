@@ -4,25 +4,20 @@ from pathlib import PosixPath
 from synphage.assets.status.status import list_genbank_files
 
 
+TEST_DATA_GB_DIR = "test/fixtures/assets_testing_folder/blasting/genbank/"
+
+
 def test_list_genbank_files(mock_env_phagy_dir_blasting):
     context = build_asset_context()
     result = list_genbank_files(context)
     assert isinstance(result, tuple)
     assert isinstance(result[0], list)
-    assert len(result[0]) == 5
-    assert set(result[0]) == set(
-        [
-            PosixPath("test/fixtures/synthetic_data/genbank/TT_000001.gb"),
-            PosixPath("test/fixtures/synthetic_data/genbank/TT_000002.gb"),
-            PosixPath("test/fixtures/synthetic_data/genbank/TT_000003.gb"),
-            PosixPath("test/fixtures/synthetic_data/genbank/TT_000004.gb"),
-            PosixPath("test/fixtures/synthetic_data/genbank/TT_000005.gb"),
-        ]
-    )
+    assert len(result[0]) == 6
+    assert set(result[0]) == set([PosixPath(f"{TEST_DATA_GB_DIR}TT_00000{i+1}.gb") for i in range(6)])
     assert isinstance(result[1], list)
-    assert len(result[1]) == 5
+    assert len(result[1]) == 6
     assert set(result[1]) == set(
-        ["TT_000001", "TT_000002", "TT_000003", "TT_000004", "TT_000005"]
+        [f"TT_00000{i+1}" for i in range(6)]
     )
 
 
@@ -34,8 +29,8 @@ def test_status_assets(mock_env_phagy_dir_blasting):
         "list_genbank_files", "standardised_ext_file"
     )
     genbank_files = result.output_for_node("list_genbank_files", "list_genbank_files")
-    assert len(standardised_files) == 5
-    assert len(genbank_files) == 5
+    assert len(standardised_files) == 6
+    assert len(genbank_files) == 6
 
 
 # test on output metadat?
