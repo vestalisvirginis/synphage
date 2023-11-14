@@ -1,5 +1,5 @@
 LOCUS       TT_000006                10000 bp    DNA     linear   CON 16-FEB-2023
-DEFINITION  Synthetic Phage Genome 1.
+DEFINITION  Synthetic Phage Genome 6.
 ACCESSION   TT_000006 REGION: 1..10000
 VERSION     TT_000006.1
 DBLINK      BioProject: SYNTH6

@@ -7,9 +7,6 @@ import pyspark.sql.functions as F
 from synphage.assets.blaster import blaster as BLT
 
 
-
-
-
 @pytest.mark.skip
 def test_blast_database_positive(tmp_path):
     d = tmp_path / "database"
