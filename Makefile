@@ -10,6 +10,7 @@ clean: # Remove workspace files
 	@rm -rf .scannerwork
 	@rm -rf ./dist
 	@rm -rf tests/temp/
+	@rm -rf test/fixtures/assets_testing_folder/blasting/gene_identity
 	@rm -rf tests/fixtures/synthetic_data/genbank/*.fna
 	@python -c "print('Cleaning: 👌')"
 
