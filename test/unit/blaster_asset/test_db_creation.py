@@ -17,15 +17,17 @@ def test_database_output_files(mock_env_phagy_dir_blasting):
     result = create_blast_db(context, asset_input)
     assert isinstance(result, list)
     assert len(os.listdir(TEST_DATA_BLAST_DB)) == 7
-    assert os.listdir(TEST_DATA_BLAST_DB) == set([
-        "TT_000001.ntf",
-        "TT_000001.nto",
-        "TT_000001.not",
-        "TT_000001.ndb",
-        "TT_000001.nhr",
-        "TT_000001.nin",
-        "TT_000001.nsq",
-    ])
+    assert set(os.listdir(TEST_DATA_BLAST_DB)) == set(
+        [
+            "TT_000001.ntf",
+            "TT_000001.nto",
+            "TT_000001.not",
+            "TT_000001.ndb",
+            "TT_000001.nhr",
+            "TT_000001.nin",
+            "TT_000001.nsq",
+        ]
+    )
 
 
 def test_create_blast_db(mock_env_phagy_dir_blasting):

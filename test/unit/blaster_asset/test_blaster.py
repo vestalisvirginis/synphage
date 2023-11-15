@@ -8,20 +8,6 @@ from synphage.assets.blaster import blaster as BLT
 
 
 @pytest.mark.skip
-def test_blastn(tmp_path):
-    d = tmp_path / "blastn_results"
-    d.mkdir()
-    p = f"{d}/TT_000001_vs_TT_000002"
-    rs = BLT.get_blastn(
-        "tests/fixtures/synthetic_data/fasta/TT_000002.fna",
-        "tests/temp/test_blast_database_positive0/database/TT_000001",
-        p,
-    )
-    assert len(os.listdir(d)) == 1
-    assert os.listdir(d) == ["TT_000001_vs_TT_000002"]
-
-
-@pytest.mark.skip
 def test_parse_blastn(spark, tmp_path):
     d = tmp_path / "blastn_summary"
     d.mkdir()

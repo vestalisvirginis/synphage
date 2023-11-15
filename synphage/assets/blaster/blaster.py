@@ -340,9 +340,7 @@ def get_blastn(context, history_fasta_files, create_blast_db):
         [os.getenv("PHAGY_DIRECTORY"), context.op_config["fasta_dir"]]
     )
     context.log.info(_fasta_path)
-    _fasta_files = list(
-        map(lambda x: f"{_fasta_path}/{Path(x).stem}.fna", os.listdir(_fasta_path))
-    )
+    _fasta_files = list(map(lambda x: f"{_fasta_path}/{x}.fna", history_fasta_files))
 
     for _query in _fasta_files:
         for _database in create_blast_db:

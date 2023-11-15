@@ -59,6 +59,9 @@ def test_genbank_to_fasta_assets(mock_env_phagy_dir_blasting):
     assert len(all_fasta_files) == 6
 
 
+# code coverage missing
+# pickle open fasta history
+
 # additional tests on assets ___________
 # output metadata for each assets
 # asset config
