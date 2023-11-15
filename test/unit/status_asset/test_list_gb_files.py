@@ -13,12 +13,12 @@ def test_list_genbank_files(mock_env_phagy_dir_blasting):
     assert isinstance(result, tuple)
     assert isinstance(result[0], list)
     assert len(result[0]) == 6
-    assert set(result[0]) == set([PosixPath(f"{TEST_DATA_GB_DIR}TT_00000{i+1}.gb") for i in range(6)])
+    assert set(result[0]) == set(
+        [PosixPath(f"{TEST_DATA_GB_DIR}TT_00000{i+1}.gb") for i in range(6)]
+    )
     assert isinstance(result[1], list)
     assert len(result[1]) == 6
-    assert set(result[1]) == set(
-        [f"TT_00000{i+1}" for i in range(6)]
-    )
+    assert set(result[1]) == set([f"TT_00000{i+1}" for i in range(6)])
 
 
 def test_status_assets(mock_env_phagy_dir_blasting):

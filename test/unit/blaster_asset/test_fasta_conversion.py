@@ -1,5 +1,3 @@
-import pytest
-
 from pathlib import PosixPath
 from dagster import materialize_to_memory, build_asset_context, asset
 
@@ -64,6 +62,7 @@ def test_genbank_to_fasta_assets(mock_env_phagy_dir_blasting):
 # additional tests on assets ___________
 # output metadata for each assets
 # asset config
+# empty upstream asset
 
 # additional tests on file ______________
 # empty file
