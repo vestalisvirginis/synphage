@@ -8,23 +8,6 @@ from synphage.assets.blaster import blaster as BLT
 
 
 @pytest.mark.skip
-def test_blast_database_positive(tmp_path):
-    d = tmp_path / "database"
-    d.mkdir()
-    rs = BLT.create_blast_db("tests/fixtures/synthetic_data/fasta/TT_000001.fna", d)
-    assert len(os.listdir(d)) == 7
-    assert os.listdir(d) == [
-        "TT_000001.ntf",
-        "TT_000001.nto",
-        "TT_000001.not",
-        "TT_000001.ndb",
-        "TT_000001.nhr",
-        "TT_000001.nin",
-        "TT_000001.nsq",
-    ]
-
-
-@pytest.mark.skip
 def test_blastn(tmp_path):
     d = tmp_path / "blastn_results"
     d.mkdir()
