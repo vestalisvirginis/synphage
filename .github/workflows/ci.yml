@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: 'actions/checkout@v3'
+    - name: Setup ncbi-blast+
+      run: |
+        sudo apt update
+        sudo apt install ncbi-blast+ -y
     - name: Setup Python
       uses: actions/setup-python@master
       with:
