@@ -47,7 +47,10 @@ def test_get_blastn_asset(mock_env_phagy_dir_blasting):
     assert [re.search("_vs_", file_name) for file_name in blastn_files]
 
 
+# code coverage missing
+# pickle open blastn history
 # test if _history_path exist
+# sequence sorting function
 
 # additional tests on assets ___________
 # output metadata for each assets
