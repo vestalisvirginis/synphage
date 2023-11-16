@@ -53,21 +53,21 @@ class PipeConfig(Config):
 
 
 @op
-def setup(config: PipeConfig) -> PipeConfig:
+def setup_config(config: PipeConfig) -> PipeConfig:
     """Source/target dirs and    file output"""
     return config
 
 
 @op(out=DynamicOut())
-def load(context, setup: PipeConfig):
+def load(context, setup_config: PipeConfig):
     """Load GenBank files"""
-    context.log.info(setup.source)
-    for file in os.listdir(setup.source):
+    context.log.info(setup_config.source)
+    for file in os.listdir(setup_config.source):
         yield DynamicOutput(file, mapping_key=file.replace(".", "_"))
 
 
 @op
-def parse_blastn(context, setup: PipeConfig, file: str):
+def parse_blastn(context, setup_config: PipeConfig, file: str):
     """Retrive sequence and metadata"""
     _path_parse_blastn_sql = os.path.join(
         os.path.dirname(__file__), "sql/parse_blastn.sql"
@@ -75,22 +75,22 @@ def parse_blastn(context, setup: PipeConfig, file: str):
     context.log.info(f"sql_file: {_path_parse_blastn_sql}")
     query = open(_path_parse_blastn_sql).read()
     conn = duckdb.connect(":memory:")
-    os.makedirs(setup.target, exist_ok=True)
-    context.log.info(f"{setup.target}/{file}.parquet")
+    os.makedirs(setup_config.target, exist_ok=True)
+    context.log.info(f"{setup_config.target}/{file}.parquet")
     context.log.info(f"File: {file}")
-    source = Path(setup.source) / file
+    source = Path(setup_config.source) / file
     context.log.info(f"source: {source}")
     conn.query(query.format(source)).pl().write_parquet(
-        f"{setup.target}/{file}.parquet"
+        f"{setup_config.target}/{file}.parquet"
     )
     return "OK"
 
 
 @op
-def parse_locus(setup: PipeConfig, file: str):
+def parse_locus(setup_config: PipeConfig, file: str):
     """Retrieve gene and locus metadata"""
-    source = Path(setup.source) / file
-    target = Path(setup.target) / str(Path(file).stem + ".parquet")
+    source = Path(setup_config.source) / file
+    target = Path(setup_config.target) / str(Path(file).stem + ".parquet")
     genome = SeqIO.read(str(source), "gb")
 
     # Ancilliary Functions
@@ -114,17 +114,17 @@ def parse_locus(setup: PipeConfig, file: str):
     elif set(map(_type, filter(_type_cds, genome.features))):
         data = list(map(_fn_cds, filter(_type_cds, genome.features)))
 
-    os.makedirs(setup.target, exist_ok=True)
+    os.makedirs(setup_config.target, exist_ok=True)
     pl.DataFrame(data=data, schema=schema, orient="row").write_parquet(str(target))
     return "OK"
 
 
 @op(ins={"file": In(Nothing)})
-def append(setup: PipeConfig):
+def append(setup_config: PipeConfig):
     """Consolidate in 1 parquet file"""
-    os.makedirs(setup.table_dir, exist_ok=True)
-    path_file = Path(setup.table_dir) / Path(setup.file)
-    pl.read_parquet(f"{setup.target}/*.parquet").write_parquet(path_file)
+    os.makedirs(setup_config.table_dir, exist_ok=True)
+    path_file = Path(setup_config.table_dir) / Path(setup_config.file)
+    pl.read_parquet(f"{setup_config.target}/*.parquet").write_parquet(path_file)
     return path_file
 
 
@@ -180,12 +180,12 @@ default_config = RunConfig(
 @job(config=default_config)
 def transform():
     """GenBank into parquet"""
-    config_blastn = setup.alias("blastn")()
+    config_blastn = setup_config.alias("blastn")()
     files = load.alias("load_blastn")(config_blastn)
     results = files.map(partial(parse_blastn, config_blastn))
     blastn_all = append.alias("append_blastn")(config_blastn, results.collect())
 
-    config_locus = setup.alias("locus")()
+    config_locus = setup_config.alias("locus")()
     files_locus = load.alias("load_locus")(config_locus)
     results_locus = files_locus.map(partial(parse_locus, config_locus))
     locus_all = append.alias("append_locus")(config_locus, results_locus.collect())
