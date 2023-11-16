@@ -471,4 +471,4 @@ def create_graph(context, create_genome, config: Diagram):
         }
     )
 
-    return "Done"
+    return _gd_diagram
