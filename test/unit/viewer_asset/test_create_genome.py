@@ -7,8 +7,8 @@ def test_create_genome(mock_env_phagy_dir_synteny):
     context = build_asset_context()
     result = create_genome(context)
     assert isinstance(result, dict)
-    assert [k for k in result.keys()] == ['TT_000001.gb', 'TT_000002.gb']
-    assert [v for v in result.values()] == ['SEQUENCE', 'REVERSE']
+    assert [k for k in result.keys()] == ["TT_000001.gb", "TT_000002.gb"]
+    assert [v for v in result.values()] == ["SEQUENCE", "REVERSE"]
 
 
 def test_create_genome_asset(mock_env_phagy_dir_synteny):
@@ -17,8 +17,8 @@ def test_create_genome_asset(mock_env_phagy_dir_synteny):
     assert result.success
     sequences = result.output_for_node("create_genome")
     assert len(sequences) == 2
-    assert [k for k in sequences.keys()] == ['TT_000001.gb', 'TT_000002.gb']
-    assert [v for v in sequences.values()] == ['SEQUENCE', 'REVERSE']
+    assert [k for k in sequences.keys()] == ["TT_000001.gb", "TT_000002.gb"]
+    assert [v for v in sequences.values()] == ["SEQUENCE", "REVERSE"]
 
 
 # Check Metadata
