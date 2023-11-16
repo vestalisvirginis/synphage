@@ -1,7 +1,6 @@
 import pytest
 
 from pydantic import ValidationError
-from dagster import RunConfig
 
 from synphage.jobs import PipeConfig
 
