@@ -2,7 +2,7 @@
 
 # from pydantic import ValidationError
 
-# from synphage.jobs import setup
+# from synphage.jobs import setup_config
 
 
 # def test_se():
@@ -12,7 +12,7 @@
 #     # test_config = PipeConfig(
 #     #     source='a',
 #     # )
-#     rs = setup(PipeConfig(source="a"))
+#     rs = setup_config(PipeConfig(source="a"))
 #     # assert rs.dict() == {'source': 'a', 'target': None, 'table_dir': None, 'file': 'out.parquet'}
 
 #     # def test_op_with_config():

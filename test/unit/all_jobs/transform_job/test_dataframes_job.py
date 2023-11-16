@@ -5,7 +5,7 @@ from dagster import RunConfig
 
 from synphage.jobs import (
     PipeConfig,
-    # setup,
+    # setup_config,
     load,
     parse_blastn,
     parse_locus,
@@ -61,11 +61,11 @@ def test_pipeconfig_param(config, result):
     assert configuration.dict() == result
 
 
-# def test_setup():
+# def test_setup_config():
 #     test_config = PipeConfig(
 #         source='a',
 #     )
-#     rs = setup(test_config)
+#     rs = setup_config(test_config)
 #     assert rs.dict() == {'source': 'a', 'target': None, 'table_dir': None, 'file': 'out.parquet'}
 
 
