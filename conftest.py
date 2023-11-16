@@ -12,6 +12,12 @@ def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 
 
+@pytest.fixture
+def mock_env_phagy_dir_synteny(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/synteny")
+    monkeypatch.setenv("SEQUENCE_FILE", "sequences.csv")
+
+
 @pytest.fixture(scope="session")
 def spark():
     try:

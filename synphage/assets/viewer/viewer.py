@@ -125,9 +125,9 @@ def _get_feature(
         for _key in _tags:
             # tag may not be present in this feature
             for _x in _f.qualifiers.get(_key, []):
-                if _x == _id:
+                if _x == _id:  # gene
                     return _f
-                elif _x[:-2] == _id:
+                elif _x[:-2] == _id:  # protein_id
                     return _f
     raise KeyError(_id)
 
@@ -471,4 +471,4 @@ def create_graph(context, create_genome, config: Diagram):
         }
     )
 
-    return "Done"
+    return _gd_diagram

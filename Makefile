@@ -9,9 +9,8 @@ clean: # Remove workspace files
 	@rm -rf .coverage
 	@rm -rf .scannerwork
 	@rm -rf ./dist
-	@rm -rf tests/temp/
 	@rm -rf test/fixtures/assets_testing_folder/blasting/gene_identity
-	@rm -rf tests/fixtures/synthetic_data/genbank/*.fna
+	@rm -rf test/fixtures/assets_testing_folder/synteny/synteny
 	@python -c "print('Cleaning: 👌')"
 
 black: # Format code
