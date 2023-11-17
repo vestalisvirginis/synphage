@@ -5,20 +5,8 @@ from dagster import RunConfig
 
 from synphage.jobs import (
     PipeConfig,
-    append,
-    gene_presence,
     transform,
 )
-
-
-@pytest.mark.skip(reason="no way of currently testing this")
-def test_append():
-    pass
-
-
-@pytest.mark.skip(reason="no way of currently testing this")
-def test_gene_presence():
-    pass
 
 
 @pytest.mark.skip(reason="no way of currently testing this")
