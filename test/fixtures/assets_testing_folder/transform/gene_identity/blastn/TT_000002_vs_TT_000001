@@ -1,0 +1,449 @@
+{
+"BlastOutput2": [
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_1",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genA | ENG_10 | [0:1000](-)",
+          "query_len": 1000,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "gnl|BL_ORD_ID|0",
+                  "accession": "0",
+                  "title": "TT_000001 | TT_000001.1 | Synthetic Phage Genome 1 | geneA | GEN_10 | [0:1000](-)"
+                }
+              ],
+              "len": 1000,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 1847.77,
+                  "score": 1000,
+                  "evalue": 0,
+                  "identity": 1000,
+                  "query_from": 1,
+                  "query_to": 1000,
+                  "query_strand": "Plus",
+                  "hit_from": 1,
+                  "hit_to": 1000,
+                  "hit_strand": "Plus",
+                  "align_len": 1000,
+                  "gaps": 0,
+                  "qseq": "TTAAGATACTTACTACATATCTAACGAAAAAAAGAAGCTTACTCTGCCTTCCTTTCCAGAGCAGCTTCTAATAAATGTTGAGCAAATTGTTTATAAAACTCATCTAAGTCATTACTTGCTTCATCCTGAGTTATATATCGAATACTGTAATTTTCTTTCTGGACTACCTTTATTGTTTTTTTCTTTAATTCCTCATAACGTTGGTAAGGTTCCAAGGCTACACCCCCGTTTTCACAGGAGTATTATATGTATGTAATGGTTTGTCTCTTGACTGTTCTTTCTTAATTAGTTCCCCGCAAAGCTTGTTTAAATAATATGTATAATTCACTTTCTTTTTCATCGAGCGCACTTCAGTACCGATTTCTTCACAAATCGCAATCGGGATACTGGCTTTGTTTACTTTATTCTTATATGTATGTTTCAACTGTTTTTCAGCTATGTTCTTATATGTAAGGAAATCATTAATATGTACGAAATAAACTTTGTTTTCCGGCTCTCTAAATTGAAACAGAAAACCAGGGATTATGTTTGGGTATTGTGTTGCTTCCCTTAAATATTTAATCTGCTGCGGCTTTATGATTTTCTCGCTGAAGGAAATGGACTTGCTTTTTGTCGACTTAAGCTCAAAGGGGAACAAGTACCCCTTAAAGAACAGAAAGCAATCATATTTGTTTTTTGATACTGCTGCCCCTCTTTTCAAGAACATTGGGTTAACATCTTTAATCCGGTAAAAGAATAACTTTTGATCTGCTGCAGATTTTTCAATGTTCGCTTCAAAAACTTTCCCTTGATTGTTTGCTCCCAATCAATCACTCTCCTAATCTATATTGAAGGTAAATTATGTATGTGCTAAAATCGTTGCTGAAAGAGGTGTGCATAGTGAAAAAACAATGGAAACCAGTTGATTCAAGACTCAATGAGCTCATGCATGAATATAGCGTTTCAATTGAAGATCTTGTTGAATGTACTGGATTATCAAAACAACGTATTAATGATTATG",
+                  "hseq": "TTAAGATACTTACTACATATCTAACGAAAAAAAGAAGCTTACTCTGCCTTCCTTTCCAGAGCAGCTTCTAATAAATGTTGAGCAAATTGTTTATAAAACTCATCTAAGTCATTACTTGCTTCATCCTGAGTTATATATCGAATACTGTAATTTTCTTTCTGGACTACCTTTATTGTTTTTTTCTTTAATTCCTCATAACGTTGGTAAGGTTCCAAGGCTACACCCCCGTTTTCACAGGAGTATTATATGTATGTAATGGTTTGTCTCTTGACTGTTCTTTCTTAATTAGTTCCCCGCAAAGCTTGTTTAAATAATATGTATAATTCACTTTCTTTTTCATCGAGCGCACTTCAGTACCGATTTCTTCACAAATCGCAATCGGGATACTGGCTTTGTTTACTTTATTCTTATATGTATGTTTCAACTGTTTTTCAGCTATGTTCTTATATGTAAGGAAATCATTAATATGTACGAAATAAACTTTGTTTTCCGGCTCTCTAAATTGAAACAGAAAACCAGGGATTATGTTTGGGTATTGTGTTGCTTCCCTTAAATATTTAATCTGCTGCGGCTTTATGATTTTCTCGCTGAAGGAAATGGACTTGCTTTTTGTCGACTTAAGCTCAAAGGGGAACAAGTACCCCTTAAAGAACAGAAAGCAATCATATTTGTTTTTTGATACTGCTGCCCCTCTTTTCAAGAACATTGGGTTAACATCTTTAATCCGGTAAAAGAATAACTTTTGATCTGCTGCAGATTTTTCAATGTTCGCTTCAAAAACTTTCCCTTGATTGTTTGCTCCCAATCAATCACTCTCCTAATCTATATTGAAGGTAAATTATGTATGTGCTAAAATCGTTGCTGAAAGAGGTGTGCATAGTGAAAAAACAATGGAAACCAGTTGATTCAAGACTCAATGAGCTCATGCATGAATATAGCGTTTCAATTGAAGATCTTGTTGAATGTACTGGATTATCAAAACAACGTATTAATGATTATG",
+                  "midline": "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 15,
+            "eff_space": 9776125,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          }
+        }
+      }
+    }
+  }
+,
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_2",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genB | ENG_20 | [1000:3000](-)",
+          "query_len": 2000,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "gnl|BL_ORD_ID|1",
+                  "accession": "1",
+                  "title": "TT_000001 | TT_000001.1 | Synthetic Phage Genome 1 | geneB | GEN_20 | [1000:3000](-)"
+                }
+              ],
+              "len": 2000,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 3694.42,
+                  "score": 2000,
+                  "evalue": 0,
+                  "identity": 2000,
+                  "query_from": 1,
+                  "query_to": 2000,
+                  "query_strand": "Plus",
+                  "hit_from": 1,
+                  "hit_to": 2000,
+                  "hit_strand": "Plus",
+                  "align_len": 2000,
+                  "gaps": 0,
+                  "qseq": "TAGGTGGTTTTAAATCAAATATGAATATTGGAACAGCAATGACATTTGCTGATGCCATAGGTTGCTCTATAGAAGAGCTTTATGTATGGAACTTTAAAGAGCGCAGACAATTAACCAAATAACTTATAATATGGTTCCCTTTTTGACCCACCTTATTTCCTGCATTAATTCCTCATTATTGTCAGCCAAGTTAATTAAGTTACGATGTGCTCTTTGCAAATCTTTTTCTTCAATGGCCTCCTTCACTGTCTTCATTTGTCTATCCATCTTGTTTAACAGTGTTTGAATTGAATGATAAGCCTCGTTAATTTTTCTCGCCTCTTTCCCATATGTGCAATATTTAGTTCATTACTTTTTGCATATTAAACTGTTGTTTGCAATACCCTACTCTTTTAAAAAGAGAAACTAGAGACTTTTTTATTCTTTTTAAGCTGCATTATTAAGCATTTATATTCGTTGTAATCCTCTTCACTATCAAATGCGAACATTGGATATTGTGAATACTCTTTTTGAAAATACTCAATTCGCCCCCCTACCTGGTGTAGTATTGAATACTTTGACATATCCTCTTCATATGGAATTGTAATAACATTTCGATTACACATAATACCTCCACTAATTTTATTTTTATTCTAAATAAAAGACCGATTTTATCCTGTTCCTATTTACATTAATCTAGATAAACAACTTCTTTTACAATTGGAAATGGACTACTGATTCTCTCACTTAAATGCAAAACTATTTCAGTTACGTCTTTTGATGTTGCCACGTGGACTGCCTTTGTAATTTTAAAATTGAATTCATTTTCAATTAAGAGACGTTTACCTTCGGAAAATATATCTATTGAACTAACCGCAAAATCACACTTTCCATTTATTCGATACGGATTAAAGCATTTCACAAAATAACATTTATTTAATTCCTTACTGTCTGATAAAACAATGTCAAATTCCACATCCCAAACAAACGTGTTAATCTTAGAATGATAAACTAAATCATGGGTAGCTCCTGTATCTTTAAAAATTTCAATCATTGAAATAATCCTCCCCAAATCACTCCTGCTGCAATAGCAGCTATAAAGACAGAAACAAATTTCATTAAAATGAAAAACTTAATATGCTTTGTTTCGTTCTCAGTTAAGTCAAAATCTGATAAAGCGAATAAACCAAACACAATTAACAATATCCAGGCTGTAACAATCAGGTATCTTTCCTCCAATCATGTTTTATTGTGGCAGATATTAATATATTCCTTCAGGCTATTAACTGTTGAAATAATACACCCTCGAACCTCTTCAGGATCTTCAAAATCCATTTCATTTTGCAGAACAAATTCATCAAACTCAATCATGGCAAGAAAGCGATCGTCATTGGGTAGCTTATTAAAATCAATATTCTTTAATCTTGGAATACCTTTTTCCTTTATCCATTCAAGGAAGGGATAATCAACATCATTCTTTGCTACTGCGATTTTTAAAAACTCATGAATATCAGAAGAGTTTTCAATATTGAAATAAATCATGAGACTTTCCTTCATAAGATCAAATAATCACAATAAAGTTTTATCAATGTTATTGTCTGATTTAATTTCAAAGTCTATATTAAACCAGGACATTACGTTCTCCATTCAATCCCTCCTTGTACATCTAAACTATTACTCACTTGACTAACCCCCTTAAGCGTTCGACTTCTGCAACTAACCATTCTGCATAACTGATATGAATTTTTATCACCTTGGTTGATCTAAGTCGCCGAGACATTACTTCAACAAATTTTTTAACTTCTTCAAATTCAATCTCTTTCATTGAGTTTATCCCACTAAATGAAATCAACGTCTTAATCAATCAAGTATCTTATTTTTTGGCTTTATATCGATTTCATCACAAGAAGGACATGAAAAATCTGAATTGTCACCTATCCAACTAAAATTGCATTCATTACAAGTCCAATCAATTTGTTCTCTACTGTCCATTATAGCTACACCTCTTTCTTAATAAATTC",
+                  "hseq": "TAGGTGGTTTTAAATCAAATATGAATATTGGAACAGCAATGACATTTGCTGATGCCATAGGTTGCTCTATAGAAGAGCTTTATGTATGGAACTTTAAAGAGCGCAGACAATTAACCAAATAACTTATAATATGGTTCCCTTTTTGACCCACCTTATTTCCTGCATTAATTCCTCATTATTGTCAGCCAAGTTAATTAAGTTACGATGTGCTCTTTGCAAATCTTTTTCTTCAATGGCCTCCTTCACTGTCTTCATTTGTCTATCCATCTTGTTTAACAGTGTTTGAATTGAATGATAAGCCTCGTTAATTTTTCTCGCCTCTTTCCCATATGTGCAATATTTAGTTCATTACTTTTTGCATATTAAACTGTTGTTTGCAATACCCTACTCTTTTAAAAAGAGAAACTAGAGACTTTTTTATTCTTTTTAAGCTGCATTATTAAGCATTTATATTCGTTGTAATCCTCTTCACTATCAAATGCGAACATTGGATATTGTGAATACTCTTTTTGAAAATACTCAATTCGCCCCCCTACCTGGTGTAGTATTGAATACTTTGACATATCCTCTTCATATGGAATTGTAATAACATTTCGATTACACATAATACCTCCACTAATTTTATTTTTATTCTAAATAAAAGACCGATTTTATCCTGTTCCTATTTACATTAATCTAGATAAACAACTTCTTTTACAATTGGAAATGGACTACTGATTCTCTCACTTAAATGCAAAACTATTTCAGTTACGTCTTTTGATGTTGCCACGTGGACTGCCTTTGTAATTTTAAAATTGAATTCATTTTCAATTAAGAGACGTTTACCTTCGGAAAATATATCTATTGAACTAACCGCAAAATCACACTTTCCATTTATTCGATACGGATTAAAGCATTTCACAAAATAACATTTATTTAATTCCTTACTGTCTGATAAAACAATGTCAAATTCCACATCCCAAACAAACGTGTTAATCTTAGAATGATAAACTAAATCATGGGTAGCTCCTGTATCTTTAAAAATTTCAATCATTGAAATAATCCTCCCCAAATCACTCCTGCTGCAATAGCAGCTATAAAGACAGAAACAAATTTCATTAAAATGAAAAACTTAATATGCTTTGTTTCGTTCTCAGTTAAGTCAAAATCTGATAAAGCGAATAAACCAAACACAATTAACAATATCCAGGCTGTAACAATCAGGTATCTTTCCTCCAATCATGTTTTATTGTGGCAGATATTAATATATTCCTTCAGGCTATTAACTGTTGAAATAATACACCCTCGAACCTCTTCAGGATCTTCAAAATCCATTTCATTTTGCAGAACAAATTCATCAAACTCAATCATGGCAAGAAAGCGATCGTCATTGGGTAGCTTATTAAAATCAATATTCTTTAATCTTGGAATACCTTTTTCCTTTATCCATTCAAGGAAGGGATAATCAACATCATTCTTTGCTACTGCGATTTTTAAAAACTCATGAATATCAGAAGAGTTTTCAATATTGAAATAAATCATGAGACTTTCCTTCATAAGATCAAATAATCACAATAAAGTTTTATCAATGTTATTGTCTGATTTAATTTCAAAGTCTATATTAAACCAGGACATTACGTTCTCCATTCAATCCCTCCTTGTACATCTAAACTATTACTCACTTGACTAACCCCCTTAAGCGTTCGACTTCTGCAACTAACCATTCTGCATAACTGATATGAATTTTTATCACCTTGGTTGATCTAAGTCGCCGAGACATTACTTCAACAAATTTTTTAACTTCTTCAAATTCAATCTCTTTCATTGAGTTTATCCCACTAAATGAAATCAACGTCTTAATCAATCAAGTATCTTATTTTTTGGCTTTATATCGATTTCATCACAAGAAGGACATGAAAAATCTGAATTGTCACCTATCCAACTAAAATTGCATTCATTACAAGTCCAATCAATTTGTTCTCTACTGTCCATTATAGCTACACCTCTTTCTTAATAAATTC",
+                  "midline": "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 16,
+            "eff_space": 19681280,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          }
+        }
+      }
+    }
+  }
+,
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_3",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genC | ENG_30 | [3000:4000](+)",
+          "query_len": 1000,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "gnl|BL_ORD_ID|2",
+                  "accession": "2",
+                  "title": "TT_000001 | TT_000001.1 | Synthetic Phage Genome 1 | geneC | GEN_30 | [3000:4000](+)"
+                }
+              ],
+              "len": 1000,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 1786.83,
+                  "score": 967,
+                  "evalue": 0,
+                  "identity": 989,
+                  "query_from": 1,
+                  "query_to": 1000,
+                  "query_strand": "Plus",
+                  "hit_from": 1,
+                  "hit_to": 1000,
+                  "hit_strand": "Plus",
+                  "align_len": 1000,
+                  "gaps": 0,
+                  "qseq": "AACATTTTATCTACTTCCAATTGTAGTTCTCCTTTTCTTTCTCTGAATCACCTATATGCGAAAGAATCCAATTATGATAACCCTCTTCTCCACAATTAGGGCAATCCATTTCAGATATAACCTTTAATGTGTTTATCATAGGATTTTTAGCAAACAAGTGATGATTGCATTTTCTACAAAAAAACACAACTTCATTTTCCATGTCTCCCCTTCCCTTCTGTATAAAATTAGAATTTTAATTAAATCTAAATCTCGAATGTTTTAAGCTCAAACGTTTTATATGAATCTACTTCTTCACCAGGTATCACATTGACACTCGGATAATTATCATAGTCATACGGGTATCCGATACAATTCATGTGAAAGCTCGTTCCATCTTTGTCAAACTCAGCTTGTAAATGATCATGTCCACAAACCCAGTGTTTTGCGTGGCAAAACGGGACATCAACCATGTAGCATGTATTAGGCTCAAATGGAGAATAAGGATTGTGAACAGGTGGAACATGTGAGACAAATACATCAACTTGTGTATTTTCAAGCGTTTCATACCAATCCATTGATTCTTTCCACATCGCTCTTACACCATCTACTTTGTTATAACCATTAAGCCAAATGTAATTAGAATCGTTAGATACTCCTTTTTGGAAGTCCCATCCTTCGATTCCTTTTGGACATTACCACATTACATCTCCTGCAAAGACTTTTCCTTTGTATGTTTCAGTTGTCTTAATTAATGGTGTTACATTTTTCATGTCAGCAGCTTTTTGAATTAGATCATTCAACCTGCCTAACGAGTCTGAGTATTTCCTTTTTTGGCTCTTGCTAAGTAAATAAAGATCATGATTACCATATGTAAAGTAAACCTTCTCGTATTGCTTTGCTGCCTCATCTAAAACCCATAAAGTTTGTTGATTCCATTCAGTAAAATCGCCGGCAATGACCAATACCTCCCCATTACCGTTTGAGATTAACCTATTTACAATTTCTCTTGTTCGCTTCT",
+                  "hseq": "AACATTTTATCTACTTCCAATTGTAGTTCTCCTTTTCTTTCTCTGAATCACCTATATGCGAAAGAATCCAATTATGATAACCCTCTTCTCCACAATTAGGGCAATCCATTTCAGATATAACCTTTAATGTGTTTATCATAGGATTTTTAGCAAACAAGTGATGATTGCATTTTCTACAAAAAAACACAACTTCATTTTCCATGTCTCCCCTTCCCTTCTGTATAAAATTAGAATTTTAATTAAATCTAAATCTCGAATGTTTTAAGCTCAAACGTTTTATATGAATCTACTTCTTCACCAGGTATCACATTGACACTCGGATAATTATCATAGTCATACGGGTATCCGATACAATTCATGTGAAAGCTCGTTCCATCTTTGTCAAACTCAGCTTGTAAATGATCATGTCCACAAACCCAGTGTTTTGCGTTAATGAACGGGACATCAACCATGTAGCATGTATTAGGCTCAAATGGAGAATAAGGATTGTGAACAGGTGGAACATGTGAGACAAATACATCAACTTGTGTATTTTCAAGCGTTTCATACCAATCCATTGATTCTTTCCACATCGCTCTTACACCATCTACTTTGTTATAACCATTAAGCCAAATGTAATTAGAATCGTTAGATACTCCTTTAAAGAAGTCCCATCCTTCGATTCCTTTTGGAAGGTACCACATTACATCTCCTGCAAAGACTTTTCCTTTGTATGTTTCAGTTGTCTTAATTAATGGTGTTACATTTTTCATGTCAGCAGCTTTTTGAATTAGATCATTCAACCTGCCTAACGAGTCTGAGTATTTCCTTTTTTGGCTCTTGCTAAGTAAATAAAGATCATGATTACCATATGTAAAGTAAACCTTCTCGTATTGCTTTGCTGCCTCATCTAAAACCCATAAAGTTTGTTGATTCCATTCAGTAAAATCGCCGGCAATGACCAATACCTCCCCATTACCGTTTGAGATTAACCTATTTACAATTTCTCTTGTTCGCTTCT",
+                  "midline": "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||     ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||   ||||||||||||||||||||||||||||   |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 15,
+            "eff_space": 9776125,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          }
+        }
+      }
+    }
+  }
+,
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_4",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genD | ENG_40 | [4000:7000](-)",
+          "query_len": 3000,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "gnl|BL_ORD_ID|3",
+                  "accession": "3",
+                  "title": "TT_000001 | TT_000001.1 | Synthetic Phage Genome 1 | geneD | GEN_40 | [4000:7000](-)"
+                }
+              ],
+              "len": 3000,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 5541.07,
+                  "score": 3000,
+                  "evalue": 0,
+                  "identity": 3000,
+                  "query_from": 1,
+                  "query_to": 3000,
+                  "query_strand": "Plus",
+                  "hit_from": 1,
+                  "hit_to": 3000,
+                  "hit_strand": "Plus",
+                  "align_len": 3000,
+                  "gaps": 0,
+                  "qseq": "CCCACTTAATCTGATTTACATTCCAAGGAATCCAATGATTTATATGGAGATCTGAAACATAATCAATTTTCATTTTGTCTCCACCTTTCTTAATGAAAAATTTATTTCTTTGGCGTGTATAAATTAAAATAATCTCTCCATAATATGATTCAAACAAGCTTGTTTTCATTACACTTTAGGAGATGAATAAGATGGCTCAACAAAGTAGATCAAGATCAAACAACAATAATGATTTACTAATTCCTCAAGCAGCTTCAGCTATTGAACAAATGAAACTTGAAATAGCTTCTGAGTTTGGTGTTCAATTAGGCGCTGAGACTACATCTCGTGCAAACGGTTCAGTTGGTGGAGAAATCACTAAACGTTTAGTTCGCTTAGCTCAACAAAACATGGGCGGTCAATTTCATTAATTTATGAGGGGGATAATTCCCCTCTCTTTTTTAAGTCTTCTCTAAATCCATACAGAACTAATGGTATTGTTTCCACCTCTTTTTATGTCACTAACTACTATTATTAAGCTCCTCGACTTGCACTGTGTAATGTCTGTACCATTTTATTGCCTCCTTTGATTAGCCACTCTATAAATTGCGTTCTCTTCATTTAGAATATATCCAGCGCTCCGTCACAATAAGAACATTTGCCACTACCCTCTTCACATGTACACATATATTTGTCACCTCCAATTTCGCTACCGTCAACTGACAACTCCTCAGATATCATTTAATTGTTGTTTCAGCTCAAAGAATTCATCATGAAGAAATTTAAATTTATCCTTATTTACGTATGCTTTGTCATCATTAAGATCAAAGAGATCTAAGTACTTTCTTTTATTTCTTTTAATAATTCGTAAAGCAATAGTGGCACTTACCCACTCTTCACCTTCCAATTGGGTTAAGACTTCACTTAGCTCGAATAACAATTCAAGCTTAGCTTTGTTTTGCTGTGTTTCGAGTTTTAACAGATCCCTTTGTTTTTCAAGTAAAGTTGTTTCAATTTGGTATTTCTTTTTCTCTAAGGCTGTTATCTGTTCGTTGGTGTTATGTATTTTGTCTCCTACTTCCAATGAATCACCTCCTTAAAGTTTGAATAAAATATTAGTTTTAAAAAATGTATATTTTTTGTTTTTGTATATTAGATAAAAAAACTGTCATTTCATCATCTTCTATTATTATATTATACATATTATTTGTATTTGTCTATAGTTATTTTATTTTCATTCTTAAATCCATTTACTTAGCCCTGACAAATGCTAAAAGGGCTTGAGCCGTATAATGAGTGCAGCTAAACACAATTTCACATTATATGAAAAATAATACTCAAAGCAAAGATAAGGTTCCCAAAGACATAAGCCAAATAAATATACCTACTATGGCTCACTGTTTCGCCCTCCAACACGTCTAAAACCTTAAACATGCTTAGGACTGTGTATATAACTGAAAATGCTGTCCAACAGAGTATAAGGATATTTTCATGCATAATTAAACCGTTATATGCCAAGGGGATGATTAAAGAACTCCCCTTAAGCAAAGTAAACAGGTAAATTAAATTCTTATTTCGTTTCGCATCTTCTGGAGTTGAATTATCAAGCACACTCTTTACTTTTATATACGTATTGCTTTCCCCTCGCATAATCAACCTGACCTCATTAATGTTTAATACAATTAGATAAGCTGATAGAAATAAAGTTACATATGTTATAGTAAACATCTCCTAATTTTATATTTGTGTTGGGTTGGCTTTTACTCACCCTCAAACTCTATACCGTTAATATTTGCTTTTATTCAAATAGCTCCCCCTTTAAAATCATTCACTTGATCAGCAATGTTTTCTTTAATTGTATGTGGCAACTGATCAATCCCTTTTATAATCCGTTTCTGACCAGTTTTCCTAATTTTTGTAGTCATCTCTTTAAAACACTCTAAAGCAGTATCTGAGATTTCATCATATAGCCCCTGAATTTTCACTAATACACTTAAATATTCTTCGTCACCTTCTTCAAATAGCGACAACCCTTCTTCAAGTTTGTTGATCTTTTCAACACTCTTTATTATTTTATTTTTATCCTTAAACAATTAATCCCCCACCCAGTTTTGGTCATGCATCTTCATGAAGTTAGCTGCTGCCTTCTTGTATCTCAGGTCTTTCTCGTACTCAGCAACTTGTCTCATATGTTCAATAAATTCATCTTCAAGTCCTTGTAACTGAAGAAACCCAAAGCAAAGACCGTTCCTATAAAGCATGTCGTCATATTTCGCTTGTAAATCTCTTTCTTTGCTGTTAATAATCTCTTCCTCCTTAAATATTAGATAAAAGTATTCTTTTATTCGGAAATATTTCCAACAAAAATCTTTTATGGTAAATTAAAAACAATGTATTTAAAGGAGTGTTAATTTGCGAAAAATATTAAAAATCGTTAGCTTACTGATTCTATTGTTATTATTGGTTTATTCTTTCTTCAGTCCTAATTCACAATTATTTGTGTTCGTTCAGCTAATCATAATTGCATTTTTGATTGGTTTTGGAATTAACTGTTTTGTTAAAAAAGAACGATACCAAGGTACTCTATACTTCGTAATTGCAATATGCAACATTACCATTAATCTTGATAAAATAAACGAGTTAATTCAGAGCATTTAACTTATACATATATAGGAGGTGGGAAATTACCCACCTTCTTTATTGGATAGGAACTAATACTTCACATAAGTGATTATCAATCATTTGTGAAGTATATCTCTCTATAATTGGTTCTCCTCTCATAGTTAGACTATTTTTTTCTATTTCAGAGAAAATATTGCCCCAAAATTCACTTACTGCCTCTTTTGTATGGTCAAGCAAGAAAACAGCGTATTTCCCTCCAGGTAACTTACCAACTTGAGCTGGTTGCAGCACATTAAAATCTTCATTTAATACAACACCAACATCATAACGGCATTCCTCTTTAGGAGTAATACTTGGATCATCTTGTGGAATTCCTAAAATTACAGAGTTATGAAATAC",
+                  "hseq": "CCCACTTAATCTGATTTACATTCCAAGGAATCCAATGATTTATATGGAGATCTGAAACATAATCAATTTTCATTTTGTCTCCACCTTTCTTAATGAAAAATTTATTTCTTTGGCGTGTATAAATTAAAATAATCTCTCCATAATATGATTCAAACAAGCTTGTTTTCATTACACTTTAGGAGATGAATAAGATGGCTCAACAAAGTAGATCAAGATCAAACAACAATAATGATTTACTAATTCCTCAAGCAGCTTCAGCTATTGAACAAATGAAACTTGAAATAGCTTCTGAGTTTGGTGTTCAATTAGGCGCTGAGACTACATCTCGTGCAAACGGTTCAGTTGGTGGAGAAATCACTAAACGTTTAGTTCGCTTAGCTCAACAAAACATGGGCGGTCAATTTCATTAATTTATGAGGGGGATAATTCCCCTCTCTTTTTTAAGTCTTCTCTAAATCCATACAGAACTAATGGTATTGTTTCCACCTCTTTTTATGTCACTAACTACTATTATTAAGCTCCTCGACTTGCACTGTGTAATGTCTGTACCATTTTATTGCCTCCTTTGATTAGCCACTCTATAAATTGCGTTCTCTTCATTTAGAATATATCCAGCGCTCCGTCACAATAAGAACATTTGCCACTACCCTCTTCACATGTACACATATATTTGTCACCTCCAATTTCGCTACCGTCAACTGACAACTCCTCAGATATCATTTAATTGTTGTTTCAGCTCAAAGAATTCATCATGAAGAAATTTAAATTTATCCTTATTTACGTATGCTTTGTCATCATTAAGATCAAAGAGATCTAAGTACTTTCTTTTATTTCTTTTAATAATTCGTAAAGCAATAGTGGCACTTACCCACTCTTCACCTTCCAATTGGGTTAAGACTTCACTTAGCTCGAATAACAATTCAAGCTTAGCTTTGTTTTGCTGTGTTTCGAGTTTTAACAGATCCCTTTGTTTTTCAAGTAAAGTTGTTTCAATTTGGTATTTCTTTTTCTCTAAGGCTGTTATCTGTTCGTTGGTGTTATGTATTTTGTCTCCTACTTCCAATGAATCACCTCCTTAAAGTTTGAATAAAATATTAGTTTTAAAAAATGTATATTTTTTGTTTTTGTATATTAGATAAAAAAACTGTCATTTCATCATCTTCTATTATTATATTATACATATTATTTGTATTTGTCTATAGTTATTTTATTTTCATTCTTAAATCCATTTACTTAGCCCTGACAAATGCTAAAAGGGCTTGAGCCGTATAATGAGTGCAGCTAAACACAATTTCACATTATATGAAAAATAATACTCAAAGCAAAGATAAGGTTCCCAAAGACATAAGCCAAATAAATATACCTACTATGGCTCACTGTTTCGCCCTCCAACACGTCTAAAACCTTAAACATGCTTAGGACTGTGTATATAACTGAAAATGCTGTCCAACAGAGTATAAGGATATTTTCATGCATAATTAAACCGTTATATGCCAAGGGGATGATTAAAGAACTCCCCTTAAGCAAAGTAAACAGGTAAATTAAATTCTTATTTCGTTTCGCATCTTCTGGAGTTGAATTATCAAGCACACTCTTTACTTTTATATACGTATTGCTTTCCCCTCGCATAATCAACCTGACCTCATTAATGTTTAATACAATTAGATAAGCTGATAGAAATAAAGTTACATATGTTATAGTAAACATCTCCTAATTTTATATTTGTGTTGGGTTGGCTTTTACTCACCCTCAAACTCTATACCGTTAATATTTGCTTTTATTCAAATAGCTCCCCCTTTAAAATCATTCACTTGATCAGCAATGTTTTCTTTAATTGTATGTGGCAACTGATCAATCCCTTTTATAATCCGTTTCTGACCAGTTTTCCTAATTTTTGTAGTCATCTCTTTAAAACACTCTAAAGCAGTATCTGAGATTTCATCATATAGCCCCTGAATTTTCACTAATACACTTAAATATTCTTCGTCACCTTCTTCAAATAGCGACAACCCTTCTTCAAGTTTGTTGATCTTTTCAACACTCTTTATTATTTTATTTTTATCCTTAAACAATTAATCCCCCACCCAGTTTTGGTCATGCATCTTCATGAAGTTAGCTGCTGCCTTCTTGTATCTCAGGTCTTTCTCGTACTCAGCAACTTGTCTCATATGTTCAATAAATTCATCTTCAAGTCCTTGTAACTGAAGAAACCCAAAGCAAAGACCGTTCCTATAAAGCATGTCGTCATATTTCGCTTGTAAATCTCTTTCTTTGCTGTTAATAATCTCTTCCTCCTTAAATATTAGATAAAAGTATTCTTTTATTCGGAAATATTTCCAACAAAAATCTTTTATGGTAAATTAAAAACAATGTATTTAAAGGAGTGTTAATTTGCGAAAAATATTAAAAATCGTTAGCTTACTGATTCTATTGTTATTATTGGTTTATTCTTTCTTCAGTCCTAATTCACAATTATTTGTGTTCGTTCAGCTAATCATAATTGCATTTTTGATTGGTTTTGGAATTAACTGTTTTGTTAAAAAAGAACGATACCAAGGTACTCTATACTTCGTAATTGCAATATGCAACATTACCATTAATCTTGATAAAATAAACGAGTTAATTCAGAGCATTTAACTTATACATATATAGGAGGTGGGAAATTACCCACCTTCTTTATTGGATAGGAACTAATACTTCACATAAGTGATTATCAATCATTTGTGAAGTATATCTCTCTATAATTGGTTCTCCTCTCATAGTTAGACTATTTTTTTCTATTTCAGAGAAAATATTGCCCCAAAATTCACTTACTGCCTCTTTTGTATGGTCAAGCAAGAAAACAGCGTATTTCCCTCCAGGTAACTTACCAACTTGAGCTGGTTGCAGCACATTAAAATCTTCATTTAATACAACACCAACATCATAACGGCATTCCTCTTTAGGAGTAATACTTGGATCATCTTGTGGAATTCCTAAAATTACAGAGTTATGAAATAC",
+                  "midline": "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 17,
+            "eff_space": 29576445,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          }
+        }
+      }
+    }
+  }
+,
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_5",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genE | ENG_50 | [7000:9000](-)",
+          "query_len": 2000,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "gnl|BL_ORD_ID|4",
+                  "accession": "4",
+                  "title": "TT_000001 | TT_000001.1 | Synthetic Phage Genome 1 | geneE | GEN_50 | [7000:10000](-)"
+                }
+              ],
+              "len": 3000,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 3694.42,
+                  "score": 2000,
+                  "evalue": 0,
+                  "identity": 2000,
+                  "query_from": 1,
+                  "query_to": 2000,
+                  "query_strand": "Plus",
+                  "hit_from": 1,
+                  "hit_to": 2000,
+                  "hit_strand": "Plus",
+                  "align_len": 2000,
+                  "gaps": 0,
+                  "qseq": "ACCATTCAACTGTGCCCACTTTTTAAAAGATTCCATTAGTTCTTTGTTTTGCTTACCACCATACTCTCCAACGTTTCGGAAATAAGCAATCCTTAATTCAGGTAATTCTTCAATAGTTATTTTCATATTTTAATCCCCTTTCCTAGAAAAAGGTAATATGATTAAAAATGTTTTTCAAGATGACTTTTAAAATAATCTATATTTCAAATACAAAATCCAATTACTTCGTTCCAGTTGATCCGTGCCCACCTCGGTCACCGTTGCCTAGACGGTCTACCTCGATCAAGTCAACTGCCGGCATCTTCTTCATAATTCTGAACTGGCAGATTCGATCCCCTTTCTTAATCTTTGTGTCACGTAACGCATAAGCAGGAAAGAACCAAAAATCGTTGTCACCCTTATAAGACTCATCGATAACACCCATTGAGTTTGTTTGAATCACACCAAAGTTCTTATACGTACTCGAACGAGGAACGACATGTGCTTCGTAACCTTCAGGCAATTCCATGGCCACTCCCAATGGAACAAGTTTAAATTCATCTTTTTTGATCGCTACATCTTCAGCTGCACGAAGATCAATCCAATCACCTTGCTCCATTTTGTTAATTCTTGTTTGTGTTTCATCTAAGTATTTGATTTTAATTTGCATTATGTATTAGCTCCTTTTAATTCAAGTTTGTTTAAAATTACCCTTTTATCGTAATTCCTTTAGTAACTCATCAAGTTCATTAGGCTTAAAACCAACACTTCGGTTTACTTCTTCTCCCTGATCACTCAGCAGAATGGTTACCGGTACTCCCATGACACCAAATCTTGCTGCTACTTCTGGTTCCTGTGTAACGTCAACAGTCTCAAATTGAATATTTACTTGTTCTAAGTAATTGGACACCATTTTACATGGATTGCAATTAGGCTGCTCTAATTTAATTAATCTCATTGAATACATCCTTTCTCGGTAAAAATGAAATCTGAATCCTTTAAAGGCTCCACTGTTGCTTTTTTGTATCCATTCCCTTTAGTTGAAAAGAAGTCATGGGATTTAGTCTTAGTGTTCAAACCATTGATAACAATTGGATTAACATCCTCTTCTTCAAACCAATGATCAAAGCCCAGATTGTTTAAAGCTTTATTTGCGTTGTATCTGATGAATTTCTTTACATCTGGAGCTAATCCAACCTGATCATAGACATCTTCTGTATACTCCAATTCATTTTCGTAAAGTTCCTGCAGTAAGTTTAAAGCCCATGCGTACAGTTCTTTTTGCTTCTGTGGCGTTTGCTTCTTATAAATCTCTTGAGCTAACAATCCTACATATACGCCATGTATCGCTTCGTCTCTAATACCCTTAGTTCAACCGAGTTCGCTACTTTCGGTTCGTTGCTCTGTCGCAACCGCCTTACGTTACCGTAAGGAGCAGACTATATCATCATCCCTGTAGGATGCCTCCCGTTTCGATTTAAGGGGTTCTCACCCACGCCAATAGCTTGCGCCCTACTCGTTTTGCGGAATTTCGCCGCCTATGCGATAGTCGTTGAACGTTCTATGCGATCCCATAAAGTCTTCCATCTTCTTTTATGTCGAATTAGACTAACGTAACGAGGATGAAGGCTGTATTTTTCACCAGCTTCAACATTGTTCATTCCAGCAATCAAATCATAGATTAAATTTGTTGCCTCCATATTAGTGAGCTTTGACATTGAATTACTTTCTCCAGGTTGTCCTGACATTAATCCAATTTTCATTGCATGTAGAGTATTTTCTTTAGGTGTAACTATTTCTAAGTTCCGAACGTGGTTGTTTAGTTTATTTCCATCTATGTGGTTTACAAACATTCCTTTTGGTATATCATAAATAAAATATTTTGCGACTAACCTATGTACTAAATAGTTCTGTGTTCCTTTTTTCGGATGCGTGTATCCTATCATTTCATAGCCATGTGGAGTAATAAATGTCTTTCTTGGTTTCTTTAATTTTTTTGATATGATAACTCCCGTTTCCGT",
+                  "hseq": "ACCATTCAACTGTGCCCACTTTTTAAAAGATTCCATTAGTTCTTTGTTTTGCTTACCACCATACTCTCCAACGTTTCGGAAATAAGCAATCCTTAATTCAGGTAATTCTTCAATAGTTATTTTCATATTTTAATCCCCTTTCCTAGAAAAAGGTAATATGATTAAAAATGTTTTTCAAGATGACTTTTAAAATAATCTATATTTCAAATACAAAATCCAATTACTTCGTTCCAGTTGATCCGTGCCCACCTCGGTCACCGTTGCCTAGACGGTCTACCTCGATCAAGTCAACTGCCGGCATCTTCTTCATAATTCTGAACTGGCAGATTCGATCCCCTTTCTTAATCTTTGTGTCACGTAACGCATAAGCAGGAAAGAACCAAAAATCGTTGTCACCCTTATAAGACTCATCGATAACACCCATTGAGTTTGTTTGAATCACACCAAAGTTCTTATACGTACTCGAACGAGGAACGACATGTGCTTCGTAACCTTCAGGCAATTCCATGGCCACTCCCAATGGAACAAGTTTAAATTCATCTTTTTTGATCGCTACATCTTCAGCTGCACGAAGATCAATCCAATCACCTTGCTCCATTTTGTTAATTCTTGTTTGTGTTTCATCTAAGTATTTGATTTTAATTTGCATTATGTATTAGCTCCTTTTAATTCAAGTTTGTTTAAAATTACCCTTTTATCGTAATTCCTTTAGTAACTCATCAAGTTCATTAGGCTTAAAACCAACACTTCGGTTTACTTCTTCTCCCTGATCACTCAGCAGAATGGTTACCGGTACTCCCATGACACCAAATCTTGCTGCTACTTCTGGTTCCTGTGTAACGTCAACAGTCTCAAATTGAATATTTACTTGTTCTAAGTAATTGGACACCATTTTACATGGATTGCAATTAGGCTGCTCTAATTTAATTAATCTCATTGAATACATCCTTTCTCGGTAAAAATGAAATCTGAATCCTTTAAAGGCTCCACTGTTGCTTTTTTGTATCCATTCCCTTTAGTTGAAAAGAAGTCATGGGATTTAGTCTTAGTGTTCAAACCATTGATAACAATTGGATTAACATCCTCTTCTTCAAACCAATGATCAAAGCCCAGATTGTTTAAAGCTTTATTTGCGTTGTATCTGATGAATTTCTTTACATCTGGAGCTAATCCAACCTGATCATAGACATCTTCTGTATACTCCAATTCATTTTCGTAAAGTTCCTGCAGTAAGTTTAAAGCCCATGCGTACAGTTCTTTTTGCTTCTGTGGCGTTTGCTTCTTATAAATCTCTTGAGCTAACAATCCTACATATACGCCATGTATCGCTTCGTCTCTAATACCCTTAGTTCAACCGAGTTCGCTACTTTCGGTTCGTTGCTCTGTCGCAACCGCCTTACGTTACCGTAAGGAGCAGACTATATCATCATCCCTGTAGGATGCCTCCCGTTTCGATTTAAGGGGTTCTCACCCACGCCAATAGCTTGCGCCCTACTCGTTTTGCGGAATTTCGCCGCCTATGCGATAGTCGTTGAACGTTCTATGCGATCCCATAAAGTCTTCCATCTTCTTTTATGTCGAATTAGACTAACGTAACGAGGATGAAGGCTGTATTTTTCACCAGCTTCAACATTGTTCATTCCAGCAATCAAATCATAGATTAAATTTGTTGCCTCCATATTAGTGAGCTTTGACATTGAATTACTTTCTCCAGGTTGTCCTGACATTAATCCAATTTTCATTGCATGTAGAGTATTTTCTTTAGGTGTAACTATTTCTAAGTTCCGAACGTGGTTGTTTAGTTTATTTCCATCTATGTGGTTTACAAACATTCCTTTTGGTATATCATAAATAAAATATTTTGCGACTAACCTATGTACTAAATAGTTCTGTGTTCCTTTTTTCGGATGCGTGTATCCTATCATTTCATAGCCATGTGGAGTAATAAATGTCTTTCTTGGTTTCTTTAATTTTTTTGATATGATAACTCCCGTTTCCGT",
+                  "midline": "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 16,
+            "eff_space": 19681280,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          }
+        }
+      }
+    }
+  }
+,
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_6",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genF | ENG_60 | [9000:10000](+)",
+          "query_len": 1000,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "gnl|BL_ORD_ID|4",
+                  "accession": "4",
+                  "title": "TT_000001 | TT_000001.1 | Synthetic Phage Genome 1 | geneE | GEN_50 | [7000:10000](-)"
+                }
+              ],
+              "len": 3000,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 1504.29,
+                  "score": 814,
+                  "evalue": 0,
+                  "identity": 950,
+                  "query_from": 1,
+                  "query_to": 1000,
+                  "query_strand": "Plus",
+                  "hit_from": 2001,
+                  "hit_to": 3000,
+                  "hit_strand": "Plus",
+                  "align_len": 1012,
+                  "gaps": 24,
+                  "qseq": "TATCCACCAAGGTGCTTCTTCGACTTCTTTCCTTATCATTTTCACCTCCTTTGGGTTCGCATAGCTTCGCTGCTGATTGTCCTAATAAGGATTTTCCAGCAATTAGAGAGGTTCACATTTGCCGTTGCCGACAAAAGGGACTATTAAATAATCAGGTTAATGATCTCTCCACTTTGCATTAACTTTCCTTGTCCATAAAAATAAAGTGGGTAATAAAACCCTGAGTAGAAAAGAAAACTCTCCAGGAACACAGATGCAACCATTCCTTTAAATAAAGAAATTTCATCGTTTTTCTTGATTGTTTTATAGACTGAAACAATTGTTCTAGCTTTCTTTTGAAGAAACCTATTGTTTTTCACCTTAGTCCAATTAC-GGACT-AACTGCTCGGTTGGAGCCAATGTTAGAAAGATGTTGCTGTAAGACTTTGCATGAACAGCATTTTCCATCATGGCCATGAAATTTAAAACTGCCTTTCTTTGAAAAGATCGGT-TA---GTTCAACTTCATCATTCAAC-TCACCTTTTAATCGAATCATTCG-ATC--TTAGCGTAAGTCCGGCCAGTACCTTCATATAAGTGTCCTGCTCATTTTTTCCGAGGTACTTCTATATTTTTCATGA-C-CAACATAAAGCAATCTCTTCCGGAAGCCAGAACTGTTTCACGTTTTGGTTATAGAACATTTGGGTAAAATCGTCTTCATGCTTTGACCAGTTTGCTGCGTCATAAATTTTTGTCAATTAATCATGTCCTTTCAATTGAAATATTTTTTTCCGAAAAAAATGCAGTGAATTTAAAAGCTGAATTGACAGACTCCTATATTACTGTCAAACATTCGAAAGGAATGAAAGACAGTGAATTTTTTAGATAACCTTATATCTTTGTTAGAGAGTACAGTCATTTCAACTGGATGGTTGTGTGATAGGCTTTTATCATGTTTAATCGAATATATTTTGAAGCTTATATTTGGTTTACTTTGTAATGCTCTTATGAGAAAATTTAACAAAAT",
+                  "hseq": "TATCCACCAAGGTGCTTCTTCGACTTCTTTCCTTATCATTTTCACCTCCTTTGGGTTCGCATAGCTTCGCTGCTGATTGTCCTAATAAGGATTTTCCAGCAATTAGAGAGGTTCACATTTGCCGTTGCCGACAAAAGGGACTATTAAATAATCAGGTTAATGATCTCTCCACTTTGCATTAACTTTCCTTGTCCATAAAAATAAAGTGGGTAATAAAACCCTGAGTAGAAAAGAAAACTCTCCAGGAACACAGATGCAACCATTCCTTTAAATAAAGAAATTTCATCGTTTTTCTTGATTGTTTTATAGACTGAAACAATTGTTCTAGCTTTCTTTTGAAGAAACCTATTGTTTTTCACC-CA-TTCAAAGACTTCATTGATCTGCTCGGTTGGAGCCAATGTTAGAAAGATGTTGCTGTAAGACTTTGCATGAACAGCATTTTCCATCATGGCCATGAAATTTAAAACTGCCTTTCTTTGA--TG-TCCATCTACGTGTTCAGC--CACGA-TCGGCATC-CC-CGTATTCCCCTGCTCTGTATCAAGAAGCGTAAGTCCGGCCAGTACCTTCATATAAGTGTCCTGCTCATTTTTTCCGAGGTACTTCCAT-GTGAGGA-GATCGCCGTTTAAAGCAATCTCTTCCGGAAGCCAGAACTGTTTCACGTTTTGGTTATAGAACATTTGGGTAAAATCGTCTTCATGCTTTGACCAGTTTGCTGCGTCATAAATTTTTGTCAATTAATCATGTCCTTTCAATTGAAATATTTTTTTCCGAAAAAAATGCAGTGAATTTAAAAGCTGAATTGACAGACTCCTATATTACTGTCAAACATTCGAAAGGAATGAAAGACAGTGAATTTTTTAGATAACCTTATATCTTTGTTAGAGAGTACAGTCATTTCAACTGGATGGTTGTGTGATAGGCTTTTATCATGTTTAATCGAATATATTTTGAAGCTTATATTTGGTTTACTTTGTAATGCTCTTATGAGAAAATTTAACAAAAT",
+                  "midline": "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||  | | |||  ||   | | | ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||   | ||  | ||   ||||| |  ||  | ||  | || ||   || ||   |  |  | |||    |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| ||  |    | || | |    ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 15,
+            "eff_space": 9776125,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          }
+        }
+      }
+    }
+  }
+,
+{
+    "report": {
+      "program": "blastn",
+      "version": "BLASTN 2.12.0+",
+      "reference": "Zheng Zhang, Scott Schwartz, Lukas Wagner, and Webb Miller (2000), \"A greedy algorithm for aligning DNA sequences\", J Comput Biol 2000; 7(1-2):203-14.",
+      "search_target": {
+        "db": "/usr/src/test/fixtures/assets_testing_folder/blasting/gene_identity/blastn_database/TT_000001"
+      },
+      "params": {
+        "expect": 0.001,
+        "sc_match": 1,
+        "sc_mismatch": -2,
+        "gap_open": 0,
+        "gap_extend": 0,
+        "filter": "m;"
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_7",
+          "query_title": "TT_000002 | TT_000002.1 | Synthetic Phage Genome 2 | genG | ENG_70 | [10000:11000](+)",
+          "query_len": 1000,
+          "hits": [
+          ],
+          "stat": {
+            "db_num": 5,
+            "db_len": 10000,
+            "hsp_len": 15,
+            "eff_space": 9776125,
+            "kappa": 0.46,
+            "lambda": 1.28,
+            "entropy": 0.85
+          },
+          "message": "No hits found"
+        }
+      }
+    }
+  }
+]
+}
