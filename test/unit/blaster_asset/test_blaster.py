@@ -8,41 +8,6 @@ from synphage.assets.blaster import blaster as BLT
 
 
 @pytest.mark.skip
-def test_parse_blastn(spark, tmp_path):
-    d = tmp_path / "blastn_summary"
-    d.mkdir()
-    p = f"{d}/blastn_summary"
-    rs = BLT.parse_blastn(
-        spark, "tests/temp/test_blastn0/blastn_results/TT_000001_vs_TT_000002", p
-    )
-    df = spark.read.parquet(p)
-    assert len(os.listdir(d)) == 1
-    assert set(
-        [
-            "query_genome_name",
-            "query_genome_id",
-            "query_gene",
-            "query_locus_tag",
-            "query_start_end",
-            "query_gene_strand",
-            "source_genome_name",
-            "source_genome_id",
-            "source_gene",
-            "source_locus_tag",
-            "source_start_end",
-            "source_gene_strand",
-            "percentage_of_identity",
-        ]
-    ).issubset(df.columns)
-
-
-@pytest.mark.skip
-def test_parse_blastn_negative():
-    # When no match between sequences
-    pass
-
-
-@pytest.mark.skip
 def test_extract_locus_tag_gene_positive(spark, tmp_path):
     path = "tests/fixtures/synthetic_data/genbank/TT_000001.gb"
     d = tmp_path / "locus_and_gene"
