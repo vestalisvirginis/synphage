@@ -11,12 +11,20 @@ FILE_LT = "locus_and_gene.parquet"
 
 
 def test_append_blastn():
-    result = append(PipeConfig(source='a', target=TARGET_BN, table_dir=TABLES, file=FILE_BN))
+    result = append(
+        PipeConfig(source="a", target=TARGET_BN, table_dir=TABLES, file=FILE_BN)
+    )
     assert isinstance(result, Path)
-    assert result == PosixPath("test/fixtures/assets_testing_folder/transform_2/tables/blastn_summary.parquet")
+    assert result == PosixPath(
+        "test/fixtures/assets_testing_folder/transform_2/tables/blastn_summary.parquet"
+    )
 
 
 def test_append_locus_tag():
-    result = append(PipeConfig(source='a', target=TARGET_LT, table_dir=TABLES, file=FILE_LT))
+    result = append(
+        PipeConfig(source="a", target=TARGET_LT, table_dir=TABLES, file=FILE_LT)
+    )
     assert isinstance(result, Path)
-    assert result == PosixPath("test/fixtures/assets_testing_folder/transform_2/tables/locus_and_gene.parquet")
+    assert result == PosixPath(
+        "test/fixtures/assets_testing_folder/transform_2/tables/locus_and_gene.parquet"
+    )

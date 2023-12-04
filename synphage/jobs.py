@@ -145,6 +145,7 @@ def gene_presence(context, blastn_all, locus_all):
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
         "/data/tables/uniqueness.parquet"
     )
+    return "OK"
 
 
 default_config = RunConfig(

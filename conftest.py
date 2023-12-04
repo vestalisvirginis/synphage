@@ -11,6 +11,10 @@ from pyspark.sql import SparkSession
 def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 
+@pytest.fixture
+def mock_env_phagy_dir_transform(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/transform")
+    monkeypatch.setenv("FILE_SYSTEM", "fs")
 
 @pytest.fixture
 def mock_env_phagy_dir_synteny(monkeypatch):
