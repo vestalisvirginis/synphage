@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.mark.skip
 def test_gene_presence_table(spark, tmp_path):
     path_locus = (

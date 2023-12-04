@@ -14,4 +14,3 @@ def test_blasting_job():
     assert result.success
 
     # add result for each node / check how nodes look like for asset job
-    
