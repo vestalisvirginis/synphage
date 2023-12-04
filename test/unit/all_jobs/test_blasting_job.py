@@ -1,12 +1,17 @@
-# example to test jobs
+from dagster import ExecuteInProcessResult, Definitions, load_assets_from_modules
 
-# def test_job():
-#     result = do_math_job.execute_in_process()
+from synphage.jobs import blasting_job
 
-#     # return type is ExecuteInProcessResult
-#     assert isinstance(result, ExecuteInProcessResult)
-#     assert result.success
-#     # inspect individual op result
-#     assert result.output_for_node("add_one") == 2
-#     assert result.output_for_node("add_two") == 3
-#     assert result.output_for_node("subtract") == -1
+from synphage.assets.blaster import blaster
+from synphage.assets.status import status
+
+
+def test_blasting_job():
+    all_assets = load_assets_from_modules([status, blaster])
+    defs = Definitions(assets=all_assets, jobs=[blasting_job])
+    result = defs.get_job_def("blasting_job").execute_in_process()
+    assert isinstance(result, ExecuteInProcessResult)
+    assert result.success
+
+    # add result for each node / check how nodes look like for asset job
+    
