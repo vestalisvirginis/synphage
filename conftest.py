@@ -8,6 +8,12 @@ from pyspark.sql import SparkSession
 
 
 @pytest.fixture
+def mock_env_ncbi_connect(monkeypatch):
+    monkeypatch.setenv("EMAIL", "name@domain.com")
+    monkeypatch.setenv("API_KEY", "jhd6hdz778ahjeahj8889")
+
+
+@pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 
