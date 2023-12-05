@@ -1,51 +1,51 @@
-# from dagster import asset, Field, AssetObservation, EnvVar
+from dagster import asset, Field, AssetObservation, EnvVar
 
-# import os
+import os
 
-# from toolz import first
-# from collections import namedtuple
-# from typing import List
-# from pathlib import Path
-
-
-# NucleotideRecord = namedtuple("NucleotideRecord", "dbname,menu,count,status")
+from toolz import first
+from collections import namedtuple
+from typing import List
+from pathlib import Path
 
 
-# def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
-#     _origin = result["eGQueryResult"]
-#     return NucleotideRecord(
-#         *first(filter(lambda x: x["DbName"] == dbname, _origin)).values()
-#     )
+NucleotideRecord = namedtuple("NucleotideRecord", "dbname,menu,count,status")
 
 
-# ncbi_query_config = {
-#     "database": Field(str, description="Database identifier", default_value="nuccore"),
-#     "keyword": Field(
-#         str,
-#         description="Search criteria for the ncbi query",
-#         default_value="Spbetavirus",
-#     ),
-# }
+def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
+    _origin = result["eGQueryResult"]
+    return NucleotideRecord(
+        *first(filter(lambda x: x["DbName"] == dbname, _origin)).values()
+    )
 
 
-# @asset(
-#     required_resource_keys={"ncbi_connection"},
-#     config_schema=ncbi_query_config,
-#     description="Getting the number of records matching the keyword(s) in the specified database",
-#     compute_kind="NCBI",
-#     metadata={"owner": "Virginie Grosboillot"},
-# )
-# def accession_count(context) -> int:
-#     _query = context.resources.ncbi_connection.conn.egquery(
-#         term=context.op_config["keyword"]
-#     )
-#     _result = context.resources.ncbi_connection.conn.read(_query)
-#     _nucleotide = _get_ncbi_count_result(_result, context.op_config["database"])
-#     _num_rows = int(_nucleotide.count)
-#     context.log_event(
-#         AssetObservation(asset_key="accession_count", metadata={"num_rows": _num_rows})
-#     )
-#     return _num_rows
+ncbi_query_config = {
+    "database": Field(str, description="Database identifier", default_value="nuccore"),
+    "keyword": Field(
+        dict,
+        description="Search criteria for the ncbi query",
+        default_value={"env": "KEYWORD"},
+    ),
+}
+
+
+@asset(
+    required_resource_keys={"ncbi_connection"},
+    config_schema=ncbi_query_config,
+    description="Getting the number of records matching the keyword(s) in the specified database",
+    compute_kind="NCBI",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def accession_count(context) -> int:
+    _query = context.resources.ncbi_connection.conn.egquery(
+        term=context.op_config["keyword"]
+    )
+    _result = context.resources.ncbi_connection.conn.read(_query)
+    _nucleotide = _get_ncbi_count_result(_result, context.op_config["database"])
+    _num_rows = int(_nucleotide.count)
+    context.log_event(
+        AssetObservation(asset_key="accession_count", metadata={"num_rows": _num_rows})
+    )
+    return _num_rows
 
 
 # ncbi_query_config_search = {
