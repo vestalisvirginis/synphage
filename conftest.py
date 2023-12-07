@@ -14,6 +14,22 @@ def mock_env_ncbi_connect(monkeypatch):
 
 
 @pytest.fixture
+def mock_env_ncbi_download_pos(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/ncbi_download/positive")
+
+
+@pytest.fixture
+def mock_env_ncbi_download_neg(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/ncbi_download/negative")
+
+
+@pytest.fixture
+def mock_env_ncbi_count(monkeypatch):
+    monkeypatch.setenv("DATABASE", "nuccore")
+    monkeypatch.setenv("KEYWORD", "Listeria ivanovii")
+
+
+@pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 
