@@ -21,9 +21,9 @@ def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
 ncbi_query_config = {
     "database": Field(str, description="Database identifier", default_value="nuccore"),
     "keyword": Field(
-        dict,
+        str,
         description="Search criteria for the ncbi query",
-        default_value={"env": "KEYWORD"},
+        default_value=os.getenv("KEYWORD", "Listeria ivanovii"),
     ),
 }
 
@@ -36,6 +36,8 @@ ncbi_query_config = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def accession_count(context) -> int:
+    k = context.op_config["keyword"]
+    context.log.info(k)
     _query = context.resources.ncbi_connection.conn.egquery(
         term=context.op_config["keyword"]
     )
@@ -66,6 +68,8 @@ ncbi_query_config_search = {
 )
 def accession_ids(context, accession_count):
     context.log.info('Starting search')
+    k = context.op_config["keyword"]
+    context.log.info(k)
     _search = context.resources.ncbi_connection.conn.esearch(
         db=context.op_config["database"],
         term=context.op_config["keyword"],
@@ -120,8 +124,10 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
     _B = set(downloaded_genomes)
     _C = _A.difference(_B)
     context.log.info(f"Number of NOT Downloaded: {len(_C)}")
-    _path = context.op_config["output_directory"]
-
+    _path = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["output_directory"]]
+    )
+    context.log.info(f"Output path: {_path}")
     for _entry in list(_C):
         _r = context.resources.ncbi_connection.conn.efetch(
             db=context.op_config["database"],
