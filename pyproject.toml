@@ -34,6 +34,10 @@ dependencies = [
 test = [
   "pytest",
   "pytest-cov",
+  "black",
+  "mypy",
+  "flake8",
+  "coverage",
 ]
 
 
