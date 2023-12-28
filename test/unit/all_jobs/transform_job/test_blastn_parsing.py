@@ -1,4 +1,5 @@
 import os
+import polars as pl
 
 from dagster import build_op_context
 
@@ -27,7 +28,7 @@ def test_parse_blastn():
     assert len(os.listdir(TARGET)) == 1
 
 
-def test_parsed_blastn_content(spark):
+def test_parsed_blastn_content():
     context = build_op_context()
     result = parse_blastn(
         context,
@@ -39,7 +40,7 @@ def test_parsed_blastn_content(spark):
         ),
         file="TT_000001_vs_TT_000001",
     )
-    df = spark.read.parquet(TARGET + "/TT_000001_vs_TT_000001.parquet")
+    df = pl.read_parquet(TARGET + "/TT_000001_vs_TT_000001.parquet")
     assert set(
         [
             "query_genome_name",
