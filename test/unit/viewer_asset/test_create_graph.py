@@ -23,6 +23,7 @@ def test_create_graph_asset(mock_env_phagy_dir_synteny):
     plot = result.output_for_node("create_graph")
     assert isinstance(plot, GenomeDiagram.Diagram)
 
+
 #     # check loggin
 #     # check metadata
 

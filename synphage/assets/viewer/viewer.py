@@ -468,7 +468,7 @@ def create_graph(context, create_genome, config: Diagram):
     ypos = int(math.trunc(height * 0.9))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
-    legend_path = 'synphage/assets/viewer/legend.svg'
+    legend_path = "synphage/assets/viewer/legend.svg"
     # (f"{_output_folder}/legend.svg")
     C.Figure(
         f"{width}px",
