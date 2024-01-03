@@ -14,8 +14,8 @@ def test_downloaded_genomes_pos(mock_env_ncbi_download_pos):
 
 
 def test_downloded_genomes_neg(mock_env_ncbi_download_neg):
-    _path = "/".join([os.getenv("PHAGY_DIRECTORY"), 'download'])
-    os.makedirs(_path, exist_ok=True) 
+    _path = "/".join([os.getenv("PHAGY_DIRECTORY"), "download"])
+    os.makedirs(_path, exist_ok=True)
     context = build_asset_context()
     result = downloaded_genomes(context)
     assert isinstance(result, list)

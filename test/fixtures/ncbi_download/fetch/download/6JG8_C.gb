@@ -1,0 +1,30 @@
+LOCUS       6JG8_C                    31 bp    DNA     linear   PHG 23-NOV-2023
+DEFINITION  Chain C, DNA (31-MER).
+ACCESSION   6JG8_C
+VERSION     6JG8_C
+KEYWORDS    .
+SOURCE      Spbetavirus SPbeta
+  ORGANISM  Spbetavirus SPbeta
+            Viruses; Duplodnaviria; Heunggongvirae; Uroviricota;
+            Caudoviricetes; Spbetavirus.
+REFERENCE   1  (bases 1 to 31)
+  AUTHORS   Guan,Z., Pei,K., Wang,J., Cui,Y., Zhu,X., Su,X., Zhou,Y., Zhang,D.,
+            Tang,C., Yin,P., Liu,Z. and Zou,T.
+  TITLE     Structural insights into DNA recognition by AimR of the arbitrium
+            communication system in the SPbeta phage
+  JOURNAL   Cell Discov 5, 29 (2019)
+   PUBMED   31149347
+REFERENCE   2  (bases 1 to 31)
+  AUTHORS   Guan,Z.Y., Pei,K. and Zou,T.T.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (13-FEB-2019)
+COMMENT     Crystal structure of AimR in complex with DNA.
+FEATURES             Location/Qualifiers
+     source          1..31
+                     /organism="Spbetavirus SPbeta"
+                     /mol_type="other DNA"
+                     /db_xref="taxon:66797"
+ORIGIN      
+        1 acttaaatat taggttttaa taacatctag t
+//
+
