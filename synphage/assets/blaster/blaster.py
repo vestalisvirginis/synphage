@@ -7,8 +7,6 @@ from dagster import (
 )
 
 import os
-import re
-import shutil
 import pickle
 
 from Bio import SeqIO
@@ -42,64 +40,6 @@ sqc_folder_config = {
         default_value="gene_identity/fasta",
     ),
 }
-
-
-# @asset(
-#     config_schema={**sqc_folder_config},
-#     description="Select for phages with complete genome sequence",
-#     compute_kind="Biopython",
-#     metadata={"owner": "Virginie Grosboillot"},
-# )
-# def sequence_sorting(context, fetch_genome) -> List[str]:
-#     context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
-
-#     _complete_sequences = []
-#     for _file in fetch_genome:
-#         for _p in SeqIO.parse(_file, "gb"):
-#             if re.search("complete genome", _p.description):
-#                 _complete_sequences.append(_file)
-
-#     context.log.info(f"Number of complete sequences: {len(_complete_sequences)}")
-
-#     _bacillus_sub_sequences = []
-#     for _file in _complete_sequences:
-#         for _p in SeqIO.parse(_file, "gb"):
-#             for _feature in _p.features:
-#                 if _feature.type == "source":
-#                     for _v in _feature.qualifiers.values():
-#                         if re.search("Bacillus subtilis", _v[0]):
-#                             _bacillus_sub_sequences.append(_file)
-
-#     context.log.info(
-#         f"Number of Bacillus subtilis sequences: {len(_bacillus_sub_sequences)}"
-#     )
-
-#     _genes_in_sequences = []
-#     for _file in _bacillus_sub_sequences:
-#         for _p in SeqIO.parse(_file, "gb"):
-#             if set(["gene"]).issubset(set([type_f.type for type_f in _p.features])):
-#                 _genes_in_sequences.append(_file)
-
-#     context.log.info(
-#         f"Number of sequences with gene features: {len(_genes_in_sequences)}"
-#     )
-
-#     _gb_path = "/".join(
-#         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genebank_dir"]]
-#     )
-
-#     for _file in _genes_in_sequences:
-#         shutil.copy2(
-#             _file,
-#             f"{_gb_path}/{Path(_file).stem}.gb",
-#         )
-
-#     return list(
-#         map(
-#             lambda x: Path(x).stem,
-#             os.listdir(_gb_path),
-#         )
-#     )
 
 
 def _assess_file_content(genome) -> bool:

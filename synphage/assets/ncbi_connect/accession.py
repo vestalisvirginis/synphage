@@ -20,11 +20,11 @@ def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
 
 ncbi_query_config = {
     "database": Field(str, description="Database identifier", default_value="nuccore"),
-    #"keyword": Field(
-        #str,
-        #description="Search criteria for the ncbi query",
-        #default_value=os.getenv(EnvVar("KEYWORD"), "Listeria ivanovii"),
-    #),
+    # "keyword": Field(
+    # str,
+    # description="Search criteria for the ncbi query",
+    # default_value=os.getenv(EnvVar("KEYWORD"), "Listeria ivanovii"),
+    # ),
 }
 
 
@@ -38,9 +38,7 @@ ncbi_query_config = {
 def accession_count(context) -> int:
     keyword = os.getenv(EnvVar("KEYWORD"), "Listeria ivanovii")
     context.log.info(keyword)
-    _query = context.resources.ncbi_connection.conn.egquery(
-        term=keyword
-    )
+    _query = context.resources.ncbi_connection.conn.egquery(term=keyword)
     _result = context.resources.ncbi_connection.conn.read(_query)
     _query.close()
     _nucleotide = _get_ncbi_count_result(_result, context.op_config["database"])
