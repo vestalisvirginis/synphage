@@ -289,7 +289,7 @@ def create_graph(context, create_genome, config: Diagram):
 
     context.log.info("Cross-links have been appended")
 
-    _gene_color_palette = gene_uniqueness(_record_names, _uniq_dir)
+    _gene_color_palette = gene_uniqueness(_uniq_dir, _record_names)
     context.log.info(f"Writing: {str(_colour_dir)}")
     os.makedirs(Path(_colour_dir).parent, exist_ok=True)
     _gene_color_palette.write_parquet(_colour_dir)
@@ -468,11 +468,13 @@ def create_graph(context, create_genome, config: Diagram):
     ypos = int(math.trunc(height * 0.9))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
+    legend_path = '/usr/src/doc/synt_graph_legend.svg'
+    # (f"{_output_folder}/legend.svg")
     C.Figure(
         f"{width}px",
         f"{height}px",
         C.SVG(_path_output),
-        C.SVG(f"{_output_folder}/legend.svg").scale(10.0).move(xpos, ypos),
+        C.SVG('/usr/src/doc/synt_graph_legend.svg').scale(10.0).move(xpos, ypos),
     ).save(_path_output)
 
     svg2png(bytestring=open(_path_output).read(), write_to=_png_output)
