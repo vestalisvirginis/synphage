@@ -30,6 +30,15 @@ def test_get_blastn(mock_env_phagy_dir_blasting):
     # assert set() file names
 
 
+def test_get_blastn_with_history(mock_env_phagy_dir_blasting_with_history):
+    context = build_asset_context()
+    asset_input_fasta = [f"TT_00000{i+1}" for i in range(6)]
+    asset_input_dbs = [f"{TEST_DATASET_BLAST_DB}TT_00000{i+1}" for i in range(6)]
+    result = get_blastn(context, asset_input_fasta, asset_input_dbs)
+    assert isinstance(result, list)
+    assert len(result) == 72  # defaults history file contains 72 entries
+
+
 def test_get_blastn_asset(mock_env_phagy_dir_blasting):
     @asset(name="history_fasta_files")
     def mock_upstream_fasta():
