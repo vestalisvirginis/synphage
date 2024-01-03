@@ -20,11 +20,11 @@ def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
 
 ncbi_query_config = {
     "database": Field(str, description="Database identifier", default_value="nuccore"),
-    "keyword": Field(
-        str,
-        description="Search criteria for the ncbi query",
-        default_value=os.getenv("KEYWORD", "Listeria ivanovii"),
-    ),
+    #"keyword": Field(
+        #str,
+        #description="Search criteria for the ncbi query",
+        #default_value=os.getenv(EnvVar("KEYWORD"), "Listeria ivanovii"),
+    #),
 }
 
 
@@ -36,10 +36,10 @@ ncbi_query_config = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def accession_count(context) -> int:
-    k = context.op_config["keyword"]
-    context.log.info(k)
+    keyword = os.getenv(EnvVar("KEYWORD"), "Listeria ivanovii")
+    context.log.info(keyword)
     _query = context.resources.ncbi_connection.conn.egquery(
-        term=context.op_config["keyword"]
+        term=keyword
     )
     _result = context.resources.ncbi_connection.conn.read(_query)
     _query.close()
@@ -68,11 +68,11 @@ ncbi_query_config_search = {
 )
 def accession_ids(context, accession_count):
     context.log.info("Starting search")
-    k = context.op_config["keyword"]
-    context.log.info(k)
+    keyword = os.getenv(EnvVar("KEYWORD"), "Listeria ivanovii")
+    context.log.info(keyword)
     _search = context.resources.ncbi_connection.conn.esearch(
         db=context.op_config["database"],
-        term=context.op_config["keyword"],
+        term=keyword,
         retmax=accession_count,
         usehistory=context.op_config["use_history"],
         idtype=context.op_config["idtype"],
