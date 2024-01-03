@@ -13,6 +13,7 @@ def test_ncbiconnection():
     )
     assert hasattr(configuration.conn, "email")
     assert hasattr(configuration.conn, "api_key")
+    assert repr(configuration) == "Email: my_email\nAPI: my_api_key\n"
 
 
 def test_ncbiconnection_values_pos():
