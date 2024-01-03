@@ -67,7 +67,7 @@ ncbi_query_config_search = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def accession_ids(context, accession_count):
-    context.log.info('Starting search')
+    context.log.info("Starting search")
     k = context.op_config["keyword"]
     context.log.info(k)
     _search = context.resources.ncbi_connection.conn.esearch(
@@ -77,7 +77,7 @@ def accession_ids(context, accession_count):
         usehistory=context.op_config["use_history"],
         idtype=context.op_config["idtype"],
     )
-    context.log.info('The searched is finished')
+    context.log.info("The searched is finished")
     _result = context.resources.ncbi_connection.conn.read(_search)
     context.log_event(
         AssetObservation(

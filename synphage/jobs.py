@@ -143,7 +143,10 @@ def gene_presence(context, blastn_all, locus_all):
     context.log.info(f"sql_file: {_path_gene_presence_sql}")
     query = open(_path_gene_presence_sql).read()
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
-        "/data/tables/uniqueness.parquet"
+        Path(os.getenv("PHAGY_DIRECTORY"))
+        / "tables"
+        / "uniqueness.parquet"
+        # "/data/tables/uniqueness.parquet"
     )
     return "OK"
 

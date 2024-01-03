@@ -26,7 +26,12 @@ def mock_env_ncbi_download_neg(monkeypatch):
 @pytest.fixture
 def mock_env_ncbi_count(monkeypatch):
     monkeypatch.setenv("DATABASE", "nuccore")
-    monkeypatch.setenv("KEYWORD", "Listeria ivanovii")
+    monkeypatch.setenv("KEYWORD", "Bacillus subtilis strain P9_B1")
+
+
+@pytest.fixture
+def mock_env_ncbi_fetch(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/ncbi_download/fetch")
 
 
 @pytest.fixture
@@ -34,16 +39,22 @@ def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 
 @pytest.fixture
+def mock_env_phagy_dir_blasting_with_history(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting_with_history")
+
+@pytest.fixture
 def mock_env_phagy_dir_transform(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/transform")
     monkeypatch.setenv("FILE_SYSTEM", "fs")
 
 @pytest.fixture
+def mock_env_phagy_dir_transform_step3(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/transform_3")
+
+@pytest.fixture
 def mock_env_phagy_dir_synteny(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/synteny")
     monkeypatch.setenv("SEQUENCE_FILE", "sequences.csv")
-
-
 # @pytest.fixture(scope="session")
 # def spark():
 #     try:

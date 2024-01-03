@@ -1,15 +1,15 @@
-# from pyspark.sql import DataFrame
+import polars as pl
 
-# from synphage.assets.viewer.viewer import gene_uniqueness
+from synphage.assets.viewer.viewer import gene_uniqueness
 
 
-# def test_gene_uniqueness(spark):
-#     path = "test/fixtures/viewer/gene_uniq_neg"
-#     result = gene_uniqueness(spark, ["A", "B"], path)
-#     assert isinstance(result, DataFrame)
-#     assert set(result.columns).issuperset(
-#         ["name", "gene", "locus_tag", "total_seq", "count", "perc_presence"]
-#     )
+def test_gene_uniqueness():
+    _path = "test/fixtures/viewer/gene_uniq_neg/part-00000-86ebc250-cc19-4372-9ed1-a818f67af698-c000.snappy.parquet"
+    result = gene_uniqueness(_path, ["A", "B"])
+    assert isinstance(result, pl.DataFrame)
+    assert set(result.columns).issuperset(
+        ["name", "gene", "locus_tag", "total_seq", "count", "perc_presence"]
+    )
 
 
 # # test perc_presence value?

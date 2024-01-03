@@ -21,24 +21,29 @@ from cairosvg import svg2png
 from lxml import etree
 import math
 
+
 def gene_uniqueness(
-    _record_name: list,
     _path_to_dataset: str,
+    _record_name: list,
 ):
     """Calculate percentage of the presence of a given gene over the displayed sequences"""
 
     _gene_uniqueness_df = (
         pl.read_parquet(_path_to_dataset)
         .filter(
-            (pl.col("name").is_in(_record_name)) &
-            (pl.col("source_genome_name").is_in(_record_name))
+            (pl.col("name").is_in(_record_name))
+            & (pl.col("source_genome_name").is_in(_record_name))
         )
         .with_columns(pl.col("name").n_unique().alias("total_seq"))
         .group_by("name", "gene", "locus_tag", "total_seq")
         .count()
-        .with_columns(((pl.col("count") - 1) / (pl.col("total_seq") - 1) * 100).alias("perc_presence"))
+        .with_columns(
+            ((pl.col("count") - 1) / (pl.col("total_seq") - 1) * 100).alias(
+                "perc_presence"
+            )
+        )
     )
-    
+
     return _gene_uniqueness_df
 
 
@@ -58,8 +63,10 @@ def _assess_file_content(_genome) -> bool:  # Duplicated function
 
 
 def _get_sqc_identity_from_csv(_file_path):
-    _df = pl.read_csv(_file_path, has_header=False).select("column_1", pl.col("column_2").cast(pl.Int16))
-    return {x:y for x,y in zip(*_df.to_dict(as_series=False).values())}
+    _df = pl.read_csv(_file_path, has_header=False).select(
+        "column_1", pl.col("column_2").cast(pl.Int16)
+    )
+    return {x: y for x, y in zip(*_df.to_dict(as_series=False).values())}
 
 
 class CheckOrientation(enum.Enum):
@@ -249,7 +256,8 @@ def create_graph(context, create_genome, config: Diagram):
         _X_vs_Y = (
             pl.read_parquet(_blastn_dir)
             .filter(
-                (pl.col("source_genome_name") == _X) & (pl.col("query_genome_name") == _Y)
+                (pl.col("source_genome_name") == _X)
+                & (pl.col("query_genome_name") == _Y)
             )
             .select("source_locus_tag", "query_locus_tag", "percentage_of_identity")
         )
@@ -453,21 +461,25 @@ def create_graph(context, create_genome, config: Diagram):
     root = tree.getroot()
     width = math.trunc(float(root.attrib.get("width")))
     height = math.trunc(float(root.attrib.get("height")))
-    
+
     context.log.info(f"W: {width}, H: {height}")
 
-    xpos = int(math.trunc(width * .6))
-    ypos = int(math.trunc(height * .9))
+    xpos = int(math.trunc(width * 0.6))
+    ypos = int(math.trunc(height * 0.9))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
-    
-    C.Figure(f"{width}px", f"{height}px", C.SVG(_path_output), C.SVG(f"{_output_folder}/legend.svg").scale(10.0).move(xpos, ypos)).save(_path_output)
-    
+    C.Figure(
+        f"{width}px",
+        f"{height}px",
+        C.SVG(_path_output),
+        C.SVG(f"{_output_folder}/legend.svg").scale(10.0).move(xpos, ypos),
+    ).save(_path_output)
+
     svg2png(bytestring=open(_path_output).read(), write_to=_png_output)
 
     # For metadata
     buffer = BytesIO()
-    #_gd_diagram.write(buffer, "png")
+    # _gd_diagram.write(buffer, "png")
     with open(_png_output, "rb") as reader:
         buffer.write(reader.read())
 

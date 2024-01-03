@@ -1,6 +1,5 @@
-import pytest
 import os
-import types
+
 from pathlib import PosixPath
 
 from dagster import RunConfig, ExecuteInProcessResult
@@ -8,7 +7,6 @@ from dagster import RunConfig, ExecuteInProcessResult
 from synphage.jobs import transform, PipeConfig
 
 
-@pytest.mark.skip
 def test_transform(mock_env_phagy_dir_transform):
     config = RunConfig(
         ops={
@@ -40,7 +38,7 @@ def test_transform(mock_env_phagy_dir_transform):
     )
     result = transform.execute_in_process(run_config=config)
     assert isinstance(result, ExecuteInProcessResult)
-    #assert result.success
+    assert result.success
     assert isinstance(result.output_for_node("blastn"), PipeConfig)
     assert isinstance(result.output_for_node("locus"), PipeConfig)
     assert isinstance(result.output_for_node("load_blastn"), dict)
@@ -49,4 +47,4 @@ def test_transform(mock_env_phagy_dir_transform):
     assert set(result.output_for_node("parse_locus").values()) == set(["OK"])
     assert isinstance(result.output_for_node("append_blastn"), PosixPath)
     assert isinstance(result.output_for_node("append_locus"), PosixPath)
-    # assert result.output_for_node("gene_presence") == "OK"  --> pb with the hardcoded path need to add config
+    assert result.output_for_node("gene_presence") == "OK"

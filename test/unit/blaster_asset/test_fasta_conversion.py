@@ -45,6 +45,19 @@ def test_genbank_to_fasta(mock_env_phagy_dir_blasting):
     assert set(result[1]) == set([f"TT_00000{i+1}" for i in range(6)])
 
 
+def test_genbank_to_fasta_with_history(mock_env_phagy_dir_blasting_with_history):
+    context = build_asset_context()
+    asset_input = [PosixPath(f"{TEST_DATA_GB_DIR}TT_00000{i+1}.gb") for i in range(6)]
+    result = genbank_to_fasta(context, asset_input)
+    assert isinstance(result, tuple)
+    assert isinstance(result[0], list)
+    assert len(result[0]) == 0
+    assert set(result[0]) == set([])
+    assert isinstance(result[1], list)
+    assert len(result[1]) == 6
+    assert set(result[1]) == set([f"TT_00000{i+1}" for i in range(6)])
+
+
 def test_genbank_to_fasta_assets(mock_env_phagy_dir_blasting):
     @asset(name="standardised_ext_file")
     def mock_upstream():
