@@ -21,6 +21,18 @@ def test_list_genbank_files(mock_env_phagy_dir_blasting):
     assert set(result[1]) == set([f"TT_00000{i+1}" for i in range(6)])
 
 
+def test_list_genbank_files_with_history(mock_env_phagy_dir_blasting_with_history):
+    context = build_asset_context()
+    result = list_genbank_files(context)
+    assert isinstance(result, tuple)
+    assert isinstance(result[0], list)
+    assert len(result[0]) == 0
+    assert set(result[0]) == set([])
+    assert isinstance(result[1], list)
+    assert len(result[1]) == 6
+    assert set(result[1]) == set([f"TT_00000{i+1}" for i in range(6)])
+
+
 def test_status_assets(mock_env_phagy_dir_blasting):
     assets = [list_genbank_files]
     result = materialize_to_memory(assets)
