@@ -35,6 +35,11 @@ def mock_env_ncbi_fetch(monkeypatch):
 
 
 @pytest.fixture
+def mock_env_sequence_check(monkeypatch):
+    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/sequence_quality")
+
+
+@pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
 

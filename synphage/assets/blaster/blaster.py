@@ -44,62 +44,46 @@ sqc_folder_config = {
 }
 
 
-# @asset(
-#     config_schema={**sqc_folder_config},
-#     description="Select for phages with complete genome sequence",
-#     compute_kind="Biopython",
-#     metadata={"owner": "Virginie Grosboillot"},
-# )
-# def sequence_sorting(context, fetch_genome) -> List[str]:
-#     context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
+@asset(
+    config_schema={**sqc_folder_config},
+    description="Checks for sequence quality and accuracy",
+    compute_kind="Biopython",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def sequence_check(context, fetch_genome) -> List[str]:
+    context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
 
-#     _complete_sequences = []
-#     for _file in fetch_genome:
-#         for _p in SeqIO.parse(_file, "gb"):
-#             if re.search("complete genome", _p.description):
-#                 _complete_sequences.append(_file)
+    _gb_path = "/".join(
+        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
+    )
+    os.makedirs(_gb_path, exist_ok=True)
 
-#     context.log.info(f"Number of complete sequences: {len(_complete_sequences)}")
+    # add check to assess the quality of the query
 
-#     _bacillus_sub_sequences = []
-#     for _file in _complete_sequences:
-#         for _p in SeqIO.parse(_file, "gb"):
-#             for _feature in _p.features:
-#                 if _feature.type == "source":
-#                     for _v in _feature.qualifiers.values():
-#                         if re.search("Bacillus subtilis", _v[0]):
-#                             _bacillus_sub_sequences.append(_file)
+    for _file in fetch_genome:
+        shutil.copy2(
+            _file,
+            f"{_gb_path}/{Path(_file).stem.replace('.', '_')}.gb",
+        )
+    
+    _downloaded_files = list(
+        map(
+            lambda x: Path(x).stem,
+            os.listdir(_gb_path),
+        )
+    )
 
-#     context.log.info(
-#         f"Number of Bacillus subtilis sequences: {len(_bacillus_sub_sequences)}"
-#     )
+    _time = datetime.now()
+    context.add_output_metadata(
+        metadata={
+            "text_metadata": f"List of downloaded sequences{_time.isoformat()} (UTC).",
+            "path": _gb_path,
+            "num_files": len(_downloaded_files),
+            "preview": _downloaded_files,
+        }
+    )
 
-#     _genes_in_sequences = []
-#     for _file in _bacillus_sub_sequences:
-#         for _p in SeqIO.parse(_file, "gb"):
-#             if set(["gene"]).issubset(set([type_f.type for type_f in _p.features])):
-#                 _genes_in_sequences.append(_file)
-
-#     context.log.info(
-#         f"Number of sequences with gene features: {len(_genes_in_sequences)}"
-#     )
-
-#     _gb_path = "/".join(
-#         [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genebank_dir"]]
-#     )
-
-#     for _file in _genes_in_sequences:
-#         shutil.copy2(
-#             _file,
-#             f"{_gb_path}/{Path(_file).stem}.gb",
-#         )
-
-#     return list(
-#         map(
-#             lambda x: Path(x).stem,
-#             os.listdir(_gb_path),
-#         )
-#     )
+    return _downloaded_files
 
 
 def _assess_file_content(genome) -> bool:
