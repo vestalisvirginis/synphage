@@ -468,13 +468,13 @@ def create_graph(context, create_genome, config: Diagram):
     ypos = int(math.trunc(height * 0.9))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
-    legend_path = '/usr/src/doc/synt_graph_legend.svg'
+    legend_path = 'synphage/assets/viewer/legend.svg'
     # (f"{_output_folder}/legend.svg")
     C.Figure(
         f"{width}px",
         f"{height}px",
         C.SVG(_path_output),
-        C.SVG('/usr/src/doc/synt_graph_legend.svg').scale(10.0).move(xpos, ypos),
+        C.SVG(legend_path).scale(10.0).move(xpos, ypos),
     ).save(_path_output)
 
     svg2png(bytestring=open(_path_output).read(), write_to=_png_output)
