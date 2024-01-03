@@ -1,16 +1,39 @@
-import pytest
+import os
+import polars as pl
+
+from pathlib import Path
+from dagster import build_op_context
+
+from synphage.jobs import gene_presence
 
 
-@pytest.mark.skip
-def test_gene_presence_table(spark, tmp_path):
-    path_locus = (
-        "tests/temp/test_extract_locus_tag_gene_po0/locus_and_gene/locus_and_gene"
+BLASTN_TABLE = (
+    "test/fixtures/assets_testing_folder/transform_3/tables/blastn_summary.parquet"
+)
+LOCUS_TAG_TABLE = (
+    "test/fixtures/assets_testing_folder/transform_3/tables/locus_and_gene.parquet"
+)
+
+
+def test_gene_presence_table(mock_env_phagy_dir_transform_step3):
+    context = build_op_context()
+    result = gene_presence(
+        context,
+        BLASTN_TABLE,
+        LOCUS_TAG_TABLE,
     )
-    path_blastn = "tests/temp/test_parse_blastn0/blastn_summary/blastn_summary"
-    d = tmp_path / "gene_uniqueness"
-    d.mkdir()
-    p = f"{d}/gene_uniqueness"
-    rs = BLT.gene_presence_table(spark, path_locus, path_blastn, p)
-    df = spark.read.parquet(p)
-    assert len(os.listdir(d)) == 1
+    assert isinstance(result, str)
+    assert result == "OK"
+
+
+def test_gene_presence_table_content(mock_env_phagy_dir_transform_step3):
+    context = build_op_context()
+    result = gene_presence(
+        context,
+        BLASTN_TABLE,
+        LOCUS_TAG_TABLE,
+    )
+    df = pl.read_parquet(
+        Path(os.getenv("PHAGY_DIRECTORY")) / "tables" / "uniqueness.parquet"
+    )
     assert set(["name", "locus_tag", "gene"]).issubset(df.columns)

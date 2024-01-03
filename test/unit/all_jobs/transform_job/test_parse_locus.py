@@ -1,8 +1,5 @@
-import pytest
 import os
 import polars as pl
-
-import pyspark.sql.functions as F
 
 from dagster import build_op_context
 
@@ -51,9 +48,34 @@ def test_parse_locus_content():
         df.select(pl.col("gene").str.len_chars().eq(0)).cast(pl.Int8).sum().item() == 0
     )  # No missing gene name
     assert (
-        df.select(pl.col("locus_tag").str.len_chars().eq(0)).cast(pl.Int8).sum().item() == 0
+        df.select(pl.col("locus_tag").str.len_chars().eq(0)).cast(pl.Int8).sum().item()
+        == 0
     )  # No missing locus tag
     assert df.select(pl.count()).item() == 5  # 5 entries
+
+
+def test_parse_locus_content_cds():
+    context = build_op_context()
+    result = parse_locus(
+        context,
+        PipeConfig(
+            source=SOURCE,
+            target=TARGET,
+            table_dir=TABLES,
+            file="locus_and_gene.parquet",
+        ),
+        file="TT_000006.gb",
+    )
+    df = pl.read_parquet(TARGET + "/TT_000006.parquet")
+    assert set(["name", "gene", "locus_tag"]) == set(df.columns)
+    assert (
+        df.select(pl.col("gene").str.len_chars().eq(0)).cast(pl.Int8).sum().item() == 0
+    )  # No missing gene name
+    assert (
+        df.select(pl.col("locus_tag").str.len_chars().eq(0)).cast(pl.Int8).sum().item()
+        == 0
+    )  # No missing locus tag
+    assert df.select(pl.count()).item() == 4  # 4 entries
 
 
 def test_parse_locus_content_missing_gene_name_value():
@@ -74,7 +96,8 @@ def test_parse_locus_content_missing_gene_name_value():
         df.select(pl.col("gene").str.len_chars().eq(0)).cast(pl.Int8).sum().item() == 1
     )  # One missing gene name
     assert (
-        df.select(pl.col("locus_tag").str.len_chars().eq(0)).cast(pl.Int8).sum().item() == 0
+        df.select(pl.col("locus_tag").str.len_chars().eq(0)).cast(pl.Int8).sum().item()
+        == 0
     )  # No missing locus tag
     assert df.select(pl.count()).item() == 5  # 5 entries
 

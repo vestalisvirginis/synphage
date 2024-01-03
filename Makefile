@@ -16,6 +16,7 @@ clean: # Remove workspace files
 	@rm -rf test/fixtures/assets_testing_folder/transform/fs
 	@rm -rf test/fixtures/assets_testing_folder/transform/tables
 	@rm -rf test/fixtures/assets_testing_folder/transform_2/tables
+	@rm test/fixtures/assets_testing_folder/transform_3/tables/uniqueness.parquet
 	@python -c "print('Cleaning: 👌')"
 
 black: # Format code
