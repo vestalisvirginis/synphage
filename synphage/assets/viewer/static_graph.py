@@ -123,7 +123,7 @@ def _read_seq(_path: str, _orientation: str) -> SeqRecord.SeqRecord:
 
 
 def _get_feature(
-    features, id, tags=("locus_tag", "gene", "old_locus_tag", "protein_d")
+    features, id, tags=("locus_tag", "gene", "old_locus_tag", "protein_id")
 ) -> SeqFeature:
     """Search list of SeqFeature objects for an identifier under the given tags."""
     for _f in features:
