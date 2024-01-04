@@ -81,10 +81,10 @@ class CheckOrientation(enum.Enum):
 )
 def create_genome(context):
     context.log.info("get path")
-    context.log.info(os.getenv(EnvVar("PHAGY_DIRECTORY")))
+    context.log.info(os.getenv(EnvVar("DATA_DIR")))
     context.log.info(os.getenv(EnvVar("SEQUENCE_FILE")))
     _path = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), os.getenv(EnvVar("SEQUENCE_FILE"))]
+        [os.getenv(EnvVar("DATA_DIR")), os.getenv(EnvVar("SEQUENCE_FILE"))]
     )
     context.log.info(_path)
 
@@ -175,13 +175,13 @@ gene_uniqueness_folder_config = {
 def create_graph(context, create_genome, config: Diagram):
     # Define the paths
 
-    _input_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "genbank"])
-    _output_folder = "/".join([os.getenv(EnvVar("PHAGY_DIRECTORY")), "synteny"])
+    _input_folder = "/".join([os.getenv(EnvVar("DATA_DIR")), "genbank"])
+    _output_folder = "/".join([os.getenv(EnvVar("DATA_DIR")), "synteny"])
     _blastn_dir = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "tables", "blastn_summary.parquet"]
+        [os.getenv(EnvVar("DATA_DIR")), "tables", "blastn_summary.parquet"]
     )
     _uniq_dir = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), "tables", "uniqueness.parquet"]
+        [os.getenv(EnvVar("DATA_DIR")), "tables", "uniqueness.parquet"]
     )
     _colour_dir = "/".join([_output_folder, "colour_table"])
 

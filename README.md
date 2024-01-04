@@ -61,7 +61,7 @@ Synphage requires:
 #### Path setup
 
 ```bash
-export PHAGY_DIRECTORY=<path_to_data_folder>
+export DATA_DIR=<path_to_data_folder>
 ```
 
 **Note:** For docker users, this path is defaulted to `/data`.

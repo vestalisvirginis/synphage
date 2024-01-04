@@ -143,7 +143,7 @@ def gene_presence(context, blastn_all, locus_all):
     context.log.info(f"sql_file: {_path_gene_presence_sql}")
     query = open(_path_gene_presence_sql).read()
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
-        Path(os.getenv("PHAGY_DIRECTORY"))
+        Path(os.getenv("DATA_DIR"))
         / "tables"
         / "uniqueness.parquet"
         # "/data/tables/uniqueness.parquet"
@@ -154,27 +154,27 @@ def gene_presence(context, blastn_all, locus_all):
 default_config = RunConfig(
     ops={
         "blastn": PipeConfig(
-            source="/".join([os.getenv("PHAGY_DIRECTORY"), "gene_identity/blastn"]),
+            source="/".join([os.getenv("DATA_DIR"), "gene_identity/blastn"]),
             target="/".join(
                 [
-                    os.getenv("PHAGY_DIRECTORY"),
+                    os.getenv("DATA_DIR"),
                     os.getenv("FILE_SYSTEM"),
                     "blastn_parsing",
                 ]
             ),
-            table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
+            table_dir="/".join([os.getenv("DATA_DIR"), "tables"]),
             file="blastn_summary.parquet",
         ),
         "locus": PipeConfig(
-            source="/".join([os.getenv("PHAGY_DIRECTORY"), "genbank"]),
+            source="/".join([os.getenv("DATA_DIR"), "genbank"]),
             target="/".join(
                 [
-                    os.getenv("PHAGY_DIRECTORY"),
+                    os.getenv("DATA_DIR"),
                     os.getenv("FILE_SYSTEM"),
                     "locus_parsing",
                 ]
             ),
-            table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
+            table_dir="/".join([os.getenv("DATA_DIR"), "tables"]),
             file="locus_and_gene.parquet",
         ),
     }

@@ -41,7 +41,7 @@ def sequence_check(context, fetch_genome) -> List[str]:
     context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
 
     _gb_path = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["genbank_dir"]]
+        [os.getenv(EnvVar("DATA_DIR")), context.op_config["genbank_dir"]]
     )
     os.makedirs(_gb_path, exist_ok=True)
 

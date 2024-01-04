@@ -83,12 +83,10 @@ def _assess_file_content(genome) -> bool:
 )
 def genbank_to_fasta(context, standardised_ext_file):
     # Paths to read and store the data
-    _path_out = (
-        Path(os.getenv(EnvVar("PHAGY_DIRECTORY"))) / context.op_config["fasta_dir"]
-    )
+    _path_out = Path(os.getenv(EnvVar("DATA_DIR"))) / context.op_config["fasta_dir"]
 
     _path = (
-        Path(os.getenv(EnvVar("PHAGY_DIRECTORY")))
+        Path(os.getenv(EnvVar("DATA_DIR")))
         / context.op_config["fs"]
         / "history_fasta_files"
     )
@@ -213,9 +211,7 @@ blastn_folder_config = {
     metadata={"owner": "Virginie Grosboillot"},
 )
 def create_blast_db(context, new_fasta_files):
-    _path = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["blast_db_dir"]]
-    )
+    _path = "/".join([os.getenv(EnvVar("DATA_DIR")), context.op_config["blast_db_dir"]])
     context.log.info(_path)
     os.makedirs(_path, exist_ok=True)
 
@@ -253,15 +249,13 @@ def create_blast_db(context, new_fasta_files):
 )
 def get_blastn(context, history_fasta_files, create_blast_db):
     # Blastn json _file directory - create directory if not yet existing
-    _path = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["blastn_dir"]]
-    )
+    _path = "/".join([os.getenv(EnvVar("DATA_DIR")), context.op_config["blastn_dir"]])
     os.makedirs(_path, exist_ok=True)
     context.log.info(_path)
 
     # History
     _history_path = "/".join(
-        [os.getenv("PHAGY_DIRECTORY"), os.getenv("FILE_SYSTEM"), "get_blastn"]
+        [os.getenv("DATA_DIR"), os.getenv("FILE_SYSTEM"), "get_blastn"]
     )
     context.log.info(_history_path)
     if os.path.exists(_history_path):
@@ -275,9 +269,7 @@ def get_blastn(context, history_fasta_files, create_blast_db):
     context.log.info(_blastn_history)
 
     # Blast each query against every databases
-    _fasta_path = "/".join(
-        [os.getenv("PHAGY_DIRECTORY"), context.op_config["fasta_dir"]]
-    )
+    _fasta_path = "/".join([os.getenv("DATA_DIR"), context.op_config["fasta_dir"]])
     context.log.info(_fasta_path)
     _fasta_files = list(map(lambda x: f"{_fasta_path}/{x}.fna", history_fasta_files))
 

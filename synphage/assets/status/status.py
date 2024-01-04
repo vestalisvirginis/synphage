@@ -64,14 +64,12 @@ sqc_folder_config = {
 )
 def list_genbank_files(context):
     # List files in the genbank directory
-    _gb_path = "/".join(
-        [os.getenv("PHAGY_DIRECTORY"), context.op_config["genbank_dir"]]
-    )
+    _gb_path = "/".join([os.getenv("DATA_DIR"), context.op_config["genbank_dir"]])
     context.log.info(f"Genbank path: {_gb_path}")
     # Load already processed files
     _path = "/".join(
         [
-            os.getenv(EnvVar("PHAGY_DIRECTORY")),
+            os.getenv(EnvVar("DATA_DIR")),
             context.op_config["fs"],
             "list_genbank_files",
         ]

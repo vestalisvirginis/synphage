@@ -24,7 +24,7 @@ jobs:
         coverage run -m pytest test/unit
         coverage xml -o coverage.xml
       env:
-        PHAGY_DIRECTORY: ${{ env.PHAGY_DIRECTORY }}
+        DATA_DIR: ${{ env.DATA_DIR }}
         FILE_SYSTEM: ${{ env.FILE_SYSTEM }}
         EMAIL: ${{ secrets.EMAIL }}
         API_KEY: ${{ secrets.API_KEY }}

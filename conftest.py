@@ -15,12 +15,12 @@ def mock_env_ncbi_connect(monkeypatch):
 
 @pytest.fixture
 def mock_env_ncbi_download_pos(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/ncbi_download/positive")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/positive")
 
 
 @pytest.fixture
 def mock_env_ncbi_download_neg(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/ncbi_download/negative")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/negative")
 
 
 @pytest.fixture
@@ -31,34 +31,34 @@ def mock_env_ncbi_count(monkeypatch):
 
 @pytest.fixture
 def mock_env_ncbi_fetch(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/ncbi_download/fetch")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/fetch")
 
 
 @pytest.fixture
 def mock_env_sequence_check(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/sequence_quality")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/sequence_quality")
 
 
 @pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/blasting")
 
 @pytest.fixture
 def mock_env_phagy_dir_blasting_with_history(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/blasting_with_history")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/blasting_with_history")
 
 @pytest.fixture
 def mock_env_phagy_dir_transform(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/transform")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/transform")
     monkeypatch.setenv("FILE_SYSTEM", "fs")
 
 @pytest.fixture
 def mock_env_phagy_dir_transform_step3(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/transform_3")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/transform_3")
 
 @pytest.fixture
 def mock_env_phagy_dir_synteny(monkeypatch):
-    monkeypatch.setenv("PHAGY_DIRECTORY", "test/fixtures/assets_testing_folder/synteny")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/synteny")
     monkeypatch.setenv("SEQUENCE_FILE", "sequences.csv")
 # @pytest.fixture(scope="session")
 # def spark():

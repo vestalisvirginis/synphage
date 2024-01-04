@@ -98,7 +98,7 @@ download_folder_config = {
 @asset(config_schema=download_folder_config, compute_kind="python")
 def downloaded_genomes(context) -> List[str]:
     _download_path = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["output_directory"]]
+        [os.getenv(EnvVar("DATA_DIR")), context.op_config["output_directory"]]
     )
     return list(map(lambda x: Path(x).stem, os.listdir(_download_path)))
 
@@ -123,7 +123,7 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
     _C = _A.difference(_B)
     context.log.info(f"Number of NOT Downloaded: {len(_C)}")
     _path = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["output_directory"]]
+        [os.getenv(EnvVar("DATA_DIR")), context.op_config["output_directory"]]
     )
     context.log.info(f"Output path: {_path}")
     for _entry in list(_C):
