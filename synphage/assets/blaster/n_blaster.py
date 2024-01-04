@@ -64,7 +64,7 @@ def _assess_file_content(genome) -> bool:
 
 
 @multi_asset(
-    config_schema={**folder_config},
+    config_schema=folder_config,
     outs={
         "new_fasta_files": AssetOut(
             is_required=True,
@@ -196,7 +196,7 @@ def genbank_to_fasta(context, standardised_ext_file):
 
 
 @asset(
-    config_schema={**folder_config},
+    config_schema=folder_config,
     description="Receive a fasta file as input and create a database for the blastn step",
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
@@ -239,7 +239,7 @@ def create_blast_db(context, new_fasta_files):
 
 
 @asset(
-    config_schema={**folder_config},
+    config_schema=folder_config,
     description="Perform blastn between available sequences and databases and return result in json format",
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
