@@ -5,7 +5,14 @@ from dagster import materialize_to_memory, build_asset_context, asset
 from synphage.assets.viewer.static_graph import create_graph, Diagram
 
 
-def test_create_graph(mock_env_phagy_dir_synteny):
+def test_create_graph_default(mock_env_phagy_dir_synteny):
+    context = build_asset_context()
+    asset_input = {"TT_000001.gb": "SEQUENCE", "TT_000002.gb": "SEQUENCE"}
+    result = create_graph(context, asset_input, Diagram())
+    assert isinstance(result, GenomeDiagram.Diagram)
+
+
+def test_create_graph_default_options(mock_env_phagy_dir_synteny_var):
     context = build_asset_context()
     asset_input = {"TT_000001.gb": "SEQUENCE", "TT_000002.gb": "SEQUENCE"}
     result = create_graph(context, asset_input, Diagram())

@@ -15,6 +15,7 @@ clean: # Remove workspace files
 	@rm -rf test/fixtures/assets_testing_folder/blasting/gene_identity
 	@rm -rf test/fixtures/assets_testing_folder/blasting_with_history/gene_identity
 	@rm -rf test/fixtures/assets_testing_folder/synteny/synteny
+	@rm -rf test/fixtures/assets_testing_folder/synteny_var/synteny
 	@rm -rf test/fixtures/assets_testing_folder/transform/fs
 	@rm -rf test/fixtures/assets_testing_folder/transform/tables
 	@rm -rf test/fixtures/assets_testing_folder/transform_2/tables

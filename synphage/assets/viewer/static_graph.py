@@ -1,4 +1,4 @@
-from dagster import asset, Config, EnvVar, MetadataValue
+from dagster import asset, Field, Config, EnvVar, MetadataValue
 
 import enum
 import os
@@ -138,7 +138,7 @@ def _get_feature(
 
 
 class Diagram(Config):
-    title: str = "diagram"
+    title: str = "synteny_plot"
     output_format: str = "SVG"
     graph_format: str = "linear"
     graph_pagesize: str = "A4"
@@ -192,10 +192,7 @@ def create_graph(
     _colour_dir = str(Path(_synteny_folder) / "colour_table")
 
     # Set name for the diagram
-    if os.getenv(EnvVar("TITLE")):
-        _name_graph = os.getenv(EnvVar("TITLE"))
-    else:
-        _name_graph = config.title
+    _name_graph = os.getenv(EnvVar("TITLE"), config.title)
 
     # Read sequences for each genome and assign them in a variable
     _records = {}
@@ -306,7 +303,7 @@ def create_graph(
         _gd_feature_set = _feature_sets[_record_name]
 
         _gene_value = _assess_file_content(_record)
-        if _gene_value:
+        if _gene_value == True:
             for _feature in _record.features:
                 if _feature.type != "gene":
                     # Exclude this feature
@@ -438,17 +435,12 @@ def create_graph(
 
     context.log.info("Colours have been applied")
 
-    if isinstance(config.graph_end, int):
-        _graph_end = config.graph_end
-    else:
-        _graph_end = _max_len
-
     _gd_diagram.draw(
-        format=config.graph_format,
-        pagesize=config.graph_pagesize,
-        fragments=config.graph_fragments,
-        start=config.graph_start,
-        end=_graph_end,
+        format=os.getenv(EnvVar('GRAPH_FORMAT'), config.graph_format),
+        pagesize=os.getenv(EnvVar('GRAPH_PAGESIZE'), config.graph_pagesize),
+        fragments=os.getenv(EnvVar('GRAPH_FRAGMENTS'), config.graph_fragments),
+        start=int(os.getenv(EnvVar('GRAPH_START'), config.graph_start)),
+        end=int(os.getenv(EnvVar('GRAPH_END'), _max_len)),
     )
 
     context.log.info("Graph has been drawn")
