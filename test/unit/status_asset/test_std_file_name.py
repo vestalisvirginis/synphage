@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from synphage.assets.status.status import _standardise_file_extention
+from synphage.assets.status.gb_file_status import _standardise_file_extention
 
 
 def test_standardise_file_extension_positive():

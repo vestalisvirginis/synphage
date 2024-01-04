@@ -1,4 +1,4 @@
-from synphage.assets.viewer.viewer import CheckOrientation
+from synphage.assets.viewer.static_graph import CheckOrientation
 
 
 def test_checkorientation():

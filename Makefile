@@ -11,6 +11,7 @@ clean: # Remove workspace files
 	@rm -rf ./dist
 	@rm -rf test/fixtures/assets_testing_folder/ncbi_download/fetch
 	@rm -rf test/fixtures/assets_testing_folder/sequence_quality/genbank
+	@rm -rf test/fixtures/assets_testing_folder/sequence_quality_with_history/genbank
 	@rm -rf test/fixtures/assets_testing_folder/blasting/gene_identity
 	@rm -rf test/fixtures/assets_testing_folder/blasting_with_history/gene_identity
 	@rm -rf test/fixtures/assets_testing_folder/synteny/synteny
@@ -25,7 +26,7 @@ black: # Format code
 	@black test
 
 flake: # Lint code
-	@flake8 --ignore=E501,W503,E731,E722 --max-cognitive-complexity=30 synphage
+	@flake8 --ignore=E501,W503,E731,E722 --max-complexity=30 synphage
 	@python -c "print('Linting: 👌')"
 
 radon:

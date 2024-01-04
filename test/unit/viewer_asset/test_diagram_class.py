@@ -1,6 +1,6 @@
 import pytest
 
-from synphage.assets.viewer.viewer import Diagram
+from synphage.assets.viewer.static_graph import Diagram
 
 
 def test_Diagram():

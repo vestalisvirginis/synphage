@@ -2,7 +2,7 @@ import re
 
 from dagster import materialize_to_memory, build_asset_context, asset
 
-from synphage.assets.blaster.blaster import get_blastn
+from synphage.assets.blaster.n_blaster import get_blastn
 
 
 TEST_DATASET_BLAST_DB = "test/fixtures/synthetic_data/blast_db/"

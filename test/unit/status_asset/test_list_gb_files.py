@@ -1,7 +1,7 @@
 from dagster import materialize_to_memory, build_asset_context
 from pathlib import PosixPath
 
-from synphage.assets.status.status import list_genbank_files
+from synphage.assets.status.gb_file_status import list_genbank_files
 
 
 TEST_DATA_GB_DIR = "test/fixtures/assets_testing_folder/blasting/genbank/"

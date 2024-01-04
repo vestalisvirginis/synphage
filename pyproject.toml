@@ -22,7 +22,6 @@ dependencies = [
     "biopython >= 1.81",
     "reportlab >= 3.6.12",
     "rlPyCairo >= 0.3.0",
-    "pyspark >= 2.15.1",
     "cuallee >= 0.6.0",
     "duckdb >= 0.9.1",
     "polars >= 0.19.11",

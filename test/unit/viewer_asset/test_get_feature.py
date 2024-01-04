@@ -3,7 +3,7 @@ import pytest
 from Bio import SeqIO
 from Bio.SeqFeature import SeqFeature
 
-from synphage.assets.viewer.viewer import _get_feature
+from synphage.assets.viewer.static_graph import _get_feature
 
 
 def test_get_feature_positive():

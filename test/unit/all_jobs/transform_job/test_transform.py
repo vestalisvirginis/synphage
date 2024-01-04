@@ -11,27 +11,27 @@ def test_transform(mock_env_phagy_dir_transform):
     config = RunConfig(
         ops={
             "blastn": PipeConfig(
-                source="/".join([os.getenv("PHAGY_DIRECTORY"), "gene_identity/blastn"]),
+                source="/".join([os.getenv("DATA_DIR"), "gene_identity/blastn"]),
                 target="/".join(
                     [
-                        os.getenv("PHAGY_DIRECTORY"),
+                        os.getenv("DATA_DIR"),
                         os.getenv("FILE_SYSTEM"),
                         "blastn_parsing",
                     ]
                 ),
-                table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
+                table_dir="/".join([os.getenv("DATA_DIR"), "tables"]),
                 file="blastn_summary.parquet",
             ),
             "locus": PipeConfig(
-                source="/".join([os.getenv("PHAGY_DIRECTORY"), "genbank"]),
+                source="/".join([os.getenv("DATA_DIR"), "genbank"]),
                 target="/".join(
                     [
-                        os.getenv("PHAGY_DIRECTORY"),
+                        os.getenv("DATA_DIR"),
                         os.getenv("FILE_SYSTEM"),
                         "locus_parsing",
                     ]
                 ),
-                table_dir="/".join([os.getenv("PHAGY_DIRECTORY"), "tables"]),
+                table_dir="/".join([os.getenv("DATA_DIR"), "tables"]),
                 file="locus_and_gene.parquet",
             ),
         }

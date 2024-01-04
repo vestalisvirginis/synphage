@@ -33,7 +33,5 @@ def test_gene_presence_table_content(mock_env_phagy_dir_transform_step3):
         BLASTN_TABLE,
         LOCUS_TAG_TABLE,
     )
-    df = pl.read_parquet(
-        Path(os.getenv("PHAGY_DIRECTORY")) / "tables" / "uniqueness.parquet"
-    )
+    df = pl.read_parquet(Path(os.getenv("DATA_DIR")) / "tables" / "uniqueness.parquet")
     assert set(["name", "locus_tag", "gene"]).issubset(df.columns)

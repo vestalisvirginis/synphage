@@ -1,6 +1,6 @@
 from dagster import materialize_to_memory, build_asset_context, asset
 
-from synphage.assets.viewer.viewer import create_genome, CheckOrientation
+from synphage.assets.viewer.static_graph import create_genome, CheckOrientation
 
 
 def test_create_genome(mock_env_phagy_dir_synteny):
