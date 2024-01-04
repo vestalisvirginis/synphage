@@ -3,11 +3,11 @@ from dagster import ExecuteInProcessResult, Definitions, load_assets_from_module
 from synphage.jobs import blasting_job
 
 from synphage.assets.blaster import n_blaster
-from synphage.assets.status import status
+from synphage.assets.status import gb_file_status
 
 
 def test_blasting_job():
-    all_assets = load_assets_from_modules([status, n_blaster])
+    all_assets = load_assets_from_modules([gb_file_status, n_blaster])
     defs = Definitions(assets=all_assets, jobs=[blasting_job])
     result = defs.get_job_def("blasting_job").execute_in_process()
     assert isinstance(result, ExecuteInProcessResult)
