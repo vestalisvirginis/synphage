@@ -1,5 +1,6 @@
 import os
 import tempfile
+
 from pathlib import Path
 
 from .ncbi_resource import ncbi_resource
