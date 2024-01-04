@@ -40,9 +40,12 @@ docker pull vestalisvirginis/synphage:latest
 
 ### Additional dependencies
 
-Synphage relies on two non-python dependencies that need to be manually installed when Synphage is installed with pip:
+Synphage relies on one non-python dependency that need to be manually installed when Synphage is installed with pip:
 - [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) >= 2.12.0   
-- [OpenJDK](https://openjdk.org/projects/jdk/17/) == 17  
+```bash
+apt update
+apt install -y ncbi-blast+
+```
 
 
 ## Usage
