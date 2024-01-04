@@ -1,6 +1,6 @@
 from Bio import SeqIO
 
-from synphage.assets.blaster.blaster import _assess_file_content
+from synphage.assets.blaster.n_blaster import _assess_file_content
 
 
 def test_contains_genes_pos():

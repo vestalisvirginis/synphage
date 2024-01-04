@@ -2,7 +2,7 @@ import os
 
 from dagster import materialize_to_memory, build_asset_context, asset
 
-from synphage.assets.blaster.blaster import create_blast_db
+from synphage.assets.blaster.n_blaster import create_blast_db
 
 
 TEST_DATA_FASTA_FILES = "test/fixtures/synthetic_data/fasta_files/"
