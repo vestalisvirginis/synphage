@@ -121,7 +121,7 @@ def genbank_to_fasta(context, standardised_ext_file) -> tuple[List[str], List[st
             _genome = SeqIO.read(_file, "genbank")
             _genome_records = list(SeqIO.parse(_file, "genbank"))
 
-            if _assess_file_content(_genome) == True:
+            if _assess_file_content(_genome):
                 with open(_output_dir, "w") as _f:
                     _gene_features = list(
                         filter(lambda x: x.type == "gene", _genome.features)

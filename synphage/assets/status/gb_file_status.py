@@ -90,7 +90,7 @@ def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
     # process new files
     _new_files = []
     _new_paths = []
-    for _file in glob.glob(str(Path(_gb_path) / f"*.gb*")):
+    for _file in glob.glob(str(Path(_gb_path) / "*.gb*")):
         if Path(_file).stem not in _files:
             context.log.info(f"The following file is being processed: {_file}")
             _new_path = _standardise_file_extention(_file)

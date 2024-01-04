@@ -1,4 +1,4 @@
-from dagster import asset, Field, Config, EnvVar, MetadataValue
+from dagster import asset, Config, EnvVar, MetadataValue
 
 import enum
 import os
@@ -306,7 +306,7 @@ def create_graph(
         _gd_feature_set = _feature_sets[_record_name]
 
         _gene_value = _assess_file_content(_record)
-        if _gene_value == True:
+        if _gene_value:
             for _feature in _record.features:
                 if _feature.type != "gene":
                     # Exclude this feature

@@ -1,5 +1,4 @@
 from dagster import (
-    asset,
     EnvVar,
     Field,
     multi_asset,
