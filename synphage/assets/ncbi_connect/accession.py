@@ -182,12 +182,12 @@ def fetch_genome(context, accession_ids, downloaded_genomes) -> List[str]:
             query_key=accession_ids["QueryKey"],
         )
 
-        _file_name = f"{_download_path}/{_entry}.gb"
+        _file_name = str(Path(_download_path) / f"{_entry}.gb")
         with open(_file_name, "w") as _writer:
             _writer.write(_r.read())
 
     _all_ids = _B.union(_A)
-    _genomes = list(map(lambda x: f"{_download_path}/{x}.gb", _all_ids))
+    _genomes = list(map(lambda x: str(Path(_download_path) / f"{x}.gb"), _all_ids))
 
     # Asset user metadata
     _time = datetime.now()

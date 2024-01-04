@@ -85,8 +85,8 @@ def sequence_check(context, fetch_genome) -> tuple[List[str], List[str]]:
     context.log.info(f"Number of genomes to transfer: {len(_T)}")
 
     # path to genbank folder
-    _gb_path = "/".join(
-        [os.getenv(EnvVar("DATA_DIR")), context.op_config["genbank_dir"]]
+    _gb_path = str(
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["genbank_dir"]
     )
     os.makedirs(_gb_path, exist_ok=True)
 
@@ -94,7 +94,7 @@ def sequence_check(context, fetch_genome) -> tuple[List[str], List[str]]:
 
     _new_transfer = []
     for _file in _T:
-        _output_file = f"{_gb_path}/{Path(_file).stem.replace('.', '_')}.gb"
+        _output_file = str(Path(_gb_path) / f"{Path(_file).stem.replace('.', '_')}.gb")
         shutil.copy2(
             _file,
             _output_file,

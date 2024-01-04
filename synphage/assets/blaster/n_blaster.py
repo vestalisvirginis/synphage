@@ -86,7 +86,7 @@ def _assess_file_content(genome) -> bool:
     },
     compute_kind="Biopython",
 )
-def genbank_to_fasta(context, standardised_ext_file):
+def genbank_to_fasta(context, standardised_ext_file) -> tuple[List[str], List[str]]:
     # Paths to read from and store the data
     _path_fasta = str(
         Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["fasta_dir"]
@@ -116,7 +116,7 @@ def genbank_to_fasta(context, standardised_ext_file):
             context.log.info(f"The following file {_file} is being processed")
 
             # Genbank to fasta
-            _output_dir = f"{_path_fasta}/{Path(_file).stem}.fna"
+            _output_dir = str(Path(_path_fasta) / f"{Path(_file).stem}.fna")
             context.log.info(f"Output file being generated: {_output_dir}")
             _genome = SeqIO.read(_file, "genbank")
             _genome_records = list(SeqIO.parse(_file, "genbank"))
@@ -201,7 +201,7 @@ def genbank_to_fasta(context, standardised_ext_file):
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_blast_db(context, new_fasta_files):
+def create_blast_db(context, new_fasta_files) -> List[str]:
     # path to store db
     _path_db = str(
         Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
@@ -212,7 +212,7 @@ def create_blast_db(context, new_fasta_files):
 
     _db = []
     for _new_fasta_file in new_fasta_files:
-        _output_dir = f"{_path_db}/{Path(_new_fasta_file).stem}"
+        _output_dir = str(Path(_path_db) / Path(_new_fasta_file).stem)
         context.log.info(f"Database being generated: {_output_dir}")
         os.system(
             f"makeblastdb -in {_new_fasta_file} -input_type fasta -dbtype nucl -out {_output_dir}"
@@ -221,7 +221,7 @@ def create_blast_db(context, new_fasta_files):
         context.log.info(f"File {_new_fasta_file} has been processed")
 
     _all_db = list(
-        set(map(lambda x: f"{_path_db}/{Path(x).stem}", os.listdir(_path_db)))
+        set(map(lambda x: str(Path(_path_db) / Path(x).stem), os.listdir(_path_db)))
     )
 
     _time = datetime.now()
@@ -244,7 +244,7 @@ def create_blast_db(context, new_fasta_files):
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def get_blastn(context, history_fasta_files, create_blast_db):
+def get_blastn(context, history_fasta_files, create_blast_db) -> List[str]:
     # Blastn json file directory - create directory if not yet existing
     _path_blastn = str(
         Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["blastn_dir"]
@@ -270,13 +270,15 @@ def get_blastn(context, history_fasta_files, create_blast_db):
         Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["fasta_dir"]
     )
     context.log.info(f"Path to fasta files: {_fasta_path}")
-    _fasta_files = list(map(lambda x: f"{_fasta_path}/{x}.fna", history_fasta_files))
+    _fasta_files = list(
+        map(lambda x: str(Path(_fasta_path) / f"{x}.fna"), history_fasta_files)
+    )
 
     _new_blastn_files = []
     for _query in _fasta_files:
         for _database in create_blast_db:
             _output_file = f"{Path(_query).stem}_vs_{Path(_database).stem}"
-            _output_dir = f"{_path_blastn}/{_output_file}"
+            _output_dir = str(Path(_path_blastn) / _output_file)
             if _output_file not in _blastn_history:
                 os.system(
                     f"blastn -query {_query} -db {_database} -evalue 1e-3 -dust no -out {_output_dir} -outfmt 15"

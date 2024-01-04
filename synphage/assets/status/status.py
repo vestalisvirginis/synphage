@@ -8,11 +8,17 @@ from dagster import (
 import os
 import pickle
 import glob
-from pathlib import Path
+import tempfile
+
+from pathlib import Path, PosixPath
+from typing import List
 from datetime import datetime
 
 
-def _standardise_file_extention(file) -> None:
+TEMP_DIR = tempfile.gettempdir()
+
+
+def _standardise_file_extention(file: str) -> PosixPath:
     """Change file extension when '.gbk' for '.gb'"""
     _path = Path(file)
     if _path.suffix == ".gbk":
@@ -21,7 +27,7 @@ def _standardise_file_extention(file) -> None:
         return _path
 
 
-sqc_folder_config = {
+folder_config = {
     "fs": Field(
         str,
         description="Path to folder containing the genbank files",
@@ -41,7 +47,7 @@ sqc_folder_config = {
 
 
 @multi_asset(
-    config_schema={**sqc_folder_config},
+    config_schema={**folder_config},
     outs={
         "standardised_ext_file": AssetOut(
             is_required=True,
@@ -62,32 +68,31 @@ sqc_folder_config = {
     },
     compute_kind="Python",
 )
-def list_genbank_files(context):
+def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
     # List files in the genbank directory
-    _gb_path = "/".join([os.getenv("DATA_DIR"), context.op_config["genbank_dir"]])
+    _gb_path = str(
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["genbank_dir"]
+    )
     context.log.info(f"Genbank path: {_gb_path}")
     # Load already processed files
-    _path = "/".join(
-        [
-            os.getenv(EnvVar("DATA_DIR")),
-            context.op_config["fs"],
-            "list_genbank_files",
-        ]
+    _hist_gb_path = str(
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
+        / context.op_config["fs"]
+        / "list_genbank_files"
     )
-
-    if os.path.exists(_path):
-        context.log.info("path exist")
-        _files = pickle.load(open(_path, "rb"))
+    if os.path.exists(_hist_gb_path):
+        _files = pickle.load(open(_hist_gb_path, "rb"))
+        context.log.info("History genbank files loaded")
     else:
-        context.log.info("path do not exist")
         _files = []
-    context.log.info(_files)
+        context.log.info("No genbank history available")
 
+    # process new files
     _new_files = []
     _new_paths = []
-    for _file in glob.glob(f"{_gb_path}/*.gb*"):
+    for _file in glob.glob(str(Path(_gb_path) / f"*.gb*")):
         if Path(_file).stem not in _files:
-            context.log.info(f"The following file {_file} is being processed")
+            context.log.info(f"The following file is being processed: {_file}")
             _new_path = _standardise_file_extention(_file)
 
             # Update lists
@@ -102,17 +107,17 @@ def list_genbank_files(context):
     context.add_output_metadata(
         output_name="standardised_ext_file",
         metadata={
-            "text_metadata": f"Last update of the genbank list {_time.isoformat()} (UTC).",
-            "processed_files": _new_files,
-            "num_files": len(_files),
-            "path": _path,
+            "text_metadata": f"New genbank files have been processed {_time.isoformat()} (UTC).",
+            "file_location": _gb_path,
+            "num_files": len(_new_files),
+            "file_preview": _new_files,
         },
     )
     context.add_output_metadata(
         output_name="list_genbank_files",
         metadata={
             "text_metadata": f"Last update of the genbank list {_time.isoformat()} (UTC).",
-            "path": _path,
+            "file_location": _hist_gb_path,
             "num_files": len(_files),
             "updated_list": _files,
         },
