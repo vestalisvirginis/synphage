@@ -2,7 +2,7 @@ from Bio.Graphics import GenomeDiagram
 
 from dagster import materialize_to_memory, build_asset_context, asset
 
-from synphage.assets.viewer.viewer import create_graph, Diagram
+from synphage.assets.viewer.static_graph import create_graph, Diagram
 
 
 def test_create_graph(mock_env_phagy_dir_synteny):

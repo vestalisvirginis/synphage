@@ -3,8 +3,12 @@ from dagster import asset, Field, Config, EnvVar, MetadataValue
 import enum
 import os
 import base64
-from io import BytesIO
+import math
+import tempfile
 
+import polars as pl
+
+from io import BytesIO
 from datetime import datetime
 from typing import Optional
 from Bio import SeqIO, SeqRecord
@@ -12,27 +16,26 @@ from Bio.Graphics import GenomeDiagram
 from reportlab.lib import colors
 from Bio.SeqFeature import SeqFeature, SimpleLocation
 from Bio.Graphics.GenomeDiagram import CrossLink
-
-import polars as pl
 from pathlib import Path
-
 from svgutils import compose as C
 from cairosvg import svg2png
 from lxml import etree
-import math
+
+
+TEMP_DIR = tempfile.gettempdir()
 
 
 def gene_uniqueness(
-    _path_to_dataset: str,
-    _record_name: list,
-):
+    path_to_dataset: str,
+    record_name: list,
+) -> pl.DataFrame:
     """Calculate percentage of the presence of a given gene over the displayed sequences"""
 
     _gene_uniqueness_df = (
-        pl.read_parquet(_path_to_dataset)
+        pl.read_parquet(path_to_dataset)
         .filter(
-            (pl.col("name").is_in(_record_name))
-            & (pl.col("source_genome_name").is_in(_record_name))
+            (pl.col("name").is_in(record_name))
+            & (pl.col("source_genome_name").is_in(record_name))
         )
         .with_columns(pl.col("name").n_unique().alias("total_seq"))
         .group_by("name", "gene", "locus_tag", "total_seq")
@@ -47,12 +50,12 @@ def gene_uniqueness(
     return _gene_uniqueness_df
 
 
-def _assess_file_content(_genome) -> bool:  # Duplicated function
+def _assess_file_content(genome: SeqRecord.SeqRecord) -> bool:  # Duplicated function
     """Assess wether the genbank file contains gene or only CDS"""
 
     _gene_count = 0
     _gene_value = False
-    for _feature in _genome.features:
+    for _feature in genome.features:
         if _feature.type == "gene":
             _gene_count = _gene_count + 1
             if _gene_count > 1:
@@ -62,8 +65,8 @@ def _assess_file_content(_genome) -> bool:  # Duplicated function
     return _gene_value
 
 
-def _get_sqc_identity_from_csv(_file_path):
-    _df = pl.read_csv(_file_path, has_header=False).select(
+def _get_sqc_identity_from_csv(file_path: str) -> dict:
+    _df = pl.read_csv(file_path, has_header=False).select(
         "column_1", pl.col("column_2").cast(pl.Int16)
     )
     return {x: y for x, y in zip(*_df.to_dict(as_series=False).values())}
@@ -79,32 +82,32 @@ class CheckOrientation(enum.Enum):
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context):
-    context.log.info("get path")
-    context.log.info(os.getenv(EnvVar("DATA_DIR")))
-    context.log.info(os.getenv(EnvVar("SEQUENCE_FILE")))
-    _path = "/".join(
-        [os.getenv(EnvVar("DATA_DIR")), os.getenv(EnvVar("SEQUENCE_FILE"))]
+def create_genome(context) -> dict:
+    # Path to sequence file
+    _path_seq = str(
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
+        / os.getenv(EnvVar("SEQUENCE_FILE"), "sequences.csv")
     )
-    context.log.info(_path)
+    context.log.info(f"File containing the sequences to plot: {_path_seq}")
 
-    if os.path.exists(_path):
-        _sequences = _get_sqc_identity_from_csv(_path)
+    if os.path.exists(_path_seq):
+        _sequences = _get_sqc_identity_from_csv(_path_seq)
+        for _k, _v in _sequences.items():
+            # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
+            if isinstance(_v, int):
+                _sequences[_k] = CheckOrientation(_v).name
     else:
-        "The file format is not recognised"
-
-    for _k, _v in _sequences.items():
-        # When the user is lazy and wants to do SEQUENCE=0, or REVERSE=1
-        if isinstance(_v, int):
-            _sequences[_k] = CheckOrientation(_v).name
+        _sequences = {}
+        context.log.info(
+            "sequences.csv file not present or the file format is not recognised"
+        )
 
     # Asset metadata
     _time = datetime.now()
     context.add_output_metadata(
         metadata={
-            "text_metadata": f"Dictionnary of sequences to plot {_time.isoformat()} (UTC).",
+            "text_metadata": f"Sequences to plot {_time.isoformat()} (UTC).",
             "num_sqcs": len(_sequences),
-            "path": _path,
             "sequences": MetadataValue.json(_sequences),
         }
     )
@@ -120,18 +123,18 @@ def _read_seq(_path: str, _orientation: str) -> SeqRecord.SeqRecord:
 
 
 def _get_feature(
-    _features, _id, _tags=("locus_tag", "gene", "old_locus_tag", "protein_id")
-):
+    features, id, tags=("locus_tag", "gene", "old_locus_tag", "protein_d")
+) -> SeqFeature:
     """Search list of SeqFeature objects for an identifier under the given tags."""
-    for _f in _features:
-        for _key in _tags:
+    for _f in features:
+        for _key in tags:
             # tag may not be present in this feature
             for _x in _f.qualifiers.get(_key, []):
-                if _x == _id:  # gene
+                if _x == id:  # gene
                     return _f
-                elif _x[:-2] == _id:  # protein_id
+                elif _x[:-2] == id:  # protein_id
                     return _f
-    raise KeyError(_id)
+    raise KeyError(id)
 
 
 class Diagram(Config):
@@ -147,18 +150,18 @@ class Diagram(Config):
     uniq_dir: str = "tables/uniqueness.parquet"
 
 
-gene_uniqueness_folder_config = {
-    "output_folder": Field(
-        str,
-        description="Path to folder where the files will be saved",
-        default_value="table",
-    ),
-    "name": Field(
-        str,
-        description="Path to folder where the files will be saved",
-        default_value="gene_uniqueness",
-    ),
-}
+# gene_uniqueness_folder_config = {
+#     "output_folder": Field(
+#         str,
+#         description="Path to folder where the files will be saved",
+#         default_value="table",
+#     ),
+#     "name": Field(
+#         str,
+#         description="Path to folder where the files will be saved",
+#         default_value="gene_uniqueness",
+#     ),
+# }
 
 
 @asset(
@@ -172,18 +175,21 @@ gene_uniqueness_folder_config = {
         "owner": "Virginie Grosboillot",
     },
 )
-def create_graph(context, create_genome, config: Diagram):
+def create_graph(
+    context, create_genome: dict, config: Diagram
+) -> GenomeDiagram.Diagram:
     # Define the paths
-
-    _input_folder = "/".join([os.getenv(EnvVar("DATA_DIR")), "genbank"])
-    _output_folder = "/".join([os.getenv(EnvVar("DATA_DIR")), "synteny"])
-    _blastn_dir = "/".join(
-        [os.getenv(EnvVar("DATA_DIR")), "tables", "blastn_summary.parquet"]
+    _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
+    _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
+    _blastn_dir = str(
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
+        / "tables"
+        / "blastn_summary.parquet"
     )
-    _uniq_dir = "/".join(
-        [os.getenv(EnvVar("DATA_DIR")), "tables", "uniqueness.parquet"]
+    _uniq_dir = str(
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
     )
-    _colour_dir = "/".join([_output_folder, "colour_table"])
+    _colour_dir = str(Path(_synteny_folder) / "colour_table")
 
     # Set name for the diagram
     if os.getenv(EnvVar("TITLE")):
@@ -195,7 +201,7 @@ def create_graph(context, create_genome, config: Diagram):
     _records = {}
 
     for _k, _v in create_genome.items():
-        _genbank_path = "/".join([_input_folder, _k])
+        _genbank_path = str(Path(_gb_folder) / _k)
         _record = _read_seq(_genbank_path, _v)
         context.log.info(f"Orientation: {_record}")
         _records[_record.name] = _record
@@ -452,8 +458,8 @@ def create_graph(context, create_genome, config: Diagram):
     else:
         _fmt = "png"
 
-    _path_output = str(f"{_output_folder}/{_name_graph}.{_fmt}")
-    _png_output = str(f"{_output_folder}/{_name_graph}.png")
+    _path_output = str(Path(_synteny_folder) / f"{_name_graph}.{_fmt}")
+    _png_output = str(Path(_synteny_folder) / f"{_name_graph}.png")
     _gd_diagram.write(_path_output, config.output_format)
 
     context.log.info("Parsing SVG xml file")
@@ -469,7 +475,7 @@ def create_graph(context, create_genome, config: Diagram):
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
     legend_path = "synphage/assets/viewer/legend.svg"
-    # (f"{_output_folder}/legend.svg")
+    # (f"{_synteny_folder}/legend.svg")
     C.Figure(
         f"{width}px",
         f"{height}px",

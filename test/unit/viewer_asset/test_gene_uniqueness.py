@@ -1,6 +1,6 @@
 import polars as pl
 
-from synphage.assets.viewer.viewer import gene_uniqueness
+from synphage.assets.viewer.static_graph import gene_uniqueness
 
 
 def test_gene_uniqueness():

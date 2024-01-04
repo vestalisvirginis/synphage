@@ -1,4 +1,4 @@
-from synphage.assets.viewer.viewer import _get_sqc_identity_from_csv
+from synphage.assets.viewer.static_graph import _get_sqc_identity_from_csv
 
 
 def test_get_sqc_identity_from_csv():

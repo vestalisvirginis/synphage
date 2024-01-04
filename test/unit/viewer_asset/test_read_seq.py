@@ -1,6 +1,6 @@
 from Bio.SeqRecord import SeqRecord
 
-from synphage.assets.viewer.viewer import _read_seq
+from synphage.assets.viewer.static_graph import _read_seq
 
 
 def test_read_seq_sequence():
