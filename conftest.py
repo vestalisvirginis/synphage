@@ -40,6 +40,11 @@ def mock_env_sequence_check(monkeypatch):
 
 
 @pytest.fixture
+def mock_env_sequence_check_with_history(monkeypatch):
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/sequence_quality_with_history")
+
+
+@pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/blasting")
 

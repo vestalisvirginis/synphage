@@ -2,20 +2,32 @@ from dagster import (
     asset,
     EnvVar,
     Field,
+    multi_asset,
+    AssetOut,
 )
 
 import os
 import shutil
+import tempfile
+import pickle
 
 from pathlib import Path
 from datetime import datetime
 from typing import List
 
 
-sqc_folder_config = {
-    "sqc_download_dir": Field(
+TEMP_DIR = tempfile.gettempdir()
+
+
+folder_config = {
+    "fs": Field(
         str,
-        description="Path to folder containing the downloaded genbank sequences",
+        description="Path to folder containing the file system files",
+        default_value="fs",
+    ),
+    "download_directory": Field(
+        str,
+        description="Path to folder",
         default_value="download",
     ),
     "genbank_dir": Field(
@@ -26,20 +38,53 @@ sqc_folder_config = {
     "fasta_dir": Field(
         str,
         description="Path to folder containing the fasta sequence files",
-        default_value="gene_identity/fasta",
+        default_value=str(Path("gene_identity") / "fasta"),
     ),
 }
 
 
-@asset(
-    config_schema={**sqc_folder_config},
-    description="Checks for sequence quality and accuracy",
+@multi_asset(
+    config_schema=folder_config,
+    outs={
+        "new_transferred_files": AssetOut(
+            is_required=True,
+            description="Checks for sequence quality and accuracy",
+            io_manager_key="io_manager",
+            metadata={
+                "owner": "Virginie Grosboillot",
+            },
+        ),
+        "history_transferred_files": AssetOut(
+            is_required=True,
+            description="Update the list of files already transferred from download to genbank folder",
+            io_manager_key="io_manager",
+            metadata={
+                "owner": "Virginie Grosboillot",
+            },
+        ),
+    },
     compute_kind="Biopython",
-    metadata={"owner": "Virginie Grosboillot"},
 )
-def sequence_check(context, fetch_genome) -> List[str]:
-    context.log.info(f"Number of genomes in download folder: {len(fetch_genome)}")
+def sequence_check(context, fetch_genome) -> tuple[List[str], List[str]]:
+    # history check
+    _path_history = (
+        Path(os.getenv(EnvVar("DATA_DIR")))
+        / context.op_config["fs"]
+        / "history_transferred_files"
+    )
 
+    if os.path.exists(_path_history):
+        _transferred_files = pickle.load(open(_path_history, "rb"))
+        context.log.info("Transferred file history loaded")
+    else:
+        _transferred_files = []
+        context.log.info("No transfer history")
+
+    # genome to transfer
+    _T = list(set(fetch_genome).difference(set(_transferred_files)))
+    context.log.info(f"Number of genomes to transfer: {len(_T)}")
+
+    # path to genbank folder
     _gb_path = "/".join(
         [os.getenv(EnvVar("DATA_DIR")), context.op_config["genbank_dir"]]
     )
@@ -47,27 +92,33 @@ def sequence_check(context, fetch_genome) -> List[str]:
 
     # add check to assess the quality of the query
 
-    for _file in fetch_genome:
+    _new_transfer = []
+    for _file in _T:
+        _output_file = f"{_gb_path}/{Path(_file).stem.replace('.', '_')}.gb"
         shutil.copy2(
             _file,
-            f"{_gb_path}/{Path(_file).stem.replace('.', '_')}.gb",
+            _output_file,
         )
-
-    _downloaded_files = list(
-        map(
-            lambda x: Path(x).stem,
-            os.listdir(_gb_path),
-        )
-    )
+        _new_transfer.append(Path(_output_file).name)
+        _transferred_files.append(_file)
 
     _time = datetime.now()
     context.add_output_metadata(
+        output_name="new_transferred_files",
         metadata={
             "text_metadata": f"List of downloaded sequences{_time.isoformat()} (UTC).",
             "path": _gb_path,
-            "num_files": len(_downloaded_files),
-            "preview": _downloaded_files,
-        }
+            "num_files": len(_new_transfer),
+            "preview": _new_transfer,
+        },
+    )
+    context.add_output_metadata(
+        output_name="history_transferred_files",
+        metadata={
+            "text_metadata": f"List of downloaded sequences last update: {_time.isoformat()} (UTC).",
+            "num_files": len(_transferred_files),
+            "preview": _transferred_files,
+        },
     )
 
-    return _downloaded_files
+    return _new_transfer, _transferred_files
