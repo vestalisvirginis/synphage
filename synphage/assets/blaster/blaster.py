@@ -83,23 +83,20 @@ def _assess_file_content(genome) -> bool:
 )
 def genbank_to_fasta(context, standardised_ext_file):
     # Paths to read and store the data
-    _path_out = "/".join(
-        [os.getenv(EnvVar("PHAGY_DIRECTORY")), context.op_config["fasta_dir"]]
+    _path_out = (
+        Path(os.getenv(EnvVar("PHAGY_DIRECTORY"))) / context.op_config["fasta_dir"]
     )
-    _path = "/".join(
-        [
-            os.getenv(EnvVar("PHAGY_DIRECTORY")),
-            context.op_config["fs"],
-            "history_fasta_files",
-        ]
+
+    _path = (
+        Path(os.getenv(EnvVar("PHAGY_DIRECTORY")))
+        / context.op_config["fs"]
+        / "history_fasta_files"
     )
 
     # fasta_history
     if os.path.exists(_path):
-        context.log.info("path exist")
         _fasta_files = pickle.load(open(_path, "rb"))
     else:
-        context.log.info("path do not exist")
         _fasta_files = []
     context.log.info(_fasta_files)
 
@@ -269,7 +266,9 @@ def get_blastn(context, history_fasta_files, create_blast_db):
     context.log.info(_history_path)
     if os.path.exists(_history_path):
         context.log.info("path exist")
-        _blastn_history = pickle.load(open(_history_path, "rb"))
+        _blastn_history = [
+            Path(file).name for file in pickle.load(open(_history_path, "rb"))
+        ]
     else:
         context.log.info("path do not exist")
         _blastn_history = []
@@ -285,7 +284,8 @@ def get_blastn(context, history_fasta_files, create_blast_db):
     for _query in _fasta_files:
         for _database in create_blast_db:
             _output_dir = f"{_path}/{Path(_query).stem}_vs_{Path(_database).stem}"
-            if _output_dir not in _blastn_history:
+            if Path(_output_dir).name not in _blastn_history:
+                context.log.info(f"output_dir {_output_dir} not in _blastn_history")
                 os.system(
                     f"blastn -query {_query} -db {_database} -evalue 1e-3 -dust no -out {_output_dir} -outfmt 15"
                 )
