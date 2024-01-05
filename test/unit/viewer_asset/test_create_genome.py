@@ -1,4 +1,4 @@
-from dagster import materialize_to_memory, build_asset_context, asset
+from dagster import materialize_to_memory, build_asset_context
 
 from synphage.assets.viewer.static_graph import create_genome, Genome
 
