@@ -85,7 +85,14 @@ def test_create_graph_asset(mock_env_phagy_dir_synteny):
 def test_create_graph_asset_config(mock_env_phagy_dir_synteny, title, config_param):
     @asset(name="create_genome")
     def mock_upstream():
-        return {"TT_000001.gb": "SEQUENCE", "TT_000002.gb": "SEQUENCE"}
+        return {
+            "TT_000001.gb": "SEQUENCE",
+            "TT_000002.gb": "SEQUENCE",
+            "TT_000003.gb": "SEQUENCE",
+            "TT_000004.gb": "SEQUENCE",
+            "TT_000005.gb": "SEQUENCE",
+            "TT_000006.gb": "SEQUENCE",
+        }
 
     assets = [create_graph, mock_upstream]
     result = materialize_to_memory(
