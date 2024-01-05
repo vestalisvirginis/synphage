@@ -461,12 +461,17 @@ def create_graph(
 
     context.log.info("Colours have been applied")
 
+    if config.graph_end:
+        graph_end = config.graph_end
+    else:
+        graph_end = _max_len
+
     _gd_diagram.draw(
         format=config.graph_shape,
         pagesize=config.graph_pagesize,
         fragments=config.graph_fragments,
         start=config.graph_start,
-        end=_max_len,
+        end=graph_end,
     )
 
     context.log.info("Graph has been drawn")

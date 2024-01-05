@@ -70,6 +70,8 @@ def test_create_graph_asset(mock_env_phagy_dir_synteny):
         ],
         [{"title": "param_gradient_3"}, {"gradient": ["#FA8072"]}],
         [{"title": "param_shape"}, {"graph_shape": "circular"}],
+        [{"title": "param_start"}, {"graph_start": 2000}],
+        [{"title": "param_end"}, {"graph_end": 3000}],
     ],
     ids=[
         "default",
@@ -80,6 +82,8 @@ def test_create_graph_asset(mock_env_phagy_dir_synteny):
         "gradient_too_many_values",
         "gradient_missing_values",
         "graph_shape",
+        "graph_start",
+        "graph_end",
     ],
 )
 def test_create_graph_asset_config(mock_env_phagy_dir_synteny, title, config_param):
