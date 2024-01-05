@@ -12,13 +12,6 @@ def test_create_graph_default(mock_env_phagy_dir_synteny):
     assert isinstance(result, GenomeDiagram.Diagram)
 
 
-def test_create_graph_default_options(mock_env_phagy_dir_synteny_var):
-    context = build_asset_context()
-    asset_input = {"TT_000001.gb": "SEQUENCE", "TT_000002.gb": "SEQUENCE"}
-    result = create_graph(context, asset_input, Diagram())
-    assert isinstance(result, GenomeDiagram.Diagram)
-
-
 def test_create_graph_asset(mock_env_phagy_dir_synteny):
     @asset(name="create_genome")
     def mock_upstream():

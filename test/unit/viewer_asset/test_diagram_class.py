@@ -3,20 +3,9 @@ import pytest
 from synphage.assets.viewer.static_graph import Diagram
 
 
-def test_Diagram():
+def test_diagram_class():
     assert callable(Diagram)
-    configuration = Diagram(
-        title="title",
-        output_format="out",
-        graph_format="fmt",
-        graph_pagesize="size",
-        graph_fragments=1,
-        graph_start=0,
-        graph_end=130000,
-        output_folder="a",
-        blastn_dir="b.parquet",
-        uniq_dir="c.parquet",
-    )
+    configuration = Diagram()
     assert hasattr(configuration, "title")
     assert hasattr(configuration, "output_format")
     assert hasattr(configuration, "graph_format")
@@ -35,7 +24,7 @@ def test_Diagram():
         [
             Diagram(),
             {
-                "title": "diagram",
+                "title": "synteny_plot",
                 "output_format": "SVG",
                 "graph_format": "linear",
                 "graph_pagesize": "A4",
@@ -49,8 +38,8 @@ def test_Diagram():
         ],
         [
             Diagram(
-                title="title",
-                output_format="out",
+                title="test_title",
+                output_format="png",
                 graph_format="fmt",
                 graph_pagesize="size",
                 graph_fragments=3,
@@ -61,8 +50,8 @@ def test_Diagram():
                 uniq_dir="c.parquet",
             ),
             {
-                "title": "title",
-                "output_format": "out",
+                "title": "test_title",
+                "output_format": "png",
                 "graph_format": "fmt",
                 "graph_pagesize": "size",
                 "graph_fragments": 3,

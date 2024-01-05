@@ -77,16 +77,19 @@ class CheckOrientation(enum.Enum):
     REVERSE = 1
 
 
+class Genome(Config):
+    sequence_file: str = "sequences.csv"
+
+
 @asset(
     description="Return a dict from the sequence paths and their orientation.",
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context) -> dict:
+def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
     _path_seq = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
-        / os.getenv(EnvVar("SEQUENCE_FILE"), "sequences.csv")
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
     )
     context.log.info(f"File containing the sequences to plot: {_path_seq}")
 
@@ -146,8 +149,8 @@ class Diagram(Config):
     graph_start: int = 0
     graph_end: Optional[int] = None
     output_folder: str = "synteny"
-    blastn_dir: str = "tables/blastn_summary.parquet"
-    uniq_dir: str = "tables/uniqueness.parquet"
+    blastn_dir: str = str(Path("tables") / "blastn_summary.parquet")
+    uniq_dir: str = str(Path("tables") / "uniqueness.parquet")
 
 
 # gene_uniqueness_folder_config = {
@@ -192,7 +195,7 @@ def create_graph(
     _colour_dir = str(Path(_synteny_folder) / "colour_table")
 
     # Set name for the diagram
-    _name_graph = os.getenv(EnvVar("TITLE"), config.title)
+    _name_graph = config.title
 
     # Read sequences for each genome and assign them in a variable
     _records = {}
@@ -436,11 +439,11 @@ def create_graph(
     context.log.info("Colours have been applied")
 
     _gd_diagram.draw(
-        format=os.getenv(EnvVar('GRAPH_FORMAT'), config.graph_format),
-        pagesize=os.getenv(EnvVar('GRAPH_PAGESIZE'), config.graph_pagesize),
-        fragments=os.getenv(EnvVar('GRAPH_FRAGMENTS'), config.graph_fragments),
-        start=int(os.getenv(EnvVar('GRAPH_START'), config.graph_start)),
-        end=int(os.getenv(EnvVar('GRAPH_END'), _max_len)),
+        format=config.graph_format,
+        pagesize=config.graph_pagesize,
+        fragments=config.graph_fragments,
+        start=config.graph_start,
+        end=_max_len,
     )
 
     context.log.info("Graph has been drawn")
