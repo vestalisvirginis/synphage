@@ -1,6 +1,6 @@
 import os
 
-from pathlib import PosixPath
+from pathlib import Path
 from dagster import materialize_to_memory, build_asset_context, asset
 
 from synphage.assets.ncbi_connect.accession import fetch_genome
@@ -56,7 +56,7 @@ ACCESSION_IDS = {
 
 
 def test_fetch_genome(mock_env_ncbi_fetch):
-    _path = "/".join([os.getenv("DATA_DIR"), "download"])
+    _path = str(Path(os.getenv("DATA_DIR")) / "download")
     os.makedirs(_path, exist_ok=True)
     context = build_asset_context(
         resources={
@@ -81,7 +81,7 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
     def mock_upstream_download():
         return ["NZ_CP045811.1"]
 
-    _path = "/".join([os.getenv("DATA_DIR"), "download"])
+    _path = str(Path(os.getenv("DATA_DIR")) / "download")
     os.makedirs(_path, exist_ok=True)
 
     assets = [fetch_genome, mock_upstream_ids, mock_upstream_download]

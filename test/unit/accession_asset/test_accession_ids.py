@@ -1,19 +1,22 @@
 import os
 
-from pathlib import PosixPath
 from dagster import materialize_to_memory, build_asset_context, asset
 
 from synphage.assets.ncbi_connect.accession import accession_ids
 from synphage.resources.ncbi_resource import NCBIConnection
 
 
-def test_accession_ids(mock_env_ncbi_count):
+TEST_KEY = "Bacillus subtilis strain P9_B1"
+
+
+def test_accession_ids():
     context = build_asset_context(
         resources={
             "ncbi_connection": NCBIConnection(
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
             )
-        }
+        },
+        asset_config={"search_key": TEST_KEY},
     )
     asset_input = 2
     result = accession_ids(context, asset_input)
@@ -22,7 +25,7 @@ def test_accession_ids(mock_env_ncbi_count):
     assert result["IdList"] == ["NZ_CP045811.1", "CP045811.1"]
 
 
-def test_accession_ids_asset(mock_env_ncbi_count):
+def test_accession_ids_asset():
     @asset(name="accession_count")
     def mock_upstream():
         return 2
@@ -35,6 +38,7 @@ def test_accession_ids_asset(mock_env_ncbi_count):
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
             )
         },
+        run_config={"ops": {"accession_ids": {"config": {"search_key": TEST_KEY}}}},
     )
     assert result.success
     result_dict = result.output_for_node("accession_ids")

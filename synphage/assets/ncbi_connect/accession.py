@@ -24,6 +24,9 @@ def _get_ncbi_count_result(result, dbname) -> NucleotideRecord:
 
 ncbi_query_config = {
     "database": Field(str, description="Database identifier", default_value="nuccore"),
+    "search_key": Field(
+        str, description="Keyword(s) for NCBI query", default_value="Myoalterovirus"
+    ),
     "use_history": Field(
         str, description="Yes/No value for history", default_value="y"
     ),
@@ -42,7 +45,7 @@ ncbi_query_config = {
 )
 def accession_count(context) -> int:
     # Search key - default: Myoalterovirus (2 entries in NCBI database Jan 2024)
-    keyword = os.getenv(EnvVar("KEYWORD"), "Myoalterovirus")
+    keyword = context.op_config["search_key"]
     context.log.info(f"Search key(s): {keyword}")
     # Query
     _query = context.resources.ncbi_connection.conn.egquery(term=keyword)
@@ -78,7 +81,7 @@ def accession_count(context) -> int:
 )
 def accession_ids(context, accession_count) -> dict:
     # Search key - default: Myoalterovirus (2 entries in NCBI database Jan 2024)
-    keyword = os.getenv(EnvVar("KEYWORD"), "Myoalterovirus")
+    keyword = context.op_config["search_key"]
     context.log.info(f"Search key(s): {keyword}")
     # Search
     context.log.info("Start NCBI database search")

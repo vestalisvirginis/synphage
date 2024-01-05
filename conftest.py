@@ -15,11 +15,6 @@ def mock_env_ncbi_download_neg(monkeypatch):
     monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/negative")
 
 @pytest.fixture
-def mock_env_ncbi_count(monkeypatch):
-    monkeypatch.setenv("DATABASE", "nuccore")
-    monkeypatch.setenv("KEYWORD", "Bacillus subtilis strain P9_B1")
-
-@pytest.fixture
 def mock_env_ncbi_fetch(monkeypatch):
     monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/fetch")
 
