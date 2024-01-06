@@ -20,6 +20,8 @@ from pathlib import Path
 from svgutils import compose as C
 from cairosvg import svg2png
 from lxml import etree
+from string import Template
+from PIL import ImageColor
 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -497,13 +499,40 @@ def create_graph(
     ypos = int(math.trunc(height * 0.9))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
-    legend_path = "synphage/assets/viewer/legend.svg"
+    # Prepare legend:
+    r, g, b = ImageColor.getcolor(colour_gradient[1], "RGB")
+    GRADIENT = f"{r},{g},{b}"
+    CB_1 = colour_palette[0]
+    CB_2 = colour_palette[1]
+    CB_3 = colour_palette[2]
+    CB_4 = colour_palette[3]
+    CB_5 = colour_palette[4]
+    CB_6 = colour_palette[5]
+    CB_7 = colour_palette[6]
+
+    parent = Path(__file__).parent
+    svg = Template(open(str(parent / "template.svg")).read())
+    legend = svg.substitute(
+        gradient=GRADIENT,
+        cb_1=CB_1,
+        cb_2=CB_2,
+        cb_3=CB_3,
+        cb_4=CB_4,
+        cb_5=CB_5,
+        cb_6=CB_6,
+        cb_7=CB_7,
+    )
+
+    with open("/tmp/legend.svg", "w") as writer:
+        writer.write(legend)
+
+    legend_path = "/tmp/legend.svg"
     # (f"{_synteny_folder}/legend.svg")
     C.Figure(
         f"{width}px",
         f"{height}px",
         C.SVG(_path_output),
-        C.SVG(legend_path).scale(10.0).move(xpos, ypos),
+        C.SVG(legend_path).move(xpos, ypos),
     ).save(_path_output)
 
     svg2png(bytestring=open(_path_output).read(), write_to=_png_output)
