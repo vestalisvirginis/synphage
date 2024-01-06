@@ -36,7 +36,7 @@ def test_diagram_class():
                     "#443983",
                     "#440154",
                 ],
-                "gradient": ["#FFFFFF", "#B22222"],
+                "gradient": "#B22222",
                 "output_format": "SVG",
                 "graph_shape": "linear",
                 "graph_pagesize": "A4",
@@ -52,7 +52,7 @@ def test_diagram_class():
             Diagram(
                 title="test_title",
                 colours=["B", "R", "V", "N", "Y", "O", "W"],
-                gradient=["W", "R"],
+                gradient="R",
                 output_format="png",
                 graph_shape="fmt",
                 graph_pagesize="size",
@@ -66,7 +66,7 @@ def test_diagram_class():
             {
                 "title": "test_title",
                 "colours": ["B", "R", "V", "N", "Y", "O", "W"],
-                "gradient": ["W", "R"],
+                "gradient": "R",
                 "output_format": "png",
                 "graph_shape": "fmt",
                 "graph_pagesize": "size",

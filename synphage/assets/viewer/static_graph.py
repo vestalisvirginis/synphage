@@ -153,7 +153,7 @@ class Diagram(Config):
         "#443983",
         "#440154",
     ]  # viridis palette
-    gradient: list[str] = ["#FFFFFF", "#B22222"]  # white to firebrick
+    gradient: str = "#B22222"  # white to firebrick
     output_format: str = "SVG"
     graph_shape: str = "linear"
     graph_pagesize: str = "A4"
@@ -216,21 +216,22 @@ def create_graph(
             "#440154",
         ]
 
-    _user_gradient = config.gradient
-    if len(_user_gradient) == 2:
-        context.log.info("Colour gradient all set!")
-        colour_gradient = _user_gradient
-    elif len(_user_gradient) > 2:
-        context.log.info(
-            "Too many colours were passed! Only the first two will be used for creating the gradient!"
-        )
-        colour_gradient = _user_gradient[0:2]
-    else:
-        _missing_colours = 2 - len(_user_gradient)
-        context.log.info(
-            f"{_missing_colours} colour(s) missing to generate the gradient! The graph will be plotted with the default gradient"
-        )
-        colour_gradient = ["#FFFFFF", "#B22222"]
+    # _user_gradient = config.gradient
+    # # if len(_user_gradient) == 2:
+    # #     context.log.info("Colour gradient all set!")
+    # #     colour_gradient = _user_gradient
+    # # elif len(_user_gradient) > 2:
+    # #     context.log.info(
+    # #         "Too many colours were passed! Only the first two will be used for creating the gradient!"
+    # #     )
+    # #     colour_gradient = _user_gradient[0:2]
+    # # else:
+    # #     _missing_colours = 2 - len(_user_gradient)
+    # #     context.log.info(
+    # #         f"{_missing_colours} colour(s) missing to generate the gradient! The graph will be plotted with the default gradient"
+    # #     )
+    #     colour_gradient = ["#FFFFFF", "#B22222"]
+    colour_gradient = config.gradient
 
     # Read sequences for each genome and assign them in a variable
     _records = {}
@@ -305,8 +306,8 @@ def create_graph(
 
         for _id_X, _id_Y, _perc in _X_vs_Y.iter_rows():
             _color = colors.linearlyInterpolatedColor(
-                colors.HexColor(colour_gradient[0]),
-                colors.HexColor(colour_gradient[1]),
+                colors.HexColor("#FFFFFF"),
+                colors.HexColor(colour_gradient),
                 0,
                 100,
                 _perc,
@@ -500,7 +501,7 @@ def create_graph(
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
     # Prepare legend:
-    r, g, b = ImageColor.getcolor(colour_gradient[1], "RGB")
+    r, g, b = ImageColor.getcolor(colour_gradient, "RGB")
     GRADIENT = f"{r},{g},{b}"
     CB_1 = colour_palette[0]
     CB_2 = colour_palette[1]
