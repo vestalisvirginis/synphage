@@ -512,6 +512,7 @@ def create_graph(
     CB_7 = colour_palette[6]
 
     parent = Path(__file__).parent
+    context.log.info(f"parent: {parent}")
     svg = Template(open(str(parent / "template.svg")).read())
     legend = svg.substitute(
         gradient=GRADIENT,
@@ -524,10 +525,13 @@ def create_graph(
         cb_7=CB_7,
     )
 
-    with open("/tmp/legend.svg", "w") as writer:
+    _uniq_legend_id = datetime.timestamp(
+        datetime.now()
+    )  # int(datetime.timestamp(datetime.now()))
+    legend_path = str(Path(TEMP_DIR) / f"{_uniq_legend_id}_legend.svg")
+    with open(legend_path, "w") as writer:
         writer.write(legend)
 
-    legend_path = "/tmp/legend.svg"
     # (f"{_synteny_folder}/legend.svg")
     C.Figure(
         f"{width}px",
