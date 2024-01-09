@@ -67,7 +67,7 @@ folder_config = {
 def sequence_check(context, fetch_genome) -> tuple[List[str], List[str]]:
     # history check
     _path_history = (
-        Path(os.getenv(EnvVar("DATA_DIR")))
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
         / context.op_config["fs"]
         / "history_transferred_files"
     )
