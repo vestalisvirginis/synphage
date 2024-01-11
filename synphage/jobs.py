@@ -12,6 +12,7 @@ from dagster import (
     Config,
     AssetKey,
     ExperimentalWarning,
+    ConfigArgumentWarning,
 )
 
 import os
@@ -29,6 +30,7 @@ from pathlib import Path
 import warnings
 
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
+warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
 
 TEMP_DIR = tempfile.gettempdir()
 
@@ -147,7 +149,7 @@ def gene_presence(context, blastn_all, locus_all):
     context.log.info(f"sql_file: {_path_gene_presence_sql}")
     query = open(_path_gene_presence_sql).read()
     conn.query(query.format(blastn_all, locus_all)).pl().write_parquet(
-        str(Path(os.getenv("DATA_DIR"), TEMP_DIR) / "tables" / "uniqueness.parquet")
+        str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet")
     )
     return "OK"
 
