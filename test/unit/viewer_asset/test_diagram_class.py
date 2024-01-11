@@ -81,6 +81,6 @@ def test_diagram_class():
     ],
     ids=["default", "personalised"],
 )
-def testDiagram_param(config, result):
+def test_diagram_param(config, result):
     configuration = config
     assert configuration.dict() == result

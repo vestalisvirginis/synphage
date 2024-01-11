@@ -34,11 +34,6 @@ folder_config = {
         description="Path to folder containing the genbank files",
         default_value="genbank",
     ),
-    "fasta_dir": Field(
-        str,
-        description="Path to folder containing the fasta sequence files",
-        default_value=str(Path("gene_identity") / "fasta"),
-    ),
 }
 
 
