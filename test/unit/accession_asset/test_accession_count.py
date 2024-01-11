@@ -1,8 +1,8 @@
 import os
 
-from dagster import materialize_to_memory, build_asset_context
+from dagster import materialize_to_memory, build_asset_context, asset
 
-from synphage.assets.ncbi_connect.accession import accession_count
+from synphage.assets.ncbi_connect.accession import accession_count, QueryConfig
 from synphage.resources.ncbi_resource import NCBIConnection
 
 
@@ -14,13 +14,18 @@ def test_accession_count():
             )
         }
     )
-    result = accession_count(context)
+    input_asset = QueryConfig()
+    result = accession_count(context, input_asset)
     assert isinstance(result, int)
     assert result == 2
 
 
 def test_accession_count_asset():
-    assets = [accession_count]
+    @asset(name="setup_query_config")
+    def mock_upstream():
+        return QueryConfig()
+
+    assets = [accession_count, mock_upstream]
     result = materialize_to_memory(
         assets,
         resources={
@@ -40,8 +45,11 @@ def test_accession_count_asset():
 
 
 def test_accession_count_asset_with_search_key():
-    search_key = "Bacillus subtilis strain P9_B1"
-    assets = [accession_count]
+    @asset(name="setup_query_config")
+    def mock_upstream():
+        return QueryConfig(search_key="Bacillus subtilis strain P9_B1")
+
+    assets = [accession_count, mock_upstream]
     result = materialize_to_memory(
         assets,
         resources={
@@ -49,7 +57,6 @@ def test_accession_count_asset_with_search_key():
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
             )
         },
-        run_config={"ops": {"accession_count": {"config": {"search_key": search_key}}}},
     )
     assert result.success
     acc_count = result.output_for_node("accession_count")
