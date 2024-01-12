@@ -206,3 +206,9 @@ synteny_job = define_asset_job(
     name="synteny_job",
     selection=AssetSelection.groups("Viewer"),
 )
+
+
+# Job 4 -> download gb files from ncbi
+ncbi_download_job = define_asset_job(
+    name="ncbi_download_job", selection=AssetSelection.groups("NCBI_connect")
+)
