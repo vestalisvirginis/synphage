@@ -26,6 +26,26 @@ def test_create_genome_asset(mock_env_phagy_dir_synteny):
     assert [v for v in sequences.values()] == ["SEQUENCE", "REVERSE"]
 
 
+def test_create_genome_no_sequence_file(mock_env_phagy_dir_synteny_no_csv):
+    asset = [create_genome]
+    result = materialize_to_memory(
+        asset,
+        run_config={
+            "ops": {"create_genome": {"config": {"sequence_file": "sequences.csv"}}}
+        },
+    )
+    assert result.success
+    sequences = result.output_for_node("create_genome")
+    assert isinstance(sequences, dict)
+    assert len(sequences) == 0
+    assert [k for k in sequences.keys()] == []
+    assert [v for v in sequences.values()] == []
+    assert (
+        result.asset_observations_for_node("create_genome")[0].metadata["message"].text
+        == "sequences.csv file not present or the file format is not recognised"
+    )
+
+
 # # Check Metadata
 # # Logger
 # # file exist or no! + File format

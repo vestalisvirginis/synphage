@@ -1,4 +1,4 @@
-from dagster import asset, Config, EnvVar, MetadataValue
+from dagster import asset, Config, EnvVar, MetadataValue, AssetObservation
 
 import enum
 import os
@@ -105,6 +105,14 @@ def create_genome(context, config: Genome) -> dict:
         _sequences = {}
         context.log.info(
             "sequences.csv file not present or the file format is not recognised"
+        )
+        context.log_event(
+            AssetObservation(
+                asset_key="create_genome",
+                metadata={
+                    "message": f"{config.sequence_file} file not present or the file format is not recognised"
+                },
+            )
         )
 
     # Asset metadata

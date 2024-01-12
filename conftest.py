@@ -47,6 +47,10 @@ def mock_env_phagy_dir_synteny(monkeypatch):
     monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/synteny")
 
 @pytest.fixture
+def mock_env_phagy_dir_synteny_no_csv(monkeypatch):
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/synteny_no_csv")
+
+@pytest.fixture
 def mock_env_phagy_dir_none(monkeypatch):
     monkeypatch.delenv("DATA_DIR", raising=False)
     
