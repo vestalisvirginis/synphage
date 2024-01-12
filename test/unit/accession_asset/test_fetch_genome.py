@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from dagster import materialize_to_memory, build_asset_context, asset
 
-from synphage.assets.ncbi_connect.accession import fetch_genome
+from synphage.assets.ncbi_connect.accession import fetch_genome, QueryConfig
 from synphage.resources.ncbi_resource import NCBIConnection
 
 
@@ -67,7 +67,10 @@ def test_fetch_genome(mock_env_ncbi_fetch):
     )
     ids_asset_input = ACCESSION_IDS
     downloaded_asset_input = ["NZ_CP045811.1"]
-    result = fetch_genome(context, ids_asset_input, downloaded_asset_input)
+    config_input = QueryConfig()
+    result = fetch_genome(
+        context, ids_asset_input, downloaded_asset_input, config_input
+    )
     assert isinstance(result, list)
     assert result == list(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
 
@@ -81,10 +84,19 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
     def mock_upstream_download():
         return ["NZ_CP045811.1"]
 
+    @asset(name="setup_query_config")
+    def mock_config_upstream():
+        return QueryConfig()
+
     _path = str(Path(os.getenv("DATA_DIR")) / "download")
     os.makedirs(_path, exist_ok=True)
 
-    assets = [fetch_genome, mock_upstream_ids, mock_upstream_download]
+    assets = [
+        fetch_genome,
+        mock_upstream_ids,
+        mock_upstream_download,
+        mock_config_upstream,
+    ]
     result = materialize_to_memory(
         assets,
         resources={
