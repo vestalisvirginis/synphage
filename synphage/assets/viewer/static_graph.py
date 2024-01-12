@@ -20,6 +20,8 @@ from pathlib import Path
 from svgutils import compose as C
 from cairosvg import svg2png
 from lxml import etree
+from string import Template
+from PIL import ImageColor
 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -77,16 +79,19 @@ class CheckOrientation(enum.Enum):
     REVERSE = 1
 
 
+class Genome(Config):
+    sequence_file: str = "sequences.csv"
+
+
 @asset(
     description="Return a dict from the sequence paths and their orientation.",
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context) -> dict:
+def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
     _path_seq = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
-        / os.getenv(EnvVar("SEQUENCE_FILE"), "sequences.csv")
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
     )
     context.log.info(f"File containing the sequences to plot: {_path_seq}")
 
@@ -138,40 +143,32 @@ def _get_feature(
 
 
 class Diagram(Config):
-    title: str = "diagram"
+    title: str = "synteny_plot"
+    colours: list[str] = [
+        "#fde725",
+        "#90d743",
+        "#35b779",
+        "#21918c",
+        "#31688e",
+        "#443983",
+        "#440154",
+    ]  # viridis palette
+    gradient: str = "#B22222"  # white to firebrick
     output_format: str = "SVG"
-    graph_format: str = "linear"
+    graph_shape: str = "linear"
     graph_pagesize: str = "A4"
     graph_fragments: int = 1
     graph_start: int = 0
     graph_end: Optional[int] = None
     output_folder: str = "synteny"
-    blastn_dir: str = "tables/blastn_summary.parquet"
-    uniq_dir: str = "tables/uniqueness.parquet"
-
-
-# gene_uniqueness_folder_config = {
-#     "output_folder": Field(
-#         str,
-#         description="Path to folder where the files will be saved",
-#         default_value="table",
-#     ),
-#     "name": Field(
-#         str,
-#         description="Path to folder where the files will be saved",
-#         default_value="gene_uniqueness",
-#     ),
-# }
+    blastn_dir: str = str(Path("tables") / "blastn_summary.parquet")
+    uniq_dir: str = str(Path("tables") / "uniqueness.parquet")
 
 
 @asset(
     description="Transform a list of genomes into a genome diagram",
     compute_kind="Biopython",
     metadata={
-        "tables": "table",
-        "name": "blastn_summary",
-        "name2": "gene_uniqueness",
-        "parquet_managment": "append",
         "owner": "Virginie Grosboillot",
     },
 )
@@ -192,10 +189,49 @@ def create_graph(
     _colour_dir = str(Path(_synteny_folder) / "colour_table")
 
     # Set name for the diagram
-    if os.getenv(EnvVar("TITLE")):
-        _name_graph = os.getenv(EnvVar("TITLE"))
+    _name_graph = config.title
+
+    # Set colours for the graph
+    _user_colours = config.colours
+    if len(_user_colours) == 7:
+        context.log.info("Colour palette all set!")
+        colour_palette = _user_colours
+    elif len(_user_colours) > 7:
+        context.log.info(
+            "Too many colours were passed! Only the first seven will be used!"
+        )
+        colour_palette = _user_colours[0:7]
     else:
-        _name_graph = config.title
+        _missing_colours = 7 - len(_user_colours)
+        context.log.info(
+            f"Colour palette is missing {_missing_colours} colours! The graph will be plotted with the default palette"
+        )
+        colour_palette = [
+            "#fde725",
+            "#90d743",
+            "#35b779",
+            "#21918c",
+            "#31688e",
+            "#443983",
+            "#440154",
+        ]
+
+    # _user_gradient = config.gradient
+    # # if len(_user_gradient) == 2:
+    # #     context.log.info("Colour gradient all set!")
+    # #     colour_gradient = _user_gradient
+    # # elif len(_user_gradient) > 2:
+    # #     context.log.info(
+    # #         "Too many colours were passed! Only the first two will be used for creating the gradient!"
+    # #     )
+    # #     colour_gradient = _user_gradient[0:2]
+    # # else:
+    # #     _missing_colours = 2 - len(_user_gradient)
+    # #     context.log.info(
+    # #         f"{_missing_colours} colour(s) missing to generate the gradient! The graph will be plotted with the default gradient"
+    # #     )
+    #     colour_gradient = ["#FFFFFF", "#B22222"]
+    colour_gradient = config.gradient
 
     # Read sequences for each genome and assign them in a variable
     _records = {}
@@ -222,8 +258,8 @@ def create_graph(
     _gd_diagram = GenomeDiagram.Diagram(_name_graph)
     _feature_sets = {}
     _max_len = 0
-
     context.log.info("Graph has been instantiated")
+
     _seq_order = {}
     _track_list = [_i for _i in range(1, 2 * len(_records), 2)]
 
@@ -270,7 +306,11 @@ def create_graph(
 
         for _id_X, _id_Y, _perc in _X_vs_Y.iter_rows():
             _color = colors.linearlyInterpolatedColor(
-                colors.white, colors.firebrick, 0, 100, _perc
+                colors.HexColor("#FFFFFF"),
+                colors.HexColor(colour_gradient),
+                0,
+                100,
+                _perc,
             )
             _border = False
             _f_x = _get_feature(_features_X, _id_X)
@@ -292,14 +332,12 @@ def create_graph(
                 flip=True,
             )
             _gd_diagram.cross_track_links.append(CrossLink(_F_x, _F_y, _color, _border))
-
     context.log.info("Cross-links have been appended")
 
     _gene_color_palette = gene_uniqueness(_uniq_dir, _record_names)
     context.log.info(f"Writing: {str(_colour_dir)}")
     os.makedirs(Path(_colour_dir).parent, exist_ok=True)
     _gene_color_palette.write_parquet(_colour_dir)
-
     context.log.info("Colour palette has been determined")
 
     for _record_name, _record in _records.items():
@@ -324,30 +362,24 @@ def create_graph(
                         .item()
                     )
                     if _perc == 0:
-                        _gene_color = colors.HexColor(
-                            "#fde725"
-                        )  # gene_color = colors.HexColor('#440154')
+                        _gene_color = colors.HexColor(colour_palette[0])
                     elif 0 < _perc <= 20:
-                        _gene_color = colors.HexColor(
-                            "#90d743"
-                        )  # gene_color = colors.HexColor('#443983')
+                        _gene_color = colors.HexColor(colour_palette[1])
                     elif 20 < _perc <= 40:
-                        _gene_color = colors.HexColor(
-                            "#35b779"
-                        )  # gene_color = colors.HexColor('#31688e')
+                        _gene_color = colors.HexColor(colour_palette[2])
                     elif 40 < _perc <= 60:
-                        _gene_color = colors.HexColor("#21918c")
+                        _gene_color = colors.HexColor(colour_palette[3])
                     elif 60 < _perc <= 80:
                         _gene_color = colors.HexColor(
-                            "#31688e"
+                            colour_palette[4]
                         )  # gene_color = colors.HexColor('#35b779')
                     elif 80 < _perc < 100:
                         _gene_color = colors.HexColor(
-                            "#443983"
+                            colour_palette[5]
                         )  # gene_color = colors.HexColor('#90d743')
                     elif _perc == 100:
                         _gene_color = colors.HexColor(
-                            "#440154"
+                            colour_palette[6]
                         )  # gene_color = colors.HexColor('#fde725')
                     else:
                         _gene_color = colors.black
@@ -392,30 +424,24 @@ def create_graph(
                         .item()
                     )
                     if _perc == 0:
-                        _gene_color = colors.HexColor(
-                            "#fde725"
-                        )  # gene_color = colors.HexColor('#440154')
+                        _gene_color = colors.HexColor(colour_palette[0])
                     elif 0 < _perc <= 20:
-                        _gene_color = colors.HexColor(
-                            "#90d743"
-                        )  # gene_color = colors.HexColor('#443983')
+                        _gene_color = colors.HexColor(colour_palette[1])
                     elif 20 < _perc <= 40:
-                        _gene_color = colors.HexColor(
-                            "#35b779"
-                        )  # gene_color = colors.HexColor('#31688e')
+                        _gene_color = colors.HexColor(colour_palette[2])
                     elif 40 < _perc <= 60:
-                        _gene_color = colors.HexColor("#21918c")
+                        _gene_color = colors.HexColor(colour_palette[3])
                     elif 60 < _perc <= 80:
                         _gene_color = colors.HexColor(
-                            "#31688e"
+                            colour_palette[4]
                         )  # gene_color = colors.HexColor('#35b779')
                     elif 80 < _perc < 100:
                         _gene_color = colors.HexColor(
-                            "#443983"
+                            colour_palette[5]
                         )  # gene_color = colors.HexColor('#90d743')
                     elif _perc == 100:
                         _gene_color = colors.HexColor(
-                            "#440154"
+                            colour_palette[6]
                         )  # gene_color = colors.HexColor('#fde725')
                     else:
                         _gene_color = colors.black
@@ -438,17 +464,17 @@ def create_graph(
 
     context.log.info("Colours have been applied")
 
-    if isinstance(config.graph_end, int):
-        _graph_end = config.graph_end
+    if config.graph_end:
+        graph_end = config.graph_end
     else:
-        _graph_end = _max_len
+        graph_end = _max_len
 
     _gd_diagram.draw(
-        format=config.graph_format,
+        format=config.graph_shape,
         pagesize=config.graph_pagesize,
         fragments=config.graph_fragments,
         start=config.graph_start,
-        end=_graph_end,
+        end=graph_end,
     )
 
     context.log.info("Graph has been drawn")
@@ -474,13 +500,44 @@ def create_graph(
     ypos = int(math.trunc(height * 0.9))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
-    legend_path = "synphage/assets/viewer/legend.svg"
+    # Prepare legend:
+    r, g, b = ImageColor.getcolor(colour_gradient, "RGB")
+    GRADIENT = f"{r},{g},{b}"
+    CB_1 = colour_palette[0]
+    CB_2 = colour_palette[1]
+    CB_3 = colour_palette[2]
+    CB_4 = colour_palette[3]
+    CB_5 = colour_palette[4]
+    CB_6 = colour_palette[5]
+    CB_7 = colour_palette[6]
+
+    parent = Path(__file__).parent
+    context.log.info(f"parent: {parent}")
+    svg = Template(open(str(parent / "template.svg")).read())
+    legend = svg.substitute(
+        gradient=GRADIENT,
+        cb_1=CB_1,
+        cb_2=CB_2,
+        cb_3=CB_3,
+        cb_4=CB_4,
+        cb_5=CB_5,
+        cb_6=CB_6,
+        cb_7=CB_7,
+    )
+
+    _uniq_legend_id = datetime.timestamp(
+        datetime.now()
+    )  # int(datetime.timestamp(datetime.now()))
+    legend_path = str(Path(TEMP_DIR) / f"{_uniq_legend_id}_legend.svg")
+    with open(legend_path, "w") as writer:
+        writer.write(legend)
+
     # (f"{_synteny_folder}/legend.svg")
     C.Figure(
         f"{width}px",
         f"{height}px",
         C.SVG(_path_output),
-        C.SVG(legend_path).scale(10.0).move(xpos, ypos),
+        C.SVG(legend_path).move(xpos, ypos),
     ).save(_path_output)
 
     svg2png(bytestring=open(_path_output).read(), write_to=_png_output)

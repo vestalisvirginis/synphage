@@ -1,6 +1,6 @@
 import os
 
-from pathlib import PosixPath
+from pathlib import PosixPath, Path
 
 from dagster import RunConfig, ExecuteInProcessResult
 
@@ -11,27 +11,15 @@ def test_transform(mock_env_phagy_dir_transform):
     config = RunConfig(
         ops={
             "blastn": PipeConfig(
-                source="/".join([os.getenv("DATA_DIR"), "gene_identity/blastn"]),
-                target="/".join(
-                    [
-                        os.getenv("DATA_DIR"),
-                        os.getenv("FILE_SYSTEM"),
-                        "blastn_parsing",
-                    ]
-                ),
-                table_dir="/".join([os.getenv("DATA_DIR"), "tables"]),
+                source=str(Path(os.getenv("DATA_DIR")) / "gene_identity" / "blastn"),
+                target=str(Path(os.getenv("DATA_DIR")) / "fs" / "blastn_parsing"),
+                table_dir=str(Path(os.getenv("DATA_DIR")) / "tables"),
                 file="blastn_summary.parquet",
             ),
             "locus": PipeConfig(
-                source="/".join([os.getenv("DATA_DIR"), "genbank"]),
-                target="/".join(
-                    [
-                        os.getenv("DATA_DIR"),
-                        os.getenv("FILE_SYSTEM"),
-                        "locus_parsing",
-                    ]
-                ),
-                table_dir="/".join([os.getenv("DATA_DIR"), "tables"]),
+                source=str(Path(os.getenv("DATA_DIR")) / "genbank"),
+                target=str(Path(os.getenv("DATA_DIR")) / "fs" / "locus_parsing"),
+                table_dir=str(Path(os.getenv("DATA_DIR")) / "tables"),
                 file="locus_and_gene.parquet",
             ),
         }

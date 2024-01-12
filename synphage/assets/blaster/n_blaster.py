@@ -93,7 +93,7 @@ def genbank_to_fasta(context, standardised_ext_file) -> tuple[List[str], List[st
     )
 
     _path_history = (
-        Path(os.getenv(EnvVar("DATA_DIR")))
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
         / context.op_config["fs"]
         / "history_fasta_files"
     )

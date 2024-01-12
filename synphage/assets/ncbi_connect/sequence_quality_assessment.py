@@ -34,11 +34,6 @@ folder_config = {
         description="Path to folder containing the genbank files",
         default_value="genbank",
     ),
-    "fasta_dir": Field(
-        str,
-        description="Path to folder containing the fasta sequence files",
-        default_value=str(Path("gene_identity") / "fasta"),
-    ),
 }
 
 
@@ -67,7 +62,7 @@ folder_config = {
 def sequence_check(context, fetch_genome) -> tuple[List[str], List[str]]:
     # history check
     _path_history = (
-        Path(os.getenv(EnvVar("DATA_DIR")))
+        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
         / context.op_config["fs"]
         / "history_transferred_files"
     )
