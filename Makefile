@@ -55,6 +55,12 @@ type: # Verify static types
 	@mypy --install-types --non-interactive synphage
 	@python -c "print('Types: 👌')"
 
+pack: # Package wheel
+	@python -m build
+
+twine: # Upload to python index
+	@twine upload dist/*
+
 # build: # Build wheel
 # 	@python setup.py bdist_wheel --universal
 
