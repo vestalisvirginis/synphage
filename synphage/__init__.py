@@ -7,7 +7,7 @@ from .assets import (
     status_assets,
 )
 
-from .jobs import blasting_job, transform, synteny_job
+from .jobs import blasting_job, transform, synteny_job, ncbi_download_job
 
 from .resources import RESOURCES_LOCAL
 
@@ -28,5 +28,5 @@ resources_by_deployment_name = {
 defs = Definitions(
     assets=all_assets,
     resources=resources_by_deployment_name["local"],
-    jobs=[blasting_job, transform, synteny_job],
+    jobs=[blasting_job, transform, synteny_job, ncbi_download_job],
 )
