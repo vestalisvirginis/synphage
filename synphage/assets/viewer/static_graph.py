@@ -504,8 +504,8 @@ def create_graph(
 
     context.log.info(f"W: {width}, H: {height}")
 
-    xpos = int(math.trunc(width * 0.6))
-    ypos = int(math.trunc(height * 0.9))
+    xpos = int(math.trunc(width * 0.68))
+    ypos = int(math.trunc(height * 0.99))
     context.log.info(f"Coord of SVG: {str(xpos)} : {str(ypos)}")
 
     # Prepare legend:
@@ -544,8 +544,8 @@ def create_graph(
     C.Figure(
         f"{width}px",
         f"{height}px",
-        C.SVG(_path_output),
-        C.SVG(legend_path).move(xpos, ypos),
+        C.SVG(_path_output).scale(0.96),
+        C.SVG(legend_path).move(xpos, ypos).scale(0.9),
     ).save(_path_output)
 
     svg2png(bytestring=open(_path_output).read(), write_to=_png_output)

@@ -10,10 +10,10 @@
   </defs>
   <g>
     <rect x="20" y="10" width="266" height="10" fill="url(#grad1)"/>
-    <text x="10" y="16" alignment-baseline="middle" style="font-size: 13px">0</text>
-    <text x="286" y="16" alignment-baseline="middle" style="font-size: 13px">100</text>
+    <text x="20" y="32" alignment-baseline="middle" style="font-size: 13px">0</text>
+    <text x="266" y="32" alignment-baseline="middle" style="font-size: 13px">100</text>
   </g>
-  <g id="colorbar">
+  <g id="colorbar" transform="translate(0,10)">
     <rect id="cb1" x="20" y="30" width="38" height="10" fill="$cb_1" />
     <rect id="cb2" x="58" y="30" width="38" height="10" fill="$cb_2" />
     <rect id="cb3" x="96" y="30" width="38" height="10" fill="$cb_3" />
@@ -21,12 +21,13 @@
     <rect id="cb5" x="172" y="30" width="38" height="10" fill="$cb_5" />
     <rect id="cb6" x="210" y="30" width="38" height="10" fill="$cb_6" />
     <rect id="cb7" x="248" y="30" width="38" height="10" fill="$cb_7" />
-    <text x="10" y="48" alignment-baseline="middle" style="font-size: 13px">0</text>
-    <text x="58" y="48" alignment-baseline="middle" style="font-size: 13px">20</text>
-    <text x="120" y="48" alignment-baseline="middle" style="font-size: 13px">40</text>
-    <text x="174" y="48" alignment-baseline="middle" style="font-size: 13px">60</text>
-    <text x="234" y="48" alignment-baseline="middle" style="font-size: 13px">80</text>
-    <text x="286" y="48" alignment-baseline="middle" style="font-size: 13px">100</text>
+    <text x="37" y="52" alignment-baseline="middle" style="font-size: 13px">0</text>
+    <text x="67" y="52" alignment-baseline="middle" style="font-size: 13px">&lt;20</text>
+    <text x="105" y="52" alignment-baseline="middle" style="font-size: 13px">&lt;40</text>
+    <text x="143" y="52" alignment-baseline="middle" style="font-size: 13px">&lt;60</text>
+    <text x="180" y="52" alignment-baseline="middle" style="font-size: 13px">&lt;80</text>
+    <text x="215" y="52" alignment-baseline="middle" style="font-size: 13px">&lt;100</text>
+    <text x="257" y="52" alignment-baseline="middle" style="font-size: 13px">100</text>
   </g>
 
 </svg>
