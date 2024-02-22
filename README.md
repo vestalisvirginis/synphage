@@ -187,6 +187,7 @@ Field Name | Description | Default Value
 
 - ~~[x] create config options for the plot at run time~~
 - ~~[x] integrate the NCBI search~~
+- [ ] implement blastp 
 - [ ] create possibility to add ref sequence with special colour coding
 - [ ] create interactive plot 
 - [ ] Help us in a discussion?
