@@ -9,7 +9,7 @@ clean: # Remove workspace files
 	@rm -rf .coverage
 	@rm -rf .scannerwork
 	@rm -rf ./dist
-	@rm -rf test/fixtures/assets_testing_folder/ncbi_download/fetch
+	@rm -rf test/fixtures/assets_testing_folder/ncbi_download/fetch/download
 	@rm -rf test/fixtures/assets_testing_folder/sequence_quality/genbank
 	@rm -rf test/fixtures/assets_testing_folder/sequence_quality_with_history/genbank
 	@rm -rf test/fixtures/assets_testing_folder/blasting/gene_identity
