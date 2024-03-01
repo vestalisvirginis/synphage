@@ -8,15 +8,15 @@ def mock_env_ncbi_connect(monkeypatch):
 
 @pytest.fixture
 def mock_env_ncbi_download_pos(monkeypatch):
-    monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/positive")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/ncbi_download/positive")
 
 @pytest.fixture
 def mock_env_ncbi_download_neg(monkeypatch):
-    monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/negative")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/ncbi_download/negative")
 
 @pytest.fixture
 def mock_env_ncbi_fetch(monkeypatch):
-    monkeypatch.setenv("DATA_DIR", "test/fixtures/ncbi_download/fetch")
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/assets_testing_folder/ncbi_download/fetch")
 
 @pytest.fixture
 def mock_env_sequence_check(monkeypatch):

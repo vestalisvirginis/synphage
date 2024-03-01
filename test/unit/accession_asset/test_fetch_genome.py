@@ -1,4 +1,3 @@
-import pytest
 import os
 
 from pathlib import Path
@@ -55,7 +54,7 @@ ACCESSION_IDS = {
     "QueryTranslation": '("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]',
 }
 
-@pytest.mark.skip(reason="need to fix test with mock resource")
+#@pytest.mark.skip(reason="need to fix test with mock resource")
 def test_fetch_genome(mock_env_ncbi_fetch):
     _path = str(Path(os.getenv("DATA_DIR")) / "download")
     os.makedirs(_path, exist_ok=True)
@@ -68,7 +67,7 @@ def test_fetch_genome(mock_env_ncbi_fetch):
     )
     ids_asset_input = ACCESSION_IDS
     downloaded_asset_input = ["NZ_CP045811.1"]
-    config_input = QueryConfig()
+    config_input = QueryConfig(search_key='("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]')
     result = fetch_genome(
         context, ids_asset_input, downloaded_asset_input, config_input
     )
@@ -76,7 +75,7 @@ def test_fetch_genome(mock_env_ncbi_fetch):
     assert result == list(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
 
 
-@pytest.mark.skip(reason="need to fix test with mock resource")
+#@pytest.mark.skip(reason="need to fix test with mock resource")
 def test_fetch_genome_asset(mock_env_ncbi_fetch):
     @asset(name="accession_ids")
     def mock_upstream_ids():
@@ -88,7 +87,7 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
 
     @asset(name="setup_query_config")
     def mock_config_upstream():
-        return QueryConfig()
+        return QueryConfig(search_key='("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]')
 
     _path = str(Path(os.getenv("DATA_DIR")) / "download")
     os.makedirs(_path, exist_ok=True)
