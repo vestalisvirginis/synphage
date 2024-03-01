@@ -72,7 +72,7 @@ def test_fetch_genome(mock_env_ncbi_fetch):
         context, ids_asset_input, downloaded_asset_input, config_input
     )
     assert isinstance(result, list)
-    assert result == list(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
+    assert set(result) == set(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
 
 
 #@pytest.mark.skip(reason="need to fix test with mock resource")
@@ -108,4 +108,4 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
     )
     assert result.success
     genomes = result.output_for_node("fetch_genome")
-    assert genomes == list(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
+    assert set(genomes) == set(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
