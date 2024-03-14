@@ -36,8 +36,8 @@ TEMP_DIR = tempfile.gettempdir()
 
 
 # Job 1 -> get the list of genbank to blastn
-blasting_job = define_asset_job(
-    name="blasting_job",
+blast = define_asset_job(
+    name="blast",
     selection=AssetSelection.groups("Status")
     | (
         AssetSelection.groups("Blaster")
@@ -202,13 +202,13 @@ def transform():
 
 # Job 3 -> creates the synteny diagram
 
-synteny_job = define_asset_job(
-    name="synteny_job",
+plot = define_asset_job(
+    name="plot",
     selection=AssetSelection.groups("Viewer"),
 )
 
 
 # Job 4 -> download gb files from ncbi
-ncbi_download_job = define_asset_job(
-    name="ncbi_download_job", selection=AssetSelection.groups("NCBI_connect")
+download = define_asset_job(
+    name="download", selection=AssetSelection.groups("NCBI_connect")
 )

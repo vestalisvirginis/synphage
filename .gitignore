@@ -1,6 +1,7 @@
 # Environments
 .venv/
 .py310/
+.py311/
 
 # Development
 .vscode/
