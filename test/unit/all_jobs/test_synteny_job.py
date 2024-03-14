@@ -1,11 +1,11 @@
 from dagster import ExecuteInProcessResult, Definitions
 
-from synphage.jobs import synteny_job
+from synphage.jobs import plot
 
 
-def test_synteny_job():
-    defs = Definitions(jobs=[synteny_job])
-    result = defs.get_job_def("synteny_job").execute_in_process()
+def test_plot():
+    defs = Definitions(jobs=[plot])
+    result = defs.get_job_def("plot").execute_in_process()
     assert isinstance(result, ExecuteInProcessResult)
     assert result.success
 
