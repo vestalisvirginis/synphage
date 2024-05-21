@@ -8,6 +8,7 @@ version = "0.1.1"
 authors = [
   { name="Virginie Grosboillot", email="vestalisvirginis@gmail.com" },
 ]
+license = {file = "LICENSE"}
 description = "Python library for plotting synteny diagram for phage and bacterial sequences."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -33,15 +34,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+dev = [
+  "black==24.4.2",
+  "mypy",
+  "flake8",
+]
 test = [
   "pytest",
   "pytest-cov",
-  "black",
-  "mypy",
-  "flake8",
   "coverage",
 ]
-
+all = [
+  "synphage[dev,test]"
+]
 
 
 [project.urls]
