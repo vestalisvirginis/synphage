@@ -137,7 +137,9 @@ def genbank_to_fasta(context, standardised_ext_file) -> tuple[List[str], List[st
                                     _feature.qualifiers["gene"][0]
                                     if "gene" in _feature.qualifiers.keys()
                                     else "None",
-                                    _feature.qualifiers["locus_tag"][0],
+                                    _feature.qualifiers["locus_tag"][0]
+                                    if "locus_tag" in _feature.qualifiers.keys()
+                                    else "None",
                                     _feature.location,
                                     _seq_record.seq[
                                         _feature.location.start : _feature.location.end
