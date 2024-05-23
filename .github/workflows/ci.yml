@@ -40,12 +40,12 @@ jobs:
         name: codecov-umbrella
         verbose: true
 
-docs:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: 3.x
-    - run: pip install mkdocs-material mkdocstrings[python]
-    - run: mkdocs gh-deploy --force
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: pip install mkdocs-material mkdocstrings[python]
+      - run: mkdocs gh-deploy --force
