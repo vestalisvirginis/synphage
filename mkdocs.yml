@@ -1,0 +1,86 @@
+site_name: synphage
+repo_url:  https://github.com/vestalisvirginis/synphage
+repo_name: vestalisvirginis/synphage
+nav:
+  - Home: index.md
+  - Getting Started: short_guide.md
+  - User guide: 
+    - Installation: installation.md
+    - Running your jobs: jobs.md
+    - Configurations: configurations.md
+  - Step-by-step example: 
+    - Bacteriophage genomes: phages.md
+    - Plasmid sequences: plasmids.md
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes 
+    - navigation.footer
+    - navigation.tracking
+    - toc.follow
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-5
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-2
+        name: Switch to light mode
+#   icon:
+#     logo: material/marker-check
+markdown_extensions:
+  - tables
+  - admonition
+  - pymdownx.details  # coloured box
+  # - codehilite
+  # - pymdownx.highlight
+  - pymdownx.superfences:  # grey background zone behind code and tables
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+#   - pymdownx.keys
+#   - pymdownx.snippets
+  - pymdownx.tabbed:  # in-content tabs
+      alternate_style: true
+  - def_list
+  - attr_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+plugins:
+  - search
+  # - autorefs
+  # - mkdocstrings:
+  #     handlers:
+  #       python:
+  #         options:
+  #           docstring_style: google
+extra_css:
+  - stylesheets/extra.css
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/vestalisvirginis/synphage
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/vestalisvirginis/synphage
