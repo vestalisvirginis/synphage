@@ -12,12 +12,14 @@ We are looking forward to hearing from you!
 
 # Installation
 
-## Pre-requisite
+<a id="pip-install"></a>
+## Via pip 
+
+### Pre-requisite
 
 `synphage` relies on one non-python dependency, [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) >= 2.12.0, that need to be manually installed when synphage is installed with `pip`.
 
-<a id="pip-install"></a>
-## Via pip 
+### Install `synphage`
 
 `synphage`is available as a [Python package](https://pypi.org/project/synphage/) and can be install with the Python package manager `pip` in an opened terminal window.
 
@@ -34,6 +36,51 @@ We are looking forward to hearing from you!
     ```
 
 This will automatically install compatible versions of all Python dependencies.
+
+### Run `synphage`
+
+1. Environment variables
+
+    1. `synphage` uses the environment variable `DATA_DIR` to allow the user to specify a data directory.
+
+    ```bash
+    export DAGSTER_HOME=/dagster
+    ```
+
+    ???+ info
+        If no data directory is set, the data folder will be the temporary folder by default.
+        The current data directory can be checked in the [config panel](#dir-config)<a id="dir-config"></a> of the jobs. 
+
+    2. Set `EMAIL` and `API_KEY` environment variables (optional). These variables are only required if you want to use the `NCBI_download` job.
+    ```bash
+    export EMAIL=john.doe@domain.com
+    export API_KEY=gdzjdfzkhlh6832HBkh
+    ```
+
+    3. The environment variable DAGSTER_HOME
+
+   # To run dagster
+    ENV DAGSTER_HOME=/dagster
+    # File config
+    ENV DATA_DIR=/data
+2. Required files
+3. Start dagster 
+4. CMD ["dagster", "dev", "-h", "0.0.0.0", "-p", "3000", "-m", "synphage"]
+
+### Save your data
+
+### Stop
+
+### Keep your data
+
+# Create volumes
+VOLUME /data
+VOLUME /dagster
+
+
+
+
+
 
 <a id="docker-install"></a>
 ## Via docker 
@@ -108,31 +155,29 @@ In order to use `synphage` Docker Image, you first need to have docker installed
     6. In `Containers -> Files` : Drag and drop your genbank files in the `/data/genbank` directory of your running container
     ![Drag and drop genbank files](./images/dd_drag_and_drop_gb_files.png){align=right}
 
-    ???+ warning
-        The use of spaces and special characters in file names, might cause error downstream.
+        ???+ warning
+            The use of spaces and special characters in file names, might cause error downstream.
 
-    ???+ note
-        `.gb`and `.gbk` are both valid extension for genbank files
+        ???+ note
+            `.gb`and `.gbk` are both valid extension for genbank files
 
     7. For ploting add a `sequences.csv` file in the /data directory. Please use the file editor of the docker to check that the format of your file is according to the example below:
     ```txt
     168_SPbeta.gb,0
     Phi3T.gb,1
     ```
-
     Example of incorrectly formatted csv file (can happen when saved from excel):
     ![Incorrectly formatted csv file](./images/dd_csv_file_excel.png){align=right}
-
     Example of correctly formatted csv file:  
     ![Correctly formatted csv file](./images/dd_csv_file_correctly_formatted.png){align=right}
 
-    ???+ warning
-        Please here use **only** `.gb` as file extension.
+        ???+ warning
+            Please here use **only** `.gb` as file extension.
 
-    ???+ info
-        The integer after the comma represents the orientation of the sequence in the synteny diagram.
-        0 : sequence
-        1 : reverse
+        ???+ info
+            The integer after the comma represents the orientation of the sequence in the synteny diagram.
+            0 : sequence
+            1 : reverse
 
     8. Connect to the web interface
     ![Open the link to the web-interface](./images/dd_web_interface.png) 
@@ -144,16 +189,16 @@ In order to use `synphage` Docker Image, you first need to have docker installed
     The variables can be exported before starting the container or a .env file can be copied into the working directory.
 
         === "export"
-        ```bash
-        export EMAIL=john.doe@domain.com
-        export API_KEY=gdzjdfzkhlh6832HBkh
-        ```
+            ```bash
+            export EMAIL=john.doe@domain.com
+            export API_KEY=gdzjdfzkhlh6832HBkh
+            ```
 
         === ".env file"
-        ```text
-        EMAIL=john.doe@domain.com
-        API_KEY=gdzjdfzkhlh6832HBkh
-        ```
+            ```text
+            EMAIL=john.doe@domain.com
+            API_KEY=gdzjdfzkhlh6832HBkh
+            ```
 
         ???+ note
             Dagster will recognise and import environment variable from the .env file automatically.
@@ -198,3 +243,61 @@ In order to use `synphage` Docker Image, you first need to have docker installed
             1 : reverse
 
     5. Open localhost:3000 in your web-browser.
+
+
+### Save your data
+
+???+ warning
+    Before stopping the container, don't forget to save your data. You can easily download the folder containing the tables and the graph onto your computer.
+
+=== "Docker Desktop"
+
+    ![Save data generated in the container](./images/dd_save_data_folder.png){align=right}
+
+=== "Bash"
+
+    ```bash
+    docker cp container-id/data/* your_directory/
+    ```
+
+### Stop and remove your container:
+
+At the end of your work you can stop and remove your container:
+
+=== "Docker Desktop"
+    ![Stop container](./images/dd_stop_container.png) 
+
+    ![Remove container](./images/dd_rm_container.png) 
+
+=== "Bash"
+
+    ```bash
+    docker stop <container-id>
+    docker rm <container-id>
+    ```
+
+### Keep your data 
+
+In order to keep your data and be able to re-use them, for example re-used previously computed sequences and create new plots, you can create volumes.
+
+=== "Docker Desktop"
+    1. Create volume  
+        ![Create volumes](./images/dd_volumes.png) 
+
+    2. Connect your volume to the docker volume when starting your container.
+    ![Attache volume to container volume](./images/dd_optional_settings_2.png) 
+
+=== "Bash"
+
+    1. Create volume  
+    ``` bash
+    docker volume create synphage_volume
+    ```
+    2. Connect your volume to the docker volume when starting your container.
+    ```bash
+    docker run -d --rm --name my_phage_box -v synphage_volume:/data -p 3000:3000 vestalisvirginis/synphage:latest
+    ```
+
+???+ info
+
+    A volume can also be created for dagster in order to keep a trace of your previous run. In this case the corresponding volume in the container is `/dagster`.
