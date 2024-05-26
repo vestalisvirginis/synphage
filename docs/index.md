@@ -2,7 +2,7 @@
 
 `synphage` is a pipeline to create phage genome synteny graphics from genbank files
 
-This library provides an intuitive toolzz to create synteny graphics highlighting the conserved genes between multiple genome sequences.  
+This library provides an intuitive tool to create synteny graphics highlighting the conserved genes between multiple genome sequences.  
 This tool is primarily designed to work with phage genomes or other short sequences of interest, although it works with bacterial genomes as well.
 
 Despite numerous synteny tools available on the market, this tool has been conceived because none of the available tools allows to visualise gene conservation in multiple sequences at one glance (as typically cross-links are drawn only between two consecutive sequences for a better readability).
