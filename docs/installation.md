@@ -1,15 +1,3 @@
-# Coming Soon
-
-We’re working hard to make this page available by the end of June! 
-
-Until then we look forward to your questions and feedbacks using the [Discussions](https://github.com/vestalisvirginis/synphage/discussions) or the [Issues](https://github.com/vestalisvirginis/synphage/issues) pages.  
-Please follow the [How to contribute?](https://github.com/vestalisvirginis/synphage/blob/main/CONTRIBUTING.md) guidelines for any contribution to this project!
-
-We are looking forward to hearing from you!
-
-
-
-
 # Installation
 
 <a id="pip-install"></a>
@@ -43,43 +31,64 @@ This will automatically install compatible versions of all Python dependencies.
 
     1. `synphage` uses the environment variable `DATA_DIR` to allow the user to specify a data directory.
 
-    ```bash
-    export DAGSTER_HOME=/dagster
-    ```
+        ```bash
+        export DATA_DIR=/path_to_data
+        ```
 
-    ???+ info
-        If no data directory is set, the data folder will be the temporary folder by default.
-        The current data directory can be checked in the [config panel](#dir-config)<a id="dir-config"></a> of the jobs. 
+        ???+ info
+            If no data directory is set, the data folder will be the temporary folder by default.
+            The current data directory can be checked in the [config panel](#dir-config)<a id="dir-config"></a> of the jobs. 
 
     2. Set `EMAIL` and `API_KEY` environment variables (optional). These variables are only required if you want to use the `NCBI_download` job.
+   
+        ```bash
+        export EMAIL=john.doe@domain.com
+        export API_KEY=gdzjdfzkhlh6832HBkh
+        ```
+
+    3. Optional. Set the environment variable DAGSTER_HOME to keep track of the previous run and generated assets.
+   
+        ```bash
+        export DAGSTER_HOME=/dagster
+        ```
+
+2. Copy genbank files in the `/genbank/` directory of you `DATA_DIR`
     ```bash
-    export EMAIL=john.doe@domain.com
-    export API_KEY=gdzjdfzkhlh6832HBkh
+    cp path_to_my_gb_files/*.gb /<path_to_data>/genbank/
     ```
 
-    3. The environment variable DAGSTER_HOME
+    ???+ warning
+        The use of spaces and special characters in file names, might cause error downstream.
 
-   # To run dagster
-    ENV DAGSTER_HOME=/dagster
-    # File config
-    ENV DATA_DIR=/data
-2. Required files
-3. Start dagster 
-4. CMD ["dagster", "dev", "-h", "0.0.0.0", "-p", "3000", "-m", "synphage"]
+    ???+ note
+        `.gb`and `.gbk` are both valid extension for genbank files
 
-### Save your data
+3. For ploting add a sequences.csv file in the /data directory. Format your file according to the example below:
+    ```txt
+    168_SPbeta.gb,0
+    Phi3T.gb,1
+    ```
+    ```bash
+    # Create file
+    touch sequences.csv
+    # Edit file
+    vim sequences.csv
+    # Copy file to the /data directory
+    docker cp path_to_file/sequences.csv /data/
+    ```
 
-### Stop
+    ???+ warning
+        Please here use **only** `.gb` as file extension.
 
-### Keep your data
+    ???+ info
+        The integer after the comma represents the orientation of the sequence in the synteny diagram.
+        0 : sequence
+        1 : reverse
 
-# Create volumes
-VOLUME /data
-VOLUME /dagster
-
-
-
-
+4. Start dagster and synphage
+    ```bash
+    dagster dev -h 0.0.0.0 -p 3000 -m synphage
+    ```
 
 
 <a id="docker-install"></a>
