@@ -54,3 +54,4 @@ __pypackages__/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+site/
