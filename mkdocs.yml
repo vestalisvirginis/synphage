@@ -1,6 +1,15 @@
+# Project information
 site_name: synphage
+site_url: https://vestalisvirginis.github.io/synphage/
+site_author: Virginie Grosboillot
+site_description: >-
+  Documentation of synphage, a pipeline to create phage genome synteny graphics from genbank files
+
+# Repository
 repo_url:  https://github.com/vestalisvirginis/synphage
 repo_name: vestalisvirginis/synphage
+
+# Page tree
 nav:
   - Home: index.md
   - Getting Started: short_guide.md
@@ -11,6 +20,8 @@ nav:
   - Step-by-step example: 
     - Bacteriophage genomes: phages.md
     - Plasmid sequences: plasmids.md
+
+# Configuration
 theme:
   name: material
   features:
