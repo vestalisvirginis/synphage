@@ -25,6 +25,7 @@
 
 This will automatically install compatible versions of all Python dependencies.
 
+<a id="run-synphage-pip"></a>
 ### Run `synphage`
 
 1. Environment variables
@@ -36,8 +37,9 @@ This will automatically install compatible versions of all Python dependencies.
         ```
 
         ???+ info
-            If no data directory is set, the data folder will be the temporary folder by default.
-            The current data directory can be checked in the [config panel](#dir-config)<a id="dir-config"></a> of the jobs. 
+            - If no data directory is set, the data folder will be the temporary folder by default.
+            The current data directory can be checked in the [config panel](#dir-config)<a id="dir-config"></a> of the jobs.  
+            - This directory contains all the data generated during the run as well as the genbank files and sequences.csv file added by the user.  
 
     2. Set `EMAIL` and `API_KEY` environment variables (optional). These variables are only required if you want to use the `NCBI_download` job.
    
@@ -51,6 +53,10 @@ This will automatically install compatible versions of all Python dependencies.
         ```bash
         export DAGSTER_HOME=/dagster
         ```
+
+        ???+ info
+            This directory contains the information linked to the run of the pipeline. In order to keep the information about previous runs when working in the same project, it is advice to connect a volume to it otherwise information will be wiped out when the container is removed.
+
 
 2. Copy genbank files in the `/genbank/` directory of you `DATA_DIR`
     ```bash
@@ -143,7 +149,8 @@ In order to use `synphage` Docker Image, you first need to have docker installed
     ```
     It will download the latest image. If a former version is desired, reeplace latest by version tag (e.g. `0.0.6`).
 
-### Run `synphage` container
+<a id="run-synphage-container"></a>
+### Run `synphage` container 
 
 === "Docker Desktop"
     1. Start the container
@@ -285,9 +292,18 @@ At the end of your work you can stop and remove your container:
     docker rm <container-id>
     ```
 
-### Keep your data 
+### Keep your data
 
-In order to keep your data and be able to re-use them, for example re-used previously computed sequences and create new plots, you can create volumes.
+???+ info
+
+    The container has two volumes. 
+
+    `/dagster` : which contain the information linked to the run of the pipeline. In order to keep the information about previous runs when working in the same project, it is advice to connect a volume to it otherwise information will be wiped out when the container is removed.
+
+    `/data` : which contains all the data generated during the run as well as the genbank files and sequences.csv file added by the user.
+
+
+In order to keep your data and be able to re-use them, for example re-used previously computed sequences and create new plots, you can create `Volumes` to attached to the container.  
 
 === "Docker Desktop"
     1. Create volume  
