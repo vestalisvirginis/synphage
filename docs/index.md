@@ -1,5 +1,7 @@
 # Welcome to `synphage` documentation
 
+Testing the workflow with site_url.
+
 `synphage` is a pipeline to create phage genome synteny graphics from genbank files
 
 This library provides an intuitive tool to create synteny graphics highlighting the conserved genes between multiple genome sequences.  
