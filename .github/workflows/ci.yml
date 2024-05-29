@@ -1,4 +1,4 @@
-name: build n' deploy MkDocs to GitHub page
+name: ci
 on:
   push:
     branches:
