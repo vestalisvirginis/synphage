@@ -1,66 +1,44 @@
-name: ci
+name: ci 
 on:
   push:
     branches:
       - main
-    paths:
-      - "docs/**"
-      - mkdocs.yml
+
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-      - name: install mkdocs
-        run: pip install mkdocs-material mkdocstrings[python]
-      - name: deploy mkdocs
-        run: mkdocs gh-deploy --force --clean --verboses  
-
-
-# name: ci 
-# on:
-#   push:
-#     branches:
-#       - main
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: 'actions/checkout@v3'
-#     - name: Setup ncbi-blast+
-#       run: |
-#         sudo apt update
-#         sudo apt install ncbi-blast+ -y
-#     - name: Setup Python
-#       uses: actions/setup-python@master
-#       with:
-#         python-version: 3.9
-#     - name: Generate coverage report
-#       run: |
-#         pip install --upgrade pip
-#         pip install '.[test]'
-#         coverage run -m pytest test/unit
-#         coverage xml -o coverage.xml
-#       env:
-#         DATA_DIR: ${{ env.DATA_DIR }}
-#         FILE_SYSTEM: ${{ env.FILE_SYSTEM }}
-#         EMAIL: ${{ secrets.EMAIL }}
-#         API_KEY: ${{ secrets.API_KEY }}
-#     - name: Upload coverage reports to Codecov
-#       uses: codecov/codecov-action@v3
-#       with:
-#         token: ${{ secrets.CODECOV_TOKEN }}
-#         directory: .
-#         env_vars: OS,PYTHON
-#         fail_ci_if_error: true
-#         files: coverage.xml
-#         flags: unittests
-#         name: codecov-umbrella
-#         verbose: true
+    - uses: 'actions/checkout@v3'
+    - name: Setup ncbi-blast+
+      run: |
+        sudo apt update
+        sudo apt install ncbi-blast+ -y
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: Generate coverage report
+      run: |
+        pip install --upgrade pip
+        pip install '.[test]'
+        coverage run -m pytest test/unit
+        coverage xml -o coverage.xml
+      env:
+        DATA_DIR: ${{ env.DATA_DIR }}
+        FILE_SYSTEM: ${{ env.FILE_SYSTEM }}
+        EMAIL: ${{ secrets.EMAIL }}
+        API_KEY: ${{ secrets.API_KEY }}
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: .
+        env_vars: OS,PYTHON
+        fail_ci_if_error: true
+        files: coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        verbose: true
 
   # docs:
   #   runs-on: ubuntu-latest
@@ -72,4 +50,26 @@ jobs:
   #     - run: pip install mkdocs-material mkdocstrings[python]
   #     - run: mkdocs build
   #     - run: mkdocs gh-deploy --force
+
+
+# name: ci
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - "docs/**"
+#       - mkdocs.yml
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-python@v5
+#         with:
+#           python-version: 3.x
+#       - name: install mkdocs
+#         run: pip install mkdocs-material mkdocstrings[python]
+#       - name: deploy mkdocs
+#         run: mkdocs gh-deploy --force --clean --verboses  
 
