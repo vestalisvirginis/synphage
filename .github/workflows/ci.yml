@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+permissions:
+  contents: write
 
 jobs:
   test:
@@ -39,6 +41,7 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         verbose: true
+
 
   # docs:
   #   runs-on: ubuntu-latest
