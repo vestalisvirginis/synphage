@@ -3,6 +3,9 @@ from dagster import (
     Field,
     EnvVar,
     AssetOut,
+    AssetCheckResult,
+    AssetCheckSpec,
+    Output,
 )
 
 import os
@@ -67,6 +70,9 @@ folder_config = {
         ),
     },
     compute_kind="Python",
+    check_specs=[
+        AssetCheckSpec(name="found_genbank_files", asset="list_genbank_files")
+    ],
 )
 def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
     # List files in the genbank directory
@@ -90,7 +96,13 @@ def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
     # process new files
     _new_files = []
     _new_paths = []
-    for _file in glob.glob(str(Path(_gb_path) / "*.gb*")):
+
+    _glob_files = glob.glob(str(Path(_gb_path) / "*.gb*"))
+    _files_found = len(_glob_files) > 0
+
+    yield AssetCheckResult(passed=_files_found, check_name="found_genbank_files")
+
+    for _file in _glob_files:
         if Path(_file).stem not in _files:
             context.log.info(f"The following file is being processed: {_file}")
             _new_path = _standardise_file_extention(_file)
@@ -104,7 +116,26 @@ def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
 
     # Asset metadata
     _time = datetime.now()
-    context.add_output_metadata(
+    # context.add_output_metadata(
+    #     output_name="standardised_ext_file",
+    #     metadata={
+    #         "text_metadata": f"New genbank files have been processed {_time.isoformat()} (UTC).",
+    #         "file_location": _gb_path,
+    #         "num_files": len(_new_files),
+    #         "file_preview": _new_files,
+    #     },
+    # )
+    # context.add_output_metadata(
+    #     output_name="list_genbank_files",
+    #     metadata={
+    #         "text_metadata": f"Last update of the genbank list {_time.isoformat()} (UTC).",
+    #         "file_location": _hist_gb_path,
+    #         "num_files": len(_files),
+    #         "updated_list": _files,
+    #     },
+    # )
+    yield Output(
+        value=_new_paths,
         output_name="standardised_ext_file",
         metadata={
             "text_metadata": f"New genbank files have been processed {_time.isoformat()} (UTC).",
@@ -113,7 +144,8 @@ def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
             "file_preview": _new_files,
         },
     )
-    context.add_output_metadata(
+    yield Output(
+        value=_files,
         output_name="list_genbank_files",
         metadata={
             "text_metadata": f"Last update of the genbank list {_time.isoformat()} (UTC).",
@@ -122,4 +154,3 @@ def list_genbank_files(context) -> tuple[List[PosixPath], List[str]]:
             "updated_list": _files,
         },
     )
-    return _new_paths, _files
