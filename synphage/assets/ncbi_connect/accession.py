@@ -1,4 +1,4 @@
-from dagster import asset, AssetObservation, EnvVar, Config, ConfigArgumentWarning
+from dagster import asset, AssetObservation, Config, ConfigArgumentWarning
 from pydantic import Field
 
 import os
@@ -13,7 +13,7 @@ from synphage.synphage_settings import DOWNLOAD_DIR
 warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
 
 
-class QueryConfig(Config):
+class QueryConfig(Config):  # type: ignore[misc] # should be ok in 1.8 version of Dagster
     search_key: str = Field(
         default="Myoalterovirus", description="Keyword(s) for NCBI query"
     )
@@ -50,8 +50,8 @@ def accession_count(context, setup_query_config: QueryConfig) -> int:
     _result = context.resources.ncbi_connection.conn.read(_query)
     _query.close()
     # Extract number of record for keyword
-    _num_rows = int(_result['Count'])
-    _ncbi_query = _result['QueryTranslation']
+    _num_rows = int(_result["Count"])
+    _ncbi_query = _result["QueryTranslation"]
     context.log_event(
         AssetObservation(asset_key="accession_count", metadata={"num_rows": _num_rows})
     )
@@ -159,7 +159,7 @@ def fetch_genome(
     _new_download = []
     count = 0
     for _entry in list(_C):
-        count +=1
+        count += 1
         context.log.info(f"Downloading {_entry}, ({count/len(_C)})")
         _r = context.resources.ncbi_connection.conn.efetch(
             db=setup_query_config.database,
@@ -174,9 +174,9 @@ def fetch_genome(
         _new_download.append(_file_name)
         with open(_file_name, "w") as _writer:
             _writer.write(_r.read())
-        context.log.info(f"Done")
+        context.log.info("Done")
 
-    context.log.info(f"Download completed successfully!")
+    context.log.info("Download completed successfully!")
     _all_ids = _B.union(_A)
     _genomes = list(map(lambda x: str(Path(_download_path) / f"{x}.gb"), _all_ids))
 

@@ -5,24 +5,21 @@ import shutil
 import pickle
 
 from pathlib import Path
-from typing import List
 from collections import namedtuple
 
 from synphage.synphage_settings import FILESYSTEM_DIR, GENBANK_DIR
 
 DownloadRecord = namedtuple("DownloadRecord", "new,history")
 
+
 @asset(
-description="Transfer new downloaded files to the genbank folder and harmonise naming of the files",
-compute_kind="Python",
-metadata={"owner": "Virginie Grosboillot"},
+    description="Transfer new downloaded files to the genbank folder and harmonise naming of the files",
+    compute_kind="Python",
+    metadata={"owner": "Virginie Grosboillot"},
 )
 def download_to_genbank(context, fetch_genome) -> DownloadRecord:
     # Check if history of transferred files
-    _path_history = (
-        Path(FILESYSTEM_DIR)
-        / "download_to_genbank"
-    )
+    _path_history = Path(FILESYSTEM_DIR) / "download_to_genbank"
 
     if os.path.exists(_path_history):
         _history_files = pickle.load(open(_path_history, "rb")).history

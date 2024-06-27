@@ -6,7 +6,5 @@ from dagster import FilesystemIOManager
 
 RESOURCES_LOCAL = {
     "ncbi_connection": ncbi_resource,
-    "io_manager": FilesystemIOManager(
-        base_dir=FILESYSTEM_DIR
-    ),
+    "io_manager": FilesystemIOManager(base_dir=FILESYSTEM_DIR),
 }
