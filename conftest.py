@@ -29,12 +29,12 @@ def mock_env_ncbi_fetch(monkeypatch):
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/ncbi_download/fetch")
 
 @pytest.fixture
-def mock_env_sequence_check(monkeypatch):
-    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/sequence_quality")
+def mock_env_download_to_genbank(monkeypatch):
+    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/download_to_genbank")
 
 @pytest.fixture
-def mock_env_sequence_check_with_history(monkeypatch):
-    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/sequence_quality_with_history")
+def mock_env_download_to_genbank_with_history(monkeypatch):
+    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/download_to_genbank_with_history")
 
 @pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):

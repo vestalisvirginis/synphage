@@ -7,19 +7,20 @@ import pickle
 from pathlib import Path
 from collections import namedtuple
 
-from synphage.synphage_settings import FILESYSTEM_DIR, GENBANK_DIR
 
 DownloadRecord = namedtuple("DownloadRecord", "new,history")
 
 
 @asset(
+    required_resource_keys={"local_resource"},
     description="Transfer new downloaded files to the genbank folder and harmonise naming of the files",
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
 def download_to_genbank(context, fetch_genome) -> DownloadRecord:
     # Check if history of transferred files
-    _path_history = Path(FILESYSTEM_DIR) / "download_to_genbank"
+    fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
+    _path_history = Path(fs) / "download_to_genbank"
 
     if os.path.exists(_path_history):
         _history_files = pickle.load(open(_path_history, "rb")).history
@@ -33,7 +34,7 @@ def download_to_genbank(context, fetch_genome) -> DownloadRecord:
     context.log.info(f"Number of genomes to transfer: {len(_T)}")
 
     # Path to genbank folder
-    _gb_path = GENBANK_DIR
+    _gb_path = context.resources.local_resource.get_paths()["GENBANK_DIR"]
     os.makedirs(_gb_path, exist_ok=True)
 
     # Harmonise file name
@@ -44,8 +45,11 @@ def download_to_genbank(context, fetch_genome) -> DownloadRecord:
             _file,
             _output_file,
         )
+        context.log.info(f"{_file} transferred")
         _new_transfer.append(Path(_output_file).name)
         _history_files.append(_file)
+
+    context.log.info("Transfer completed")
 
     context.add_output_metadata(
         metadata={
