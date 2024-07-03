@@ -1,4 +1,3 @@
-import pytest
 import os
 
 from dagster import materialize_to_memory, build_asset_context, asset
@@ -7,8 +6,6 @@ from synphage.assets.ncbi_connect.accession import accession_count, QueryConfig
 from synphage.resources.ncbi_resource import NCBIConnection
 
 
-
-@pytest.mark.skip(reason="Error with connection to the database")
 def test_accession_count():
     context = build_asset_context(
         resources={
@@ -23,8 +20,6 @@ def test_accession_count():
     assert result == 2
 
 
-
-@pytest.mark.skip(reason="Error with connection to the database")
 def test_accession_count_asset():
     @asset(name="setup_query_config")
     def mock_upstream():
@@ -49,8 +44,6 @@ def test_accession_count_asset():
             assert v.text == "Myoalterovirus"
 
 
-
-@pytest.mark.skip(reason="Error with connection to the database")
 def test_accession_count_asset_with_search_key():
     @asset(name="setup_query_config")
     def mock_upstream():
