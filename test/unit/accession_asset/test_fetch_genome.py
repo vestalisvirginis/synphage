@@ -5,6 +5,7 @@ from dagster import materialize_to_memory, build_asset_context, asset
 
 from synphage.assets.ncbi_connect.accession import fetch_genome, QueryConfig
 from synphage.resources.ncbi_resource import NCBIConnection
+from synphage.resources.local_resource import InputOutputConfig
 
 
 ACCESSION_IDS = {
@@ -54,29 +55,43 @@ ACCESSION_IDS = {
     "QueryTranslation": '("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]',
 }
 
-#@pytest.mark.skip(reason="need to fix test with mock resource")
+
 def test_fetch_genome(mock_env_ncbi_fetch):
-    _path = str(Path(os.getenv("DATA_DIR")) / "download")
-    os.makedirs(_path, exist_ok=True)
+    # set path for downstream validation
+    _path = Path(os.getenv("OUTPUT_DIR")) / "download"
+    # run validation
     context = build_asset_context(
         resources={
             "ncbi_connection": NCBIConnection(
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
-            )
+            ),
+            "local_resource": InputOutputConfig(
+                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+            ),
         }
     )
     ids_asset_input = ACCESSION_IDS
     downloaded_asset_input = ["NZ_CP045811.1"]
-    config_input = QueryConfig(search_key='("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]')
+    config_input = QueryConfig(
+        search_key='("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]'
+    )
     result = fetch_genome(
         context, ids_asset_input, downloaded_asset_input, config_input
     )
     assert isinstance(result, list)
-    assert set(result) == set(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
+    physical_files = list(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
+    assert len(result) == len(physical_files)
+    for file in result:
+        assert (
+            file in physical_files
+        ), "File {file} is not present in the download folder."
 
 
-#@pytest.mark.skip(reason="need to fix test with mock resource")
 def test_fetch_genome_asset(mock_env_ncbi_fetch):
+    # set path for downstream validation
+    _path = str(Path(os.getenv("OUTPUT_DIR")) / "download")
+
+    # run validation
     @asset(name="accession_ids")
     def mock_upstream_ids():
         return ACCESSION_IDS
@@ -87,10 +102,9 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
 
     @asset(name="setup_query_config")
     def mock_config_upstream():
-        return QueryConfig(search_key='("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]')
-
-    _path = str(Path(os.getenv("DATA_DIR")) / "download")
-    os.makedirs(_path, exist_ok=True)
+        return QueryConfig(
+            search_key='("Bacillus subtilis"[Organism] OR Bacillus subtilis[All Fields]) AND strain[All Fields] AND P9_B1[All Fields]'
+        )
 
     assets = [
         fetch_genome,
@@ -103,9 +117,17 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
         resources={
             "ncbi_connection": NCBIConnection(
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
-            )
+            ),
+            "local_resource": InputOutputConfig(
+                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+            ),
         },
     )
     assert result.success
     genomes = result.output_for_node("fetch_genome")
-    assert set(genomes) == set(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
+    physical_files = list(map(lambda x: f"{_path}/{x}.gb", ACCESSION_IDS["IdList"]))
+    assert len(genomes) == len(physical_files)
+    for file in genomes:
+        assert (
+            file in physical_files
+        ), "File {file} is not present in the download folder."

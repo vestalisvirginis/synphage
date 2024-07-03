@@ -26,7 +26,6 @@ def mock_env_ncbi_download_neg(monkeypatch):
 
 @pytest.fixture
 def mock_env_ncbi_fetch(monkeypatch):
-    monkeypatch.chdir('test/fixtures/assets_testing_folder/ncbi_download/fetch')
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/ncbi_download/fetch")
 
 @pytest.fixture
