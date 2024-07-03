@@ -1,10 +1,18 @@
+from .local_resource import InputOutputConfig, LocalFilesystemIOManager
 from .ncbi_resource import ncbi_resource
-from synphage.synphage_settings import FILESYSTEM_DIR
 
-from dagster import FilesystemIOManager
+import os
+
+
+init_local_io_manager = LocalFilesystemIOManager(
+    input_dir=str(os.getenv("DATA_DIR")), output_dir=str(os.getenv("OUTPUT_DIR"))
+)
 
 
 RESOURCES_LOCAL = {
+    "local_resource": InputOutputConfig(
+        input_dir=str(os.getenv("DATA_DIR")), output_dir=str(os.getenv("OUTPUT_DIR"))
+    ),
     "ncbi_connection": ncbi_resource,
-    "io_manager": FilesystemIOManager(base_dir=FILESYSTEM_DIR),
+    "io_manager": init_local_io_manager.get_io_manager(),
 }
