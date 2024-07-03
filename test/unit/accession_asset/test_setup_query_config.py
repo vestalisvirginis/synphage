@@ -1,6 +1,4 @@
-import os
-
-from dagster import materialize_to_memory, build_asset_context, asset, RunConfig
+from dagster import materialize_to_memory, RunConfig
 
 from synphage.assets.ncbi_connect.accession import setup_query_config, QueryConfig
 
