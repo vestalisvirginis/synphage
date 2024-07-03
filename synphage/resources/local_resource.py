@@ -3,7 +3,7 @@ import tempfile
 
 from pathlib import Path
 from dagster import ConfigurableResource, FilesystemIOManager
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -17,14 +17,14 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
         description="Path to the output directory. If not set, it will be defaulted to the temp dir."
     )
 
-    @validator("input_dir")
-    def data_dir_exists(cls, v) -> str:
+    @field_validator("input_dir")
+    def data_dir_exists(cls, v: str) -> str:
         if "DATA_DIR" not in os.environ:
             return TEMP_DIR
         return v
 
-    @validator("output_dir")
-    def output_dir_exists(cls, v) -> str:
+    @field_validator("output_dir")
+    def output_dir_exists(cls, v: str) -> str:
         if "OUTPUT_DIR" not in os.environ:
             return TEMP_DIR
         return v
