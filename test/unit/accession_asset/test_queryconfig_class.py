@@ -11,7 +11,6 @@ def test_queryconfig_class():
     assert hasattr(configuration, "use_history")
     assert hasattr(configuration, "idtype")
     assert hasattr(configuration, "rettype")
-    assert hasattr(configuration, "download_dir")
 
 
 @pytest.mark.parametrize(
@@ -25,7 +24,6 @@ def test_queryconfig_class():
                 "use_history": "y",
                 "idtype": "acc",
                 "rettype": "gb",
-                "download_dir": "download",
             },
         ],
         [
@@ -35,7 +33,6 @@ def test_queryconfig_class():
                 use_history="No",
                 idtype="id",
                 rettype="fasta",
-                download_dir="d_dir",
             ),
             {
                 "search_key": "AAA",
@@ -43,7 +40,6 @@ def test_queryconfig_class():
                 "use_history": "No",
                 "idtype": "id",
                 "rettype": "fasta",
-                "download_dir": "d_dir",
             },
         ],
     ],

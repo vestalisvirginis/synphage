@@ -7,8 +7,6 @@ import warnings
 from typing import List
 from pathlib import Path
 
-from synphage.synphage_settings import DOWNLOAD_DIR
-
 
 warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
 
@@ -113,6 +111,7 @@ def accession_ids(context, accession_count, setup_query_config: QueryConfig) -> 
 
 
 @asset(
+    required_resource_keys={"local_resource"},
     description="In case of multiple searches, check what sequences have already been downloaded.",
     compute_kind="python",
     io_manager_key="io_manager",
@@ -120,7 +119,7 @@ def accession_ids(context, accession_count, setup_query_config: QueryConfig) -> 
 )
 def downloaded_genomes(context) -> List[str]:
     # Download directory
-    _download_path = DOWNLOAD_DIR
+    _download_path = context.resources.local_resource.get_paths()["DOWNLOAD_DIR"]
     os.makedirs(_download_path, exist_ok=True)
     # List file in download directory
     _downloaded_files = list(map(lambda x: Path(x).stem, os.listdir(_download_path)))
@@ -138,7 +137,7 @@ def downloaded_genomes(context) -> List[str]:
 
 
 @asset(
-    required_resource_keys={"ncbi_connection"},
+    required_resource_keys={"ncbi_connection", "local_resource"},
     description="Download records one by one from the ncbi database",
     compute_kind="NCBI",
     io_manager_key="io_manager",
@@ -153,7 +152,7 @@ def fetch_genome(
     _C = _A.difference(_B)
     context.log.info(f"Number of files NOT downloaded: {len(_C)}")
     # Path to download
-    _download_path = DOWNLOAD_DIR
+    _download_path = context.resources.local_resource.get_paths()["DOWNLOAD_DIR"]
     context.log.info(f"Download in process to: {_download_path}")
     # Fetch and write files
     _new_download = []
