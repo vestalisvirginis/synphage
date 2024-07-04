@@ -15,6 +15,7 @@ DownloadRecord = namedtuple("DownloadRecord", "new,history")
     required_resource_keys={"local_resource"},
     description="Transfer new downloaded files to the genbank folder and harmonise naming of the files",
     compute_kind="Python",
+    io_manager_key="io_manager",
     metadata={"owner": "Virginie Grosboillot"},
 )
 def download_to_genbank(context, fetch_genome) -> DownloadRecord:
