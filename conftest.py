@@ -37,6 +37,21 @@ def mock_env_download_to_genbank_with_history(monkeypatch):
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/download_to_genbank_with_history")
 
 @pytest.fixture
+def mock_env_users_to_genbank(monkeypatch):
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/user_data_transfer/user_data")
+    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/user_data_transfer/data")
+
+@pytest.fixture
+def mock_env_users_to_genbank_with_history(monkeypatch):
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/user_data_transfer/user_data")
+    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/user_data_transfer/data_with_history")
+
+@pytest.fixture
+def mock_env_users_to_genbank_empty_dir(monkeypatch):
+    monkeypatch.setenv("DATA_DIR", "test/fixtures/user_data_transfer")
+    monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/user_data_transfer/data")
+
+@pytest.fixture
 def mock_env_phagy_dir_blasting(monkeypatch):
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/assets_testing_folder/blasting")
 

@@ -2,6 +2,7 @@ from dagster import Definitions
 
 from .assets import (
     ncbi_connect_assets,
+    user_input_assets,
     blaster_assets,
     viewer_assets,
     status_assets,
@@ -14,6 +15,7 @@ from .resources import RESOURCES_LOCAL
 
 all_assets = [
     *ncbi_connect_assets,
+    *user_input_assets,
     *blaster_assets,
     *viewer_assets,
     *status_assets,
