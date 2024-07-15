@@ -1,217 +1,103 @@
-from dagster import (
-    asset,
-    Field,
-    multi_asset,
-    AssetOut,
-    EnvVar,
-)
+from dagster import asset
 
 import os
 import pickle
-import tempfile
+import polars as pl
 
-from Bio import SeqIO
 from pathlib import Path
-from datetime import datetime
 from typing import List
+from collections import namedtuple
 
 
-TEMP_DIR = tempfile.gettempdir()
-
-
-folder_config = {
-    "fs": Field(
-        str,
-        description="Path to folder containing the file system files",
-        default_value="fs",
-    ),
-    "genbank_dir": Field(
-        str,
-        description="Path to folder containing the genbank files",
-        default_value="genbank",
-    ),
-    "fasta_dir": Field(
-        str,
-        description="Path to folder containing the fasta files",
-        default_value=str(Path("gene_identity") / "fasta"),
-    ),
-    "blast_db_dir": Field(
-        str,
-        description="Path to folder containing the database for the blastn",
-        default_value=str(Path("gene_identity") / "blastn_database"),
-    ),
-    "blastn_dir": Field(
-        str,
-        description="Path to folder containing the blastn json files",
-        default_value=str(Path("gene_identity") / "blastn"),
-    ),
-}
-
-
-def _assess_file_content(genome) -> bool:
-    """Assess wether the genbank file contains gene or only CDS"""
-
-    gene_count = 0
-    gene_value = False
-    for feature in genome.features:
-        if feature.type == "gene":
-            gene_count = gene_count + 1
-            if gene_count > 1:
-                gene_value = True
-                break
-
-    return gene_value
-
-
-@multi_asset(
-    config_schema=folder_config,
-    outs={
-        "new_fasta_files": AssetOut(
-            is_required=True,
-            description="""Return the path for last created fasta files. Parse genebank file and create a file containing every genes in the fasta format.
-            Note: The sequence start and stop indexes are `-1` on the fasta _file 1::10  --> [0:10] included/excluded.""",
-            io_manager_key="io_manager",
-            metadata={
-                "owner": "Virginie Grosboillot",
-            },
-        ),
-        "history_fasta_files": AssetOut(
-            is_required=True,
-            description="Update the list of sequences available in the fasta folder",
-            io_manager_key="io_manager",
-            metadata={
-                "owner": "Virginie Grosboillot",
-            },
-        ),
-    },
-    compute_kind="Biopython",
-)
-def genbank_to_fasta(context, standardised_ext_file) -> tuple[List[str], List[str]]:
-    # Paths to read from and store the data
-    _path_fasta = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["fasta_dir"]
-    )
-
-    _path_history = (
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
-        / context.op_config["fs"]
-        / "history_fasta_files"
-    )
-
-    # fasta_history
-    if os.path.exists(_path_history):
-        _fasta_files = pickle.load(open(_path_history, "rb"))
-        context.log.info("Fasta history loaded")
-    else:
-        _fasta_files = []
-        context.log.info("No fasta history")
-
-    context.log.info(f"Path to fasta files: {_path_fasta}")
-    os.makedirs(_path_fasta, exist_ok=True)
-
-    _new_fasta_files = []
-    _new_fasta_paths = []
-    for _file in standardised_ext_file:
-        if Path(_file).stem not in _fasta_files:
-            context.log.info(f"The following file {_file} is being processed")
-
-            # Genbank to fasta
-            _output_dir = str(Path(_path_fasta) / f"{Path(_file).stem}.fna")
-            context.log.info(f"Output file being generated: {_output_dir}")
-            _genome = SeqIO.read(_file, "genbank")
-            _genome_records = list(SeqIO.parse(_file, "genbank"))
-
-            if _assess_file_content(_genome):
-                with open(_output_dir, "w") as _f:
-                    _gene_features = list(
-                        filter(lambda x: x.type == "gene", _genome.features)
-                    )
-                    for _feature in _gene_features:
-                        for _seq_record in _genome_records:
-                            _f.write(
-                                ">%s | %s | %s | %s | %s | %s\n%s\n"
-                                % (
-                                    _seq_record.name,
-                                    _seq_record.id,
-                                    _seq_record.description,
-                                    _feature.qualifiers["gene"][0]
-                                    if "gene" in _feature.qualifiers.keys()
-                                    else "None",
-                                    _feature.qualifiers["locus_tag"][0],
-                                    _feature.location,
-                                    _seq_record.seq[
-                                        _feature.location.start : _feature.location.end
-                                    ],
-                                )
-                            )
-            else:
-                with open(_output_dir, "w") as _f:
-                    _gene_features = list(
-                        filter(lambda x: x.type == "CDS", _genome.features)
-                    )
-                    for _feature in _gene_features:
-                        for _seq_record in _genome_records:
-                            _f.write(
-                                ">%s | %s | %s | %s | %s | %s\n%s\n"
-                                % (
-                                    _seq_record.name,
-                                    _seq_record.id,
-                                    _seq_record.description,
-                                    _feature.qualifiers["protein_id"][0],
-                                    _feature.qualifiers["protein_id"][0][:-2],
-                                    _feature.location,
-                                    _seq_record.seq[
-                                        _feature.location.start : _feature.location.end
-                                    ],
-                                )
-                            )
-
-            _new_fasta_files.append(Path(_file).stem)
-            _new_fasta_paths.append(_output_dir)
-
-    _fasta_files = _fasta_files + _new_fasta_files
-    context.log.info("The fasta file history has been updated")
-
-    _time = datetime.now()
-    context.add_output_metadata(
-        output_name="new_fasta_files",
-        metadata={
-            "text_metadata": f"New genbank files have been processed to fasta {_time.isoformat()} (UTC).",
-            "file_location": _path_fasta,
-            "num_processed_files": len(_new_fasta_files),
-            "preview": _new_fasta_files,
-        },
-    )
-    context.add_output_metadata(
-        output_name="history_fasta_files",
-        metadata={
-            "text_metadata": f"The list of fasta files has been updated {_time.isoformat()} (UTC).",
-            "file_location": _path_history,
-            "num_files": len(_fasta_files),
-            "preview": _fasta_files,
-        },
-    )
-
-    return _new_fasta_paths, _fasta_files
+FastaNRecord = namedtuple("FastaNRecord", "new,history")
 
 
 @asset(
-    config_schema=folder_config,
+    required_resource_keys={"local_resource"},
+    description="Create fasta files for every genes in the fasta format. Ona fasta fila/per gb file.",
+    compute_kind="Python",
+    io_manager_key="io_manager",
+    metadata={"owner": "Virginie Grosboillot"},
+)
+def create_fasta_n(context, append_processed_df) -> FastaNRecord:
+
+    # Check if history of created fasta files
+    fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
+    _path_history = Path(fs) / "create_fasta_n"
+
+    if os.path.exists(_path_history):
+        _history_files = pickle.load(open(_path_history, "rb")).history
+        context.log.info("Transferred file history loaded")
+    else:
+        _history_files = []
+        context.log.info("No transfer history")
+
+    # Write fasta for new files only
+    df, check_df = append_processed_df
+
+    listed_files = [
+        f"{Path(path).stem}.fna" for path in df.select("filename").unique().to_series().to_list()
+    ]
+
+    _T = list(set(listed_files).difference(set(_history_files)))
+    context.log.info(f"Number of genomes to convert to fasta: {len(_T)}")
+
+    # Path to genbank folder
+    _fasta_path = context.resources.local_resource.get_paths()["FASTA_N_DIR"]
+    os.makedirs(_fasta_path, exist_ok=True)
+
+    # Create fasta files
+    _new_fasta = []
+    for _file in _T:
+        context.log.info(f"The following file {_file} is being processed")
+        _output_dir = str(Path(_fasta_path) / _file)
+
+        with open(_output_dir, "w") as _f:
+            for data in (
+                df.filter(pl.col("filename").str.contains(_file))
+                .select("key", "extract")
+                .iter_rows(named=True)
+            ):
+                _f.write(
+                    ">%s \n%s\n"
+                    % (
+                        data['key'],
+                        data['extract'],
+                    )
+                )
+        context.log.info(f"Fasta for {_file} created")
+        _new_fasta.append(_output_dir)
+        _history_files.append(_file)
+
+    context.log.info("Fasta file creation completed.")
+
+    context.add_output_metadata(
+        metadata={
+            "path": _fasta_path,
+            "num_new_files": len(_new_fasta),
+            "new_files_preview": _new_fasta,
+            "total_files": len(_history_files),
+            "total_files_preview": _history_files,
+        },
+    )
+
+    return FastaNRecord(_new_fasta, _history_files)
+
+
+@asset(
+    required_resource_keys={"local_resource"},
     description="Receive a fasta file as input and create a database for the blastn step",
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_blast_db(context, new_fasta_files) -> List[str]:
+def create_blast_db(context, create_fasta_n) -> List[str]:
     # path to store db
-    _path_db = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
-        / context.op_config["blast_db_dir"]
-    )
+    _path_db = context.resources.local_resource.get_paths()["BLASTN_DB_DIR"]
     context.log.info(f"Path to database: {_path_db}")
     os.makedirs(_path_db, exist_ok=True)
 
     _db = []
-    for _new_fasta_file in new_fasta_files:
+    for _new_fasta_file in create_fasta_n.new:
         _output_dir = str(Path(_path_db) / Path(_new_fasta_file).stem)
         context.log.info(f"Database being generated: {_output_dir}")
         os.system(
@@ -224,10 +110,8 @@ def create_blast_db(context, new_fasta_files) -> List[str]:
         set(map(lambda x: str(Path(_path_db) / Path(x).stem), os.listdir(_path_db)))
     )
 
-    _time = datetime.now()
     context.add_output_metadata(
         metadata={
-            "text_metadata": f"The list of dbs has been updated {_time.isoformat()} (UTC).",
             "file_location": _path_db,
             "num_new_files": len(_db),
             "processed_files": _db,
@@ -239,23 +123,20 @@ def create_blast_db(context, new_fasta_files) -> List[str]:
 
 
 @asset(
-    config_schema=folder_config,
+    required_resource_keys={"local_resource"},
     description="Perform blastn between available sequences and databases and return result in json format",
     compute_kind="Blastn",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def get_blastn(context, history_fasta_files, create_blast_db) -> List[str]:
+def get_blastn(context, create_fasta_n, create_blast_db) -> List[str]:
     # Blastn json file directory - create directory if not yet existing
-    _path_blastn = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["blastn_dir"]
-    )
+    _path_blastn = context.resources.local_resource.get_paths()["BLASTN_DIR"]
     os.makedirs(_path_blastn, exist_ok=True)
     context.log.info(f"Path to blastn results: {_path_blastn}")
 
     # History
-    _history_path = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "fs" / "get_blastn"
-    )
+    fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
+    _history_path = str(Path(fs) / "get_blastn")
     if os.path.exists(_history_path):
         _blastn_history = [
             Path(file).name for file in pickle.load(open(_history_path, "rb"))
@@ -266,34 +147,27 @@ def get_blastn(context, history_fasta_files, create_blast_db) -> List[str]:
         context.log.info("No blastn history available")
 
     # Blast each query against every databases
-    _fasta_path = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / context.op_config["fasta_dir"]
-    )
-    context.log.info(f"Path to fasta files: {_fasta_path}")
-    _fasta_files = list(
-        map(lambda x: str(Path(_fasta_path) / f"{x}.fna"), history_fasta_files)
-    )
+    _fasta_files = create_fasta_n.history
 
     _new_blastn_files = []
     for _query in _fasta_files:
         for _database in create_blast_db:
-            _output_file = f"{Path(_query).stem}_vs_{Path(_database).stem}"
-            _output_dir = str(Path(_path_blastn) / _output_file)
-            if _output_file not in _blastn_history:
-                os.system(
-                    f"blastn -query {_query} -db {_database} -evalue 1e-3 -dust no -out {_output_dir} -outfmt 15"
-                )
-                _new_blastn_files.append(_output_file)
-                _blastn_history.append(_output_dir)
-                context.log.info(f"Query {_output_file} processed successfully")
+            if not Path(_query).stem == Path(_database).stem:
+                _output_file = f"{Path(_query).stem}_vs_{Path(_database).stem}"
+                _output_dir = str(Path(_path_blastn) / _output_file)
+                if _output_file not in _blastn_history:
+                    os.system(
+                        f"blastn -query {_query} -db {_database} -evalue 1e-3 -dust no -out {_output_dir} -outfmt 15"
+                    )
+                    _new_blastn_files.append(_output_file)
+                    _blastn_history.append(_output_dir)
+                    context.log.info(f"Query {_output_file} processed successfully")
 
     _full_list = [Path(x).stem for x in _blastn_history]
 
     # Asset metadata
-    _time = datetime.now()
     context.add_output_metadata(
         metadata={
-            "text_metadata": f"The list of blasted sequences has been updated {_time.isoformat()} (UTC).",
             "file_location": _path_blastn,
             "num_files": len(_new_blastn_files),
             "processed_files": _new_blastn_files,
