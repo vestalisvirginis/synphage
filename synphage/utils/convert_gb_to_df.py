@@ -136,6 +136,6 @@ def genbank_to_dataframe(filename: str):
         organism=pl.lit(organism),
         taxonomy=pl.lit(taxonomy),
         filename=pl.lit(filename),
-    ).drop_nulls()
+    )
 
     return df
