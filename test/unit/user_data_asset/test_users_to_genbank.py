@@ -1,3 +1,4 @@
+import pytest
 import os
 
 from dagster import materialize_to_memory, build_asset_context
@@ -43,11 +44,29 @@ def test_users_to_genbank_with_history(mock_env_users_to_genbank_with_history):
     assert len(result[1]) == 1
 
 
-def test_users_to_genbank_remove_dot(mock_env_users_to_genbank):
+@pytest.mark.parametrize(
+    "input_path, new_name, old_filename",
+    [
+        (
+            "test/fixtures/user_data_transfer/user_data_with_dot",
+            "TT_000002_1.gb",
+            "test/fixtures/user_data_transfer/user_data_with_dot/TT_000002.1.gb",
+        ),
+        (
+            "test/fixtures/user_data_transfer/user_data_with_space",
+            "TT_00000_2.gb",
+            "test/fixtures/user_data_transfer/user_data_with_space/TT 00000 2.gb",
+        ),
+    ],
+    ids=["filename_with_dot", "file_name_with_space"],
+)
+def test_users_to_genbank_rename(
+    mock_env_users_to_genbank, input_path, new_name, old_filename
+):
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
-                input_dir="test/fixtures/user_data_transfer/user_data_with_dot",
+                input_dir=input_path,
                 output_dir=os.getenv("OUTPUT_DIR"),
             )
         }
@@ -57,12 +76,10 @@ def test_users_to_genbank_remove_dot(mock_env_users_to_genbank):
     assert len(result) == 2
     assert isinstance(result[0], list)
     assert len(result[0]) == 1
-    assert result[0] == ["TT_000002_1.gb"]
+    assert result[0] == [new_name]
     assert isinstance(result[1], list)
     assert len(result[1]) == 1
-    assert result[1] == [
-        "test/fixtures/user_data_transfer/user_data_with_dot/TT_000002.1.gb"
-    ]
+    assert result[1] == [old_filename]
 
 
 def test_users_to_genbank_asset(mock_env_users_to_genbank):

@@ -81,7 +81,10 @@ def users_to_genbank(context) -> UsersRecord:
     # Harmonise file name
     _new_transfer = []
     for _file in _T:
-        _output_file = str(Path(_gb_path) / f"{Path(_file).stem.replace('.', '_')}.gb")
+        _output_file = str(
+            Path(_gb_path)
+            / f"{Path(_file).stem.replace('.', '_').replace(' ', '_')}.gb"
+        )
         shutil.copy2(
             _file,
             _output_file,
@@ -102,16 +105,3 @@ def users_to_genbank(context) -> UsersRecord:
         },
     )
     return UsersRecord(_new_transfer, _history_files)
-
-
-# @asset(
-#     required_resource_keys={"local_resource"},
-#     description="Transfer user's files to the genbank folder and harmonise naming of the files",
-#     compute_kind="Python",
-#     metadata={"owner": "Virginie Grosboillot"},
-# # )
-# def has_files(context) -> bool:
-#     # Check for user's file(s)
-#     users_dir = context.resources.local_resource.get_paths()["USER_DATA"]
-#     assert (bool({_ for _ in Path(users_dir).rglob('*.gb*')}), "No genbank files were found in the input_folder.")
-#     return True
