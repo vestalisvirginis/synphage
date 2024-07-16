@@ -9,6 +9,7 @@ from dagster import (
 import os
 import tempfile
 import polars as pl
+import csv
 
 from pathlib import Path
 
@@ -98,15 +99,21 @@ def append_processed_df(context):
             severity=_check_severity(check),
         )
 
+    csv_path = str(Path(context.resources.local_resource.get_paths()["SYNPHAGE_DATA"]) / 'sequences.csv')
     seq_dict = {}
-    for file in [filename for filename in df.select('filename').unique().iter_rows()]:
-        seq_dict[file] = 'SEQUENCE'
+    for file in [Path(filename['filename']).name for filename in df.select('filename').unique().iter_rows(named=True)]:
+        seq_dict[file] = 0
+
+    with open(csv_path,'w') as f:
+        w = csv.writer(f)
+        w.writerows(seq_dict.items())
 
     yield Output(
         value=(df, seq_dict, check_df),
         metadata={
             "rows_data": len(df),
             "df": MetadataValue.md(df.to_pandas().head().to_markdown()),
+            "num_sequences": len(seq_dict),
             "rows_check_df": len(check_df),
             "check_df": MetadataValue.md(check_df.to_pandas().to_markdown()),
         },
