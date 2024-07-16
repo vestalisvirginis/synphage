@@ -2,163 +2,689 @@ from dagster import (
     Output,
     AssetCheckSpec,
     AssetCheckResult,
-
     asset,
     AssetIn,
     AssetExecutionContext,
+    MetadataValue,
 )
 
 import os
 import pickle
-import pandas as pd
-import polars  as pl
-from toolz import compose, juxt
-from operator import itemgetter as it
-from operator import methodcaller as mc
+import polars as pl
+import tempfile
 from pathlib import Path
-from cuallee import Check, bio
+
+from synphage.utils.check_factory import _check_severity, _create_check_specs
 
 
-GENBANK_CHECKS = {'is_complete': {'check_type': 'std', 'check_name': 'is_complete', 'cols': ["gene", "locus_tag", "cds_gene", "cds_locus_tag", "protein_id", "start", "end", "strand", "extract"], 'check_value': None, 'check_description': 'Validate the column completeness'},
-                  'is_unique': {'check_type': 'std', 'check_name': 'is_unique', 'cols': ["gene", "locus_tag", "cds_gene", "cds_locus_tag", "protein_id", "start", "end"], 'check_value': None, 'check_description': 'Validate the uniqueness of each value presents in the column'},
-                  'is_dna': {'check_type': 'bio', 'check_name': 'is_dna', 'cols': ['extract'], 'check_value': None, 'check_description': 'Validate that the sequence only contains ATCG'},
-                  'is_protein': {'check_type': 'bio', 'check_name': 'is_protein', 'cols': ['translation', 'translation_fn'], 'check_value': None, 'check_description': 'Validate that the protein sequence only contains valid amino acids'},
-                  'is_contained_in' : {'check_type': 'parameterised', 'check_name': 'is_contained_in', 'cols': ['strand'], 'check_value': (1,-1), 'check_description': 'Validate that the protein sequence only contains valid amino acids'},
-                  }
+TEMP_DIR = tempfile.gettempdir()
 
-check = Check()
+PATH_TO_LOCAL_DIR = str(
+    Path(os.getenv("OUTPUT_DIR", TEMP_DIR)) / "fs" / "genbank_history"
+)
+PATH_TO_DVP_DIR = str(Path("temp") / "development" / "data" / "fs" / "genbank_history")
 
-### Check logic to implement
+GENBANK_CHECKS = {
+    "is_complete": {
+        "check_type": "std",
+        "check_name": "is_complete",
+        "cols": [
+            "gene",
+            "locus_tag",
+            "cds_gene",
+            "cds_locus_tag",
+            "protein_id",
+            "start",
+            "end",
+            "strand",
+            "extract",
+        ],
+        "check_value": None,
+        "check_description": "Validate the column completeness",
+    },
+    "is_unique": {
+        "check_type": "std",
+        "check_name": "is_unique",
+        "cols": [
+            "gene",
+            "locus_tag",
+            "cds_gene",
+            "cds_locus_tag",
+            "protein_id",
+            "start",
+            "end",
+        ],
+        "check_value": None,
+        "check_description": "Validate the uniqueness of each value presents in the column",
+    },
+    "is_dna": {
+        "check_type": "bio",
+        "check_name": "is_dna",
+        "cols": ["extract"],
+        "check_value": None,
+        "check_description": "Validate that the sequence only contains ATCG",
+    },
+    "is_protein": {
+        "check_type": "bio",
+        "check_name": "is_protein",
+        "cols": ["translation", "translation_fn"],
+        "check_value": None,
+        "check_description": "Validate that the protein sequence only contains valid amino acids",
+    },
+    "is_contained_in": {
+        "check_type": "parameterised",
+        "check_name": "is_contained_in",
+        "cols": ["strand"],
+        "check_value": (1, -1),
+        "check_description": "Validate that the protein sequence only contains valid amino acids",
+    },
+}
 
-# bio checks:
-# levenstein distance
-# cols=[('translate', 'translate_fn')]
+# Check logic to implement:
+#   if cds_locus_tag, check locus_tag == cds_locus_tag
+#   bio checks:
+#       levenstein distance
+#       cols=[('translate', 'translate_fn')]
 
-# for id , name check on the full dataframe --> unique to each file
-# are_unique 
-# cols = [(file, id), (file, name)]
-
-
-
-def create_check_specs(check_dict, asset_name):
-    """Create """
-    check = Check()
-    for key in check_dict:
-        check_type, check_name, cols, value, description = compose(juxt(map(it, ["check_type", "check_name", "cols", "check_value", "check_description"])), mc("get", key))(check_dict)
-        if check_type == 'bio':
-            juxt(map(lambda x: mc(check_name, x), cols))(check.bio)
-        elif check_type == 'parameterised':
-            juxt(map(lambda x: mc(check_name, x, value), cols))(check)
-        else:
-            juxt(map(lambda x: mc(check_name, x), cols))(check)
-    #check.is_contained_in('strand', (1,-1))
-
-    #check_specs = [AssetCheckSpec(name=f"{item.method}.{item.column}", asset=asset_name, description=check_dict) for item in check.rules]
-    check_specs = [AssetCheckSpec(name=f"{item.method}.{item.column}", asset=asset_name) for item in check.rules]
-    
-    return check, check_specs
+#   for id , name check on the full dataframe --> unique to each file
+#       are_unique
+#       cols = [(file, id), (file, name)]
 
 
-def _chiki_1_settings(asset_name: str, asset_check_specs: list[AssetCheckSpec], asset_description: str = "Empty") -> dict:
-    """Asset configuration for chiki gb validation"""
+def _gb_validation_settings(
+    asset_name: str,
+    asset_check_specs: list[AssetCheckSpec],
+    asset_description: str = "Empty",
+) -> dict:
+    """Asset configuration for genbank file validation assets"""
     return {
         "name": asset_name.lower(),
         "description": asset_description,
         "io_manager_key": "io_manager",
-        # "group_name": "checks",
+        "required_resource_keys": {"local_resource"},
         "metadata": {"owner": "Virginie Grosboillot"},
-        "compute_kind": "validation",
+        "compute_kind": "Validation",
         "check_specs": asset_check_specs,
     }
 
 
-def _chiki_2_settings(asset_name: str, input_name: str, asset_description: str = "Empty") -> dict:
-    """Asset configuration for chiki gb validation"""
+def _gb_labelling_settings(
+    asset_name: str, input_name: str, asset_description: str = "Empty"
+) -> dict:
+    """Asset configuration for check evaluation and genbank file labelling"""
     return {
         "name": asset_name.lower(),
         "description": asset_description,
         "ins": {input_name.lower(): AssetIn()},
         "io_manager_key": "io_manager",
-        # "group_name": "checks",
         "metadata": {"owner": "Virginie Grosboillot"},
-        "compute_kind": "validation",
+        "compute_kind": "Validation",
     }
 
 
-def chiki_level_1(key, name, check_specs, check, description):
-    """Asset factory for df loading"""
-    
-    @asset(**_chiki_1_settings(asset_name=key + "_validation", asset_check_specs=check_specs, asset_description=description))
-    def asset_template(context: AssetExecutionContext):
-        entity = name
-        path= "temp/development/data/fs/gb_parsing"
-        data = pd.read_parquet(f"{path}/{entity}.parquet")
-        yield Output(value=data, metadata={"rows": len(data)})
+def _gb_transformation_settings(
+    asset_name: str, input_name: str, asset_description: str = "Empty"
+) -> dict:
+    """Asset configuration for df transformation"""
+    return {
+        "name": asset_name.lower(),
+        "description": asset_description,
+        "ins": {input_name.lower(): AssetIn()},
+        "io_manager_key": "io_manager",
+        "required_resource_keys": {"local_resource"},
+        "metadata": {"owner": "Virginie Grosboillot"},
+        "compute_kind": "Transformation",
+    }
 
-        for item in check.validate(data).itertuples():
+
+def gb_validation(key, name, check_specs, check, description):
+    """Asset factory for genbank file validation"""
+
+    @asset(
+        **_gb_validation_settings(
+            asset_name=key + "_validation",
+            asset_check_specs=check_specs,
+            asset_description=description,
+        )
+    )
+    def asset_template(context: AssetExecutionContext, create_genbank_df):
+        entity = name
+        fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
+        path = str(Path(fs) / "gb_parsing")
+        data = pl.read_parquet(f"{path}/{entity}.parquet")
+        check_df = check.validate(data)
+
+        for item in check_df.iter_rows(named=True):
             yield AssetCheckResult(
                 asset_key=key.lower() + "_validation",
-                check_name=f"{item.rule}.{item.column}",
-                passed=(item.status == "PASS"),
+                check_name=f"{item['rule']}.{item['column']}",
+                passed=(item["status"] == "PASS"),
                 metadata={
-                    "level": item.level,
-                    "rows": int(item.rows),
-                    "column": item.column,
-                    "value": str(item.value),
-                    "violations": int(item.violations),
-                    "pass_rate": item.pass_rate,
+                    "level": item["level"],
+                    "rows": int(item["rows"]),
+                    "column": item["column"],
+                    "value": str(item["value"]),
+                    "violations": int(item["violations"]),
+                    "pass_rate": item["pass_rate"],
                 },
+                severity=_check_severity(check),
             )
 
-        #return Output(value=data, metadata={"rows": len(data)})
-    
+        yield Output(
+            value=(data, check_df),
+            metadata={
+                "rows_data": len(data),
+                "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                "rows_check_df": len(check_df),
+                "check_df": MetadataValue.md(check_df.to_pandas().to_markdown()),
+            },
+        )
+
     return asset_template
 
 
-def chiki_level_2(key, input_name, description):
-    """Asset factory for Writing in a new location"""
+def gb_labelling(key, input_name, description):
+    """Asset factory for check evaluation and genbank file labelling"""
 
     @asset(
-        **_chiki_2_settings(
+        **_gb_labelling_settings(
             asset_name=key, input_name=input_name, asset_description=description
         )
     )
     def asset_template(**kwargs):
-        entity = kwargs[input_name]
-        path= "temp/development/data/fs/gb_parsing_copy"
-        file_name = "test"
-        entity.to_parquet(f"{path}/{file_name}.parquet")
+        data, check_df = kwargs[input_name]
 
-        return Output(value=entity, metadata={"rows": len(entity)})
-    
+        # method filters
+        _unique = pl.col("rule") == "is_unique"
+        _complete = pl.col("rule") == "is_complete"
+        # col filters
+        _locus_tag = pl.col("column") == "locus_tag"
+        _cds_locus_tag = pl.col("column") == "cds_locus_tag"
+        _protein_id = pl.col("column") == "protein_id"
+        _gene = pl.col("column") == "gene"
+
+        # Logic
+        if (
+            check_df.filter(_unique & _locus_tag)
+            .select("status")
+            .to_series()
+            .to_list()[0]
+            == "PASS"
+        ):
+            if (
+                check_df.filter(_complete & _locus_tag)
+                .select("status")
+                .to_series()
+                .to_list()[0]
+                == "PASS"
+            ):
+                gb_type = "locus_tag"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `locus_tag` in the `gene` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            elif check_df.filter(_complete & _locus_tag).select(
+                "violations"
+            ).to_series().to_list()[0] <= (
+                check_df.filter(_complete & _cds_locus_tag)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+                | check_df.filter(_complete & _protein_id)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+            ):
+                gb_type = "locus_tag"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `locus_tag` in the `gene` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            else:
+                "Genbank file is not from type `gene`."
+
+        elif (
+            check_df.filter(_unique & _cds_locus_tag)
+            .select("status")
+            .to_series()
+            .to_list()[0]
+            == "PASS"
+        ):
+
+            if (
+                check_df.filter(_complete & _cds_locus_tag)
+                .select("status")
+                .to_series()
+                .to_list()[0]
+                == "PASS"
+            ):
+                gb_type = "cds_locus_tag"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `locus_tag` in the `cds` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            elif check_df.filter(_complete & _cds_locus_tag).select(
+                "violations"
+            ).to_series().to_list()[0] <= (
+                check_df.filter(_complete & _locus_tag)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+                | check_df.filter(_complete & _protein_id)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+            ):
+                gb_type = "cds_locus_tag"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `locus_tag` in the `cds` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            else:
+                "Genbank file is not from type `cds_locus_tag`."
+
+        elif (
+            check_df.filter(_unique & _protein_id)
+            .select("status")
+            .to_series()
+            .to_list()[0]
+            == "PASS"
+        ):
+
+            if (
+                check_df.filter(_complete & _protein_id)
+                .select("status")
+                .to_series()
+                .to_list()[0]
+                == "PASS"
+            ):
+                gb_type = "protein_id"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `protein_id` in the `cds` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            elif check_df.filter(_complete & _protein_id).select(
+                "violations"
+            ).to_series().to_list()[0] <= (
+                check_df.filter(_complete & _locus_tag)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+                | check_df.filter(_complete & _cds_locus_tag)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+            ):
+                gb_type = "protein_id"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `protein_id` in the `cds` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            else:
+                "Genbank file is not from type `protein`."
+
+        elif (
+            check_df.filter(_unique & _gene).select("status").to_series().to_list()[0]
+            == "PASS"
+        ):
+
+            if (
+                check_df.filter(_complete & _gene)
+                .select("status")
+                .to_series()
+                .to_list()[0]
+                == "PASS"
+            ):
+                gb_type = "gene"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `gene` in the `gene` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            elif check_df.filter(_complete & _gene).select(
+                "violations"
+            ).to_series().to_list()[0] <= (
+                check_df.filter(_complete & _locus_tag)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+                | check_df.filter(_complete & _protein_id)
+                .select("violations")
+                .to_series()
+                .to_list()[0]
+            ):
+                gb_type = "gene"
+                data.with_columns(gb_type=gb_type)
+                return Output(
+                    value=(data, gb_type),
+                    metadata={
+                        "result": "The attribute `gene` in the `gene` features will be used as unique identifier for downstream processing.",
+                        "gb_type": gb_type,
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+
+            else:
+                "Genbank file is not from type `gene`."
+
+        else:
+            "This file is too incomplete and will not be processed!"
+            gb_type = None
+            return Output(
+                value=(data, gb_type),
+                metadata={
+                    "result": "None of the excpecting attribute are unique and the file cannot be processed downstream.",
+                    "gb_type": gb_type,
+                    "rows_data": len(data),
+                    "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                },
+            )
+
+        # Check first LOCUS_TAG:
+        # is_unique ?
+        #   yes -> continue
+        #   no -> next loop
+        # is_complete AND is_unique --> 'gene' type
+        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'locus_tag' type
+        # --> downstream processing:
+        #       - if protein_id, filter (locus_tag AND protein_id) isNotNull
+        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
+        #       - else: filter locus_tag isNotNull
+        # Check second CDS_LOCUS_TAG:
+        # is_unique ?
+        #   yes -> continue
+        #   no -> next loop
+        # is_complete AND is_unique --> 'cds_locus_tag' type
+        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR protein_id)  AND is_unique --> 'cds_locus_tag' type
+        # --> downstream processing:
+        #       filter cds_locus_tag isNotNull
+        #       fill locus_tag with cds_locus_tag
+        # Check third PROTEIN_ID:
+        # is_unique ?
+        #   yes -> continue
+        #   no -> next loop
+        # is_complete AND is_unique --> 'protein_id' type
+        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR cds_locus_tag)  AND is_unique --> 'protein' type
+        # --> downstream processing:
+        #       filter protein_id isNotNull
+        #       fill locus tag
+        # Check forth GENE:
+        # is_complete AND is_unique --> 'gene' type
+        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'gene' type
+        # --> downstream processing:
+        #       - if protein_id, filter (gene AND protein_id) isNotNull
+        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
+        #       - else: filter locus_tag isNotNull
+
+    return asset_template
+
+
+def df_transformation(key, input_name, description):
+    """Asset factory for dataframe transformation for downstream use"""
+
+    @asset(
+        **_gb_transformation_settings(
+            asset_name=key, input_name=input_name, asset_description=description
+        )
+    )
+    def asset_template(context, **kwargs):
+        data, gb_type = kwargs[input_name]
+        entity = key
+        fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
+        _path = str(Path(fs) / "transformed_dfs")
+        os.makedirs(_path, exist_ok=True)
+
+        if gb_type == "locus_tag":
+            if not data.select(pl.col("protein_id")).is_empty():
+                data = data.filter(
+                    (pl.col("locus_tag").is_not_null())
+                    & (pl.col("protein_id").is_not_null())
+                )
+                data.write_parquet(f"{_path}/{entity}.parquet")
+                return Output(
+                    value="ok",
+                    metadata={
+                        "text": "The file has been processed",
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+            elif not data.select(pl.col("cds_locus_tag")).is_empty():
+                data = data.filter(
+                    (pl.col("locus_tag").is_not_null())
+                    & (pl.col("cds_locus_tag").is_not_null())
+                )
+                data.write_parquet(f"{_path}/{entity}.parquet")
+                return Output(
+                    value="ok",
+                    metadata={
+                        "text": "The file has been processed",
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+            else:
+                data = data.filter(pl.col("locus_tag").is_not_null())
+                data.write_parquet(f"{_path}/{entity}.parquet")
+                return Output(
+                    value="ok",
+                    metadata={
+                        "text": "The file has been processed",
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+        elif gb_type == "cds_type":
+            data = data.filter(pl.col("cds_locus_tag").is_not_null()).with_columns(
+                pl.coalesce(["locus_tag", "cds_locus_tag"]).alias("locus_tag")
+            )
+            data.write_parquet(f"{_path}/{entity}.parquet")
+            return Output(
+                value="ok",
+                metadata={
+                    "text": "The file has been processed",
+                    "rows_data": len(data),
+                    "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                },
+            )
+        elif gb_type == "protein_id":
+            data = data.filter(pl.col("protein_id").is_not_null()).with_columns(
+                pl.coalesce(["locus_tag", "protein_id"]).alias("locus_tag")
+            )
+            data.write_parquet(f"{_path}/{entity}.parquet")
+            return Output(
+                value="ok",
+                metadata={
+                    "text": "The file has been processed",
+                    "rows_data": len(data),
+                    "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                },
+            )
+        elif gb_type == "gene":
+            if not data.select(pl.col("protein_id")).is_empty():
+                data = data.filter(
+                    (pl.col("gene").is_not_null())
+                    & (pl.col("protein_id").is_not_null())
+                ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
+                data.write_parquet(f"{_path}/{entity}.parquet")
+                return Output(
+                    value="ok",
+                    metadata={
+                        "text": "The file has been processed",
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+            elif not data.select(pl.col("cds_locus_tag")).is_empty():
+                data = data.filter(
+                    (pl.col("gene").is_not_null())
+                    & (pl.col("cds_locus_tag").is_not_null())
+                ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
+                data.write_parquet(f"{_path}/{entity}.parquet")
+                return Output(
+                    value="ok",
+                    metadata={
+                        "text": "The file has been processed",
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+            else:
+                data = data.filter(pl.col("gene").is_not_null()).with_columns(
+                    pl.coalesce(["locus_tag", "gene"]).alias("locus_tag")
+                )
+                data.write_parquet(f"{_path}/{entity}.parquet")
+                return Output(
+                    value="ok",
+                    metadata={
+                        "text": "The file has been processed",
+                        "rows_data": len(data),
+                        "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                    },
+                )
+        else:
+            return Output(
+                value="Not ok",
+                metadata={
+                    "text": "The file has not been processed. Please refer to the validation step.",
+                    "rows_data": len(data),
+                    "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
+                },
+            )
+
+        # LOGIC TEMPLATE
+        # Check first LOCUS_TAG:
+        # is_unique ?
+        #   yes -> continue
+        #   no -> next loop
+        # is_complete AND is_unique --> 'gene' type
+        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'gene' type
+        # --> downstream processing:
+        #       - if protein_id, filter (locus_tag AND protein_id) isNotNull
+        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
+        #       - else: filter locus_tag isNotNull
+        # Check second CDS_LOCUS_TAG:
+        # is_unique ?
+        #   yes -> continue
+        #   no -> next loop
+        # is_complete AND is_unique --> 'cds_locus_tag' type
+        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR protein_id)  AND is_unique --> 'cds_locus_tag' type
+        # --> downstream processing:
+        #       filter cds_locus_tag isNotNull
+        #       fill locus_tag with cds_locus_tag
+        # Check third PROTEIN_ID:
+        # is_unique ?
+        #   yes -> continue
+        #   no -> next loop
+        # is_complete AND is_unique --> 'protein_id' type
+        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR cds_locus_tag)  AND is_unique --> 'protein' type
+        # --> downstream processing:
+        #       filter protein_id isNotNull
+        #       fill locus tag
+        # Check forth GENE:
+        # is_complete AND is_unique --> 'gene' type
+        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'gene' type
+        # --> downstream processing:
+        #       - if protein_id, filter (gene AND protein_id) isNotNull
+        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
+        #       - else: filter locus_tag isNotNull
+
     return asset_template
 
 
 def load_dynamic():
-    """Asset factory generator using crm manifesto"""
-
-    _file = 'temp/development/data/fs/genbank_history'
-    entities = pickle.load(open(_file, 'rb'))
-    asset_names = entities.history
+    """Asset factory generator based on the genbank files history"""
+    # fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
+    # path = str(Path(fs) / "gb_parsing")
+    # _file = 'temp/development/data/fs/genbank_history'
+    # entities = pickle.load(open(path, 'rb'))
+    # asset_names = entities.history
+    # path = PATH_TO_LOCAL_DIR
+    # path = PATH_TO_DVP_DIR
+    path = PATH_TO_LOCAL_DIR
+    if os.path.exists(path):
+        # asset_names = [Path(file).stem for file in os.listdir(path)]
+        entities = pickle.load(open(path, "rb"))
+        asset_names = entities.history
+    else:
+        asset_names = []
     assets = []
     for asset_name in asset_names:
-        checks, check_specs=create_check_specs(GENBANK_CHECKS, asset_name=asset_name.lower() + "_validation")
+        checks, check_specs = _create_check_specs(
+            GENBANK_CHECKS, asset_name=asset_name.lower() + "_validation"
+        )
         assets.append(
-            chiki_level_1(
+            gb_validation(
                 key=asset_name,
                 name=asset_name,
                 check_specs=check_specs,
                 check=checks,
                 description=f"Load table for {asset_name} and apply the checks",
-
             )
         )
 
         assets.append(
-            chiki_level_2(
+            gb_labelling(
                 key=asset_name,
                 input_name=asset_name.lower() + "_validation",
-                description="Not yet known"
+                description=f"Evaluate check results for {asset_name} and label genbank file for downstream processing",
+            )
+        )
+
+        assets.append(
+            df_transformation(
+                key=asset_name.lower() + "_transformation",
+                input_name=asset_name.lower(),
+                description=f"Apply transformation for {asset_name} dataframe for downstream computation",
             )
         )
 
