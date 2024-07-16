@@ -110,7 +110,7 @@ def gene_presence(
     context.log.info(f"sql_file: {_path_gene_presence_sql}")
     query = open(_path_gene_presence_sql).read()
     conn.query(query.format(blastn_all, path_to_df)).pl().write_parquet(
-        str(Path(tables) / "uniqueness.parquet")
+        str(Path(tables) / "gene_uniqueness.parquet")
     )
     return "OK"
 

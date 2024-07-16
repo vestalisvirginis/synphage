@@ -110,7 +110,7 @@ def protein_presence(
     context.log.info(f"sql_file: {_path_protein_presence_sql}")
     query = open(_path_protein_presence_sql).read()
     conn.query(query.format(blastp_all, path_to_df)).pl().write_parquet(
-        str(Path(tables) / "uniqueness.parquet")
+        str(Path(tables) / "protein_uniqueness.parquet")
     )
     return "OK"
 
