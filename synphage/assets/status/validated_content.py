@@ -98,8 +98,12 @@ def append_processed_df(context):
             severity=_check_severity(check),
         )
 
+    seq_dict = {}
+    for file in [filename for filename in df.select('filename').unique().iter_rows()]:
+        seq_dict[file] = 'SEQUENCE'
+
     yield Output(
-        value=(df, check_df),
+        value=(df, seq_dict, check_df),
         metadata={
             "rows_data": len(df),
             "df": MetadataValue.md(df.to_pandas().head().to_markdown()),

@@ -34,7 +34,7 @@ def create_fasta_p(context, append_processed_df) -> FastaPRecord:
         context.log.info("No transfer history")
 
     # Write fasta for new files only
-    df, check_df = append_processed_df
+    df, seq, check_df = append_processed_df
 
     listed_files = [
         f"{Path(path).stem}.fna"
