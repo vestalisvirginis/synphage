@@ -10,6 +10,7 @@ from dagster import (
 
 import os
 import pickle
+import duckdb
 import polars as pl
 import tempfile
 from pathlib import Path
@@ -219,7 +220,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "locus_tag"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -243,7 +244,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "locus_tag"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -273,7 +274,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "cds_locus_tag"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -297,7 +298,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "cds_locus_tag"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -327,7 +328,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "protein_id"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -351,7 +352,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "protein_id"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -378,7 +379,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "gene"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -402,7 +403,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "gene"
-                data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=gb_type)
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -483,13 +484,34 @@ def df_transformation(key, input_name, description):
         _path = str(Path(fs) / "transformed_dfs")
         os.makedirs(_path, exist_ok=True)
 
+        conn = duckdb.connect(":memory:")
+        
+        (
+            conn
+            .execute("""
+                    CREATE or REPLACE TABLE genbank (
+                    cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
+                    start_sequence integer, end_sequence integer, strand integer, extract string, gene string, locus_tag string, translation_fn string, id string, name string, description string, topology string, organism string, 
+                    taxonomy varchar[], filename string, gb_type string);"""
+            )
+        )
+        
+        parquet_destination = f"{_path}/{entity}.parquet"
+
         if gb_type == "locus_tag":
             if not data.select(pl.col("protein_id")).is_empty():
                 data = data.filter(
                     (pl.col("locus_tag").is_not_null())
                     & (pl.col("protein_id").is_not_null())
                 )
-                data.write_parquet(f"{_path}/{entity}.parquet")
+                
+                (
+                    conn
+                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    .execute("select * from genbank")
+                    .pl()
+                ).write_parquet(parquet_destination)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -503,7 +525,14 @@ def df_transformation(key, input_name, description):
                     (pl.col("locus_tag").is_not_null())
                     & (pl.col("cds_locus_tag").is_not_null())
                 )
-                data.write_parquet(f"{_path}/{entity}.parquet")
+                
+                (
+                    conn
+                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    .execute("select * from genbank")
+                    .pl()
+                ).write_parquet(parquet_destination)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -514,7 +543,14 @@ def df_transformation(key, input_name, description):
                 )
             else:
                 data = data.filter(pl.col("locus_tag").is_not_null())
-                data.write_parquet(f"{_path}/{entity}.parquet")
+                
+                (
+                    conn
+                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    .execute("select * from genbank")
+                    .pl()
+                ).write_parquet(parquet_destination)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -527,7 +563,13 @@ def df_transformation(key, input_name, description):
             data = data.filter(pl.col("cds_locus_tag").is_not_null()).with_columns(
                 pl.coalesce(["locus_tag", "cds_locus_tag"]).alias("locus_tag")
             )
-            data.write_parquet(f"{_path}/{entity}.parquet")
+            
+            (
+                conn
+                .execute(f"INSERT INTO genbank by position (select * from data)")
+                .execute("select * from genbank")
+                .pl()
+            ).write_parquet(parquet_destination)
             return Output(
                 value="ok",
                 metadata={
@@ -540,7 +582,14 @@ def df_transformation(key, input_name, description):
             data = data.filter(pl.col("protein_id").is_not_null()).with_columns(
                 pl.coalesce(["locus_tag", "protein_id"]).alias("locus_tag")
             )
-            data.write_parquet(f"{_path}/{entity}.parquet")
+            
+            (
+                conn
+                .execute(f"INSERT INTO genbank by position (select * from data)")
+                .execute("select * from genbank")
+                .pl()
+            ).write_parquet(parquet_destination)
+
             return Output(
                 value="ok",
                 metadata={
@@ -555,7 +604,13 @@ def df_transformation(key, input_name, description):
                     (pl.col("gene").is_not_null())
                     & (pl.col("protein_id").is_not_null())
                 ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
-                data.write_parquet(f"{_path}/{entity}.parquet")
+                
+                (
+                    conn
+                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    .execute("select * from genbank")
+                    .pl()
+                ).write_parquet(parquet_destination)
                 return Output(
                     value="ok",
                     metadata={
@@ -569,7 +624,13 @@ def df_transformation(key, input_name, description):
                     (pl.col("gene").is_not_null())
                     & (pl.col("cds_locus_tag").is_not_null())
                 ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
-                data.write_parquet(f"{_path}/{entity}.parquet")
+                
+                (
+                    conn
+                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    .execute("select * from genbank")
+                    .pl()
+                ).write_parquet(parquet_destination)
                 return Output(
                     value="ok",
                     metadata={
@@ -582,7 +643,13 @@ def df_transformation(key, input_name, description):
                 data = data.filter(pl.col("gene").is_not_null()).with_columns(
                     pl.coalesce(["locus_tag", "gene"]).alias("locus_tag")
                 )
-                data.write_parquet(f"{_path}/{entity}.parquet")
+                
+                (
+                    conn
+                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    .execute("select * from genbank")
+                    .pl()
+                ).write_parquet(parquet_destination)
                 return Output(
                     value="ok",
                     metadata={

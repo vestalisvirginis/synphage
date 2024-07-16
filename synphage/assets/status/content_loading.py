@@ -12,6 +12,7 @@ from dagster import (
 
 import os
 import pickle
+import duckdb
 import polars as pl
 import pandas as pd
 
@@ -115,8 +116,7 @@ def parse_gb(context, setup_config: ValidationConfig, file: str):
     full_path = str(Path(source) / f"{file}.gb")
     df = genbank_to_dataframe(full_path)
     df.write_parquet(f"{target}/{file}.parquet")
-    df_load = pd.read_parquet(f"{target}/{file}.parquet")
-    return df_load
+    return df
 
 
 @op(
@@ -131,8 +131,23 @@ def append_gb(context, setup_config: ValidationConfig):
     )
     path_file = context.resources.local_resource.get_paths()["TABLES_DIR"]
     os.makedirs(path_file, exist_ok=True)
-    pl.read_parquet(f"{target}/*.parquet").write_parquet(
-        str(Path(path_file) / "setup_config.table_dir_suffix")
+    parquet_origin = f"{target}/*.parquet"
+    parquet_destination = str(Path(path_file) / "setup_config.table_dir_suffix")
+
+    
+    (
+        duckdb
+        .connect(":memory:") 
+        .execute("""
+                CREATE or REPLACE TABLE genbank (
+                cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
+                start_sequence integer, end_sequence integer, strand integer, extract string, gene string, locus_tag string, translation_fn string, id string, name string, description string, topology string, organism string, 
+                taxonomy varchar[], filename string);"""
+        )
+        .execute(f"INSERT INTO genbank by position (select * from read_parquet('{parquet_origin}'))")
+        .execute("select * from genbank")
+        .pl()
+        .write_parquet(parquet_destination)
     )
     return "ok"
 

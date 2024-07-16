@@ -8,6 +8,7 @@ from dagster import (
 
 import os
 import tempfile
+import duckdb
 import polars as pl
 import csv
 
@@ -76,10 +77,27 @@ def append_processed_df(context):
     path_file = context.resources.local_resource.get_paths()["TABLES_DIR"]
     os.makedirs(path_file, exist_ok=True)
     # if os.path.exists(target):
-    df = pl.read_parquet(f"{target}/*.parquet").with_columns(
-        pl.concat_str("filename", "id", "locus_tag").hash().alias("key")
+    parquet_origin = f"{target}/*.parquet"
+    parquet_destination = str(Path(path_file) / "processed_genbank_df.parquet")
+    df = (
+        duckdb
+        .connect(":memory:")
+        .execute("""
+                CREATE or REPLACE TABLE genbank (
+                cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
+                start_sequence integer, end_sequence integer, strand integer, extract string, gene string, locus_tag string, translation_fn string, id string, name string, description string, topology string, organism string, 
+                taxonomy varchar[], filename string, gb_type string);"""
+        )
+        .execute(f"INSERT INTO genbank by position (select * from read_parquet('{parquet_origin}'))")
+        .execute("select * from genbank")
+        .pl()
+        .with_columns(pl.concat_str("filename", "id", "locus_tag").hash().alias("key"))
     )
-    df.write_parquet(str(Path(path_file) / "processed_genbank_df.parquet"))
+    df.write_parquet(parquet_destination)
+    # df = pl.read_parquet(f"{target}/*.parquet").with_columns(
+    #     pl.concat_str("filename", "id", "locus_tag").hash().alias("key")
+    # )
+    # df.write_parquet(str(Path(path_file) / "processed_genbank_df.parquet"))
 
     check_df = check.validate(df)
 
