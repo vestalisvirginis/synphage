@@ -1,4 +1,4 @@
-with blastn as (select COLUMNS('^(query|source)_.*$'), query_title as key from read_parquet('{}')),
+with blastn as (select COLUMNS('^(query|source)_.*$'), query_key as key from read_parquet('{}')),
      locus as (select * from read_parquet('{}'))
 select 
     A.*, B.*
