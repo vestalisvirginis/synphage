@@ -1,3 +1,4 @@
+import pytest
 import os
 
 from dagster import materialize_to_memory, build_asset_context, asset
@@ -49,7 +50,25 @@ def test_download_to_genbank_with_history(mock_env_download_to_genbank_with_hist
     assert len(result[1]) == 1
 
 
-def test_download_to_genbank_remove_dot(mock_env_download_to_genbank):
+@pytest.mark.parametrize(
+    "input_asset, new_name, old_filename",
+    [
+        (
+            "test/fixtures/assets_testing_folder/download_to_genbank/download/TT_000001.1.gb",
+            "TT_000001_1.gb",
+            "test/fixtures/assets_testing_folder/download_to_genbank/download/TT_000001.1.gb",
+        ),
+        (
+            "test/fixtures/assets_testing_folder/download_to_genbank/download/TT 00000 1.gb",
+            "TT_00000_1.gb",
+            "test/fixtures/assets_testing_folder/download_to_genbank/download/TT 00000 1.gb",
+        ),
+    ],
+    ids=["filename_with_dot", "file_name_with_space"],
+)
+def test_download_to_genbank_rename(
+    mock_env_download_to_genbank, input_asset, new_name, old_filename
+):
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
@@ -57,20 +76,16 @@ def test_download_to_genbank_remove_dot(mock_env_download_to_genbank):
             )
         }
     )
-    input_asset = [
-        "test/fixtures/assets_testing_folder/download_to_genbank/download/TT_000001.1.gb"
-    ]
+    input_asset = [input_asset]
     result = download_to_genbank(context, input_asset)
     assert isinstance(result, DownloadRecord)
     assert len(result) == 2
     assert isinstance(result[0], list)
     assert len(result[0]) == 1
-    assert result[0] == ["TT_000001_1.gb"]
+    assert result[0] == [new_name]
     assert isinstance(result[1], list)
     assert len(result[1]) == 1
-    assert result[1] == [
-        "test/fixtures/assets_testing_folder/download_to_genbank/download/TT_000001.1.gb"
-    ]
+    assert result[1] == [old_filename]
 
 
 def test_download_to_genbank_asset(mock_env_download_to_genbank):

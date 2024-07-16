@@ -41,7 +41,10 @@ def download_to_genbank(context, fetch_genome) -> DownloadRecord:
     # Harmonise file name
     _new_transfer = []
     for _file in _T:
-        _output_file = str(Path(_gb_path) / f"{Path(_file).stem.replace('.', '_')}.gb")
+        _output_file = str(
+            Path(_gb_path)
+            / f"{Path(_file).stem.replace('.', '_').replace(' ', '_')}.gb"
+        )
         shutil.copy2(
             _file,
             _output_file,
