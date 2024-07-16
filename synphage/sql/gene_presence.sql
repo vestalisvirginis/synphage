@@ -5,4 +5,4 @@ select
 FROM 
     locus B
 LEFT JOIN
-    blastn A using('name', 'locus_tag')
+    blastn A using('key')
