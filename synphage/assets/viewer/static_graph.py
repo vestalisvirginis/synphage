@@ -8,6 +8,7 @@ import tempfile
 
 import polars as pl
 
+from pydantic import Field
 from io import BytesIO
 from datetime import datetime
 from typing import Optional
@@ -85,14 +86,16 @@ class Genome(Config):
 
 @asset(
     description="Return a dict from the sequence paths and their orientation.",
+    required_resource_keys={'local_resource'},
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context, config: Genome) -> dict:
+def create_genome(context, config: Genome, transform_blastn, transform_blastp) -> dict:
     # Path to sequence file
-    _path_seq = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
-    )
+    # _path_seq = str(
+    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
+    # )
+    _path_seq = str(Path(context.resources.local_resource.get_paths()['SYNPHAGE_DATA']) / config.sequence_file)
     context.log.info(f"File containing the sequences to plot: {_path_seq}")
 
     if os.path.exists(_path_seq):
@@ -116,10 +119,8 @@ def create_genome(context, config: Genome) -> dict:
         )
 
     # Asset metadata
-    _time = datetime.now()
     context.add_output_metadata(
         metadata={
-            "text_metadata": f"Sequences to plot {_time.isoformat()} (UTC).",
             "num_sqcs": len(_sequences),
             "sequences": MetadataValue.json(_sequences),
         }
@@ -152,6 +153,10 @@ def _get_feature(
 
 class Diagram(Config):
     title: str = "synteny_plot"
+    graph_type: str = Field(
+        default="blastn",
+        description="Data to plot. Value=['blastn' | 'blastp']",
+    )
     colours: list[str] = [
         "#fde725",
         "#90d743",
@@ -175,6 +180,7 @@ class Diagram(Config):
 
 @asset(
     description="Transform a list of genomes into a genome diagram",
+    required_resource_keys={'local_resource'},
     compute_kind="Biopython",
     metadata={
         "owner": "Virginie Grosboillot",
@@ -184,17 +190,28 @@ def create_graph(
     context, create_genome: dict, config: Diagram
 ) -> GenomeDiagram.Diagram:
     # Define the paths
-    _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
-    _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
-    _blastn_dir = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
-        / "tables"
-        / "blastn_summary.parquet"
-    )
-    _uniq_dir = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
-    )
-    _colour_dir = str(Path(_synteny_folder) / "colour_table")
+    #_gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
+    _gb_folder = context.resources.local_resource.get_paths()['GENBANK_DIR']
+    #_synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
+    _synteny_folder = context.resources.local_resource.get_paths()['SYNTENY_DIR']
+    # _blastn_dir = str(
+    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
+    #     / "tables"
+    #     / "blastn_summary.parquet"
+    # )
+    # Which blast summary table ?
+    _tables_path = context.resources.local_resource.get_paths()['TABLES_DIR']
+    if config.graph_type == 'blastp':
+        _blast_dir = str(Path(_tables_path) / "blastp_summary.parquet")
+        _uniq_dir = str(Path(_tables_path) / "protein_uniqueness.parquet")
+    else:
+        _blast_dir = str(Path(_tables_path) / "blastn_summary.parquet")
+        _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
+
+    # _uniq_dir = str(
+    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
+    # )
+    _colour_dir = str(Path(_synteny_folder) / "colour_table.parquet")
 
     # Set name for the diagram
     _name_graph = config.title
@@ -304,12 +321,12 @@ def create_graph(
         _set_Y = _feature_sets[_Y]
 
         _X_vs_Y = (
-            pl.read_parquet(_blastn_dir)
+            pl.read_parquet(_blast_dir)
             .filter(
                 (pl.col("source_genome_name") == _X)
                 & (pl.col("query_genome_name") == _Y)
             )
-            .select("source_locus_tag", "query_locus_tag", "percentage_of_identity")
+            .select("source_locus_tag", "query_locus_tag", "percentage_of_identity")   ###TODO
         )
 
         for _id_X, _id_Y, _perc in _X_vs_Y.iter_rows():
@@ -342,7 +359,7 @@ def create_graph(
             _gd_diagram.cross_track_links.append(CrossLink(_F_x, _F_y, _color, _border))
     context.log.info("Cross-links have been appended")
 
-    _gene_color_palette = gene_uniqueness(_uniq_dir, _record_names)
+    _gene_color_palette = gene_uniqueness(_uniq_dir, _record_names)   ###TODO
     context.log.info(f"Writing: {str(_colour_dir)}")
     os.makedirs(Path(_colour_dir).parent, exist_ok=True)
     _gene_color_palette.write_parquet(_colour_dir)
