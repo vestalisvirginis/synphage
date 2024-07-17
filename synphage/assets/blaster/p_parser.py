@@ -101,7 +101,7 @@ def protein_presence(
     """Consolidate gene and locus"""
     tables = context.resources.local_resource.get_paths()["TABLES_DIR"]
     path_to_df = str(Path(tables) / setup_pconfig.locus_table)
-    #locus_all = pl.read_parquet(path_to_df)
+    # locus_all = pl.read_parquet(path_to_df)
 
     conn = duckdb.connect(":memory:")
     _path_protein_presence_sql = os.path.join(
