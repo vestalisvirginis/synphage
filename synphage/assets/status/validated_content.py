@@ -80,15 +80,17 @@ def append_processed_df(context):
     parquet_origin = f"{target}/*.parquet"
     parquet_destination = str(Path(path_file) / "processed_genbank_df.parquet")
     df = (
-        duckdb
-        .connect(":memory:")
-        .execute("""
+        duckdb.connect(":memory:")
+        .execute(
+            """
                 CREATE or REPLACE TABLE genbank (
                 cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
-                start_sequence integer, end_sequence integer, strand integer, extract string, gene string, locus_tag string, translation_fn string, id string, name string, description string, topology string, organism string, 
+                start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
                 taxonomy varchar[], filename string, gb_type string);"""
         )
-        .execute(f"INSERT INTO genbank by position (select * from read_parquet('{parquet_origin}'))")
+        .execute(
+            f"INSERT INTO genbank by position (select * from read_parquet('{parquet_origin}'))"
+        )
         .execute("select * from genbank")
         .pl()
         .with_columns(pl.concat_str("filename", "id", "locus_tag").hash().alias("key"))
@@ -117,12 +119,18 @@ def append_processed_df(context):
             severity=_check_severity(check),
         )
 
-    csv_path = str(Path(context.resources.local_resource.get_paths()["SYNPHAGE_DATA"]) / 'sequences.csv')
+    csv_path = str(
+        Path(context.resources.local_resource.get_paths()["SYNPHAGE_DATA"])
+        / "sequences.csv"
+    )
     seq_dict = {}
-    for file in [Path(filename['filename']).name for filename in df.select('filename').unique().iter_rows(named=True)]:
+    for file in [
+        Path(filename["filename"]).name
+        for filename in df.select("filename").unique().iter_rows(named=True)
+    ]:
         seq_dict[file] = 0
 
-    with open(csv_path,'w') as f:
+    with open(csv_path, "w") as f:
         w = csv.writer(f)
         w.writerows(seq_dict.items())
 

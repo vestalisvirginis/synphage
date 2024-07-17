@@ -485,17 +485,17 @@ def df_transformation(key, input_name, description):
         os.makedirs(_path, exist_ok=True)
 
         conn = duckdb.connect(":memory:")
-        
+
         (
-            conn
-            .execute("""
+            conn.execute(
+                """
                     CREATE or REPLACE TABLE genbank (
                     cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
-                    start_sequence integer, end_sequence integer, strand integer, extract string, gene string, locus_tag string, translation_fn string, id string, name string, description string, topology string, organism string, 
+                    start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
                     taxonomy varchar[], filename string, gb_type string);"""
             )
         )
-        
+
         parquet_destination = f"{_path}/{entity}.parquet"
 
         if gb_type == "locus_tag":
@@ -504,10 +504,11 @@ def df_transformation(key, input_name, description):
                     (pl.col("locus_tag").is_not_null())
                     & (pl.col("protein_id").is_not_null())
                 )
-                
+
                 (
-                    conn
-                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    conn.execute(
+                        f"INSERT INTO genbank by position (select * from data)"
+                    )
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -525,10 +526,11 @@ def df_transformation(key, input_name, description):
                     (pl.col("locus_tag").is_not_null())
                     & (pl.col("cds_locus_tag").is_not_null())
                 )
-                
+
                 (
-                    conn
-                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    conn.execute(
+                        f"INSERT INTO genbank by position (select * from data)"
+                    )
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -543,10 +545,11 @@ def df_transformation(key, input_name, description):
                 )
             else:
                 data = data.filter(pl.col("locus_tag").is_not_null())
-                
+
                 (
-                    conn
-                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    conn.execute(
+                        f"INSERT INTO genbank by position (select * from data)"
+                    )
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -563,10 +566,9 @@ def df_transformation(key, input_name, description):
             data = data.filter(pl.col("cds_locus_tag").is_not_null()).with_columns(
                 pl.coalesce(["locus_tag", "cds_locus_tag"]).alias("locus_tag")
             )
-            
+
             (
-                conn
-                .execute(f"INSERT INTO genbank by position (select * from data)")
+                conn.execute(f"INSERT INTO genbank by position (select * from data)")
                 .execute("select * from genbank")
                 .pl()
             ).write_parquet(parquet_destination)
@@ -582,10 +584,9 @@ def df_transformation(key, input_name, description):
             data = data.filter(pl.col("protein_id").is_not_null()).with_columns(
                 pl.coalesce(["locus_tag", "protein_id"]).alias("locus_tag")
             )
-            
+
             (
-                conn
-                .execute(f"INSERT INTO genbank by position (select * from data)")
+                conn.execute(f"INSERT INTO genbank by position (select * from data)")
                 .execute("select * from genbank")
                 .pl()
             ).write_parquet(parquet_destination)
@@ -604,10 +605,11 @@ def df_transformation(key, input_name, description):
                     (pl.col("gene").is_not_null())
                     & (pl.col("protein_id").is_not_null())
                 ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
-                
+
                 (
-                    conn
-                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    conn.execute(
+                        f"INSERT INTO genbank by position (select * from data)"
+                    )
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -624,10 +626,11 @@ def df_transformation(key, input_name, description):
                     (pl.col("gene").is_not_null())
                     & (pl.col("cds_locus_tag").is_not_null())
                 ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
-                
+
                 (
-                    conn
-                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    conn.execute(
+                        f"INSERT INTO genbank by position (select * from data)"
+                    )
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -643,10 +646,11 @@ def df_transformation(key, input_name, description):
                 data = data.filter(pl.col("gene").is_not_null()).with_columns(
                     pl.coalesce(["locus_tag", "gene"]).alias("locus_tag")
                 )
-                
+
                 (
-                    conn
-                    .execute(f"INSERT INTO genbank by position (select * from data)")
+                    conn.execute(
+                        f"INSERT INTO genbank by position (select * from data)"
+                    )
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
