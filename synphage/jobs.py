@@ -50,23 +50,23 @@ download = define_asset_job(
 # Job 3 : validations with to reload + refresh UI
 
 # Job 4 : blastn
-get_blastn = define_asset_job(
-    name="get_blastn", selection=(AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_n").downstream())
+blastn = define_asset_job(
+    name="make_blastn", selection=(AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_n").downstream())
 )
 
 # Job 5 : blastp
-get_blastp = define_asset_job(
-    name="get_blastp", selection=(AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_p").downstream())
+blastp = define_asset_job(
+    name="make_blastp", selection=(AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_p").downstream())
 )
 
 # Job 6 : blastn and blastp combined
-get_all_blast = define_asset_job(
-    name="get_all_blast", selection=(AssetSelection.groups("Blaster"))
+all_blast = define_asset_job(
+    name="make_all_blast", selection=(AssetSelection.groups("Blaster"))
 )
 
 # Job 7 : create the synteny diagram
 plot = define_asset_job(
-    name="plot",
+    name="make_plot",
     selection=AssetSelection.groups("Viewer"),
 )
 
