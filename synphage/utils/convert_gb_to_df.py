@@ -77,7 +77,7 @@ def genbank_to_dataframe(filename: str):
     cds_extract = list(
         map(lambda x: str(x.extract(genome.seq)), filter(_type_cds, genome.features))
     )
-    df_cds_extract = pl.DataFrame(cds_extract, schema=["extract"])
+    df_cds_extract = pl.DataFrame(cds_extract, schema=["cds_extract"])
     # df_cds_translate = pl.DataFrame(map(partial(translate, stop_symbol="", table=11), cds_extract), schema=["translation_fn"])
 
     cds = pl.concat(items=[df_cds, df_cds_pk, df_cds_extract], how="horizontal").rename(
@@ -125,9 +125,10 @@ def genbank_to_dataframe(filename: str):
     )
 
     # join all the dataframes
-    df = cds.join(
-        other=gene, on=["start", "end", "strand", "extract"], how="full", coalesce=True
-    )
+    # df = cds.join(
+    #     other=gene, on=["start", "end", "strand", "extract"], how="full", coalesce=True
+    # )
+    df = cds.join(other=gene, on=["start", "end", "strand"], how="full", coalesce=True)
     df = df.with_columns(
         id=pl.lit(id),
         name=pl.lit(name),
