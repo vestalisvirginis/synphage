@@ -220,7 +220,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "locus_tag"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -244,7 +244,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "locus_tag"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -274,7 +274,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "cds_locus_tag"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -298,7 +298,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "cds_locus_tag"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -328,7 +328,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "protein_id"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -352,7 +352,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "protein_id"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -379,7 +379,7 @@ def gb_labelling(key, input_name, description):
                 == "PASS"
             ):
                 gb_type = "gene"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
@@ -403,7 +403,7 @@ def gb_labelling(key, input_name, description):
                 .to_list()[0]
             ):
                 gb_type = "gene"
-                data = data.with_columns(gb_type=gb_type)
+                data = data.with_columns(gb_type=pl.lit(gb_type))
                 return Output(
                     value=(data, gb_type),
                     metadata={
