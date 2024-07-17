@@ -8,7 +8,7 @@ from .assets import (
     status_assets,
 )
 
-from .jobs import blast, transform, plot, download
+from .jobs import get_user_data, download, get_blastn, get_blastp, get_all_blast, plot
 
 from .resources import RESOURCES_LOCAL
 
@@ -30,5 +30,5 @@ resources_by_deployment_name = {
 defs = Definitions(
     assets=all_assets,
     resources=resources_by_deployment_name["local"],
-    jobs=[blast, transform, plot, download],
+    jobs=[get_user_data, download, get_blastn, get_blastp, get_all_blast, plot],
 )
