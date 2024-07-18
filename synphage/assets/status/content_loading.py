@@ -11,7 +11,6 @@ from dagster import (
     AssetExecutionContext,
     file_relative_path,
     Output,
-
 )
 
 import os
@@ -173,15 +172,11 @@ def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
 @asset(
     required_resource_keys={"pipes_subprocess_client"},
 )
-def reload_ui_asset(
-    context: AssetExecutionContext, create_genbank_df
-) -> Output:
+def reload_ui_asset(context: AssetExecutionContext, create_genbank_df) -> Output:
     # Command to reload the UI
     cmd = [shutil.which("python"), file_relative_path(__file__, "external_code.py")]
     # return pipes_subprocess_client.run(
     #     command=cmd, context=context
     # ).get_materialize_result()
-    context.resources.pipes_subprocess_client.run(
-        command=cmd, context=context
-    )
-    return Output(value = "Definitions have been reloaded")
+    context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+    return Output(value="Definitions have been reloaded")

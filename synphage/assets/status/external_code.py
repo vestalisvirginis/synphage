@@ -10,7 +10,7 @@ def main():
         }
     }
     """
-    response = requests.post(url, json={'query': query})
+    response = requests.post(url, json={"query": query})
     if response.status_code == 200:
         print("Definitions reloaded successfully")
     else:

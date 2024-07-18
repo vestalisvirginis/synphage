@@ -8,7 +8,6 @@ from dagster import (
     MetadataValue,
     PipesSubprocessClient,
     file_relative_path,
-
 )
 
 import os
@@ -519,8 +518,10 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
-                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
-                
+                context.resources.pipes_subprocess_client.run(
+                    command=cmd, context=context
+                )
+
                 return Output(
                     value="ok",
                     metadata={
@@ -543,7 +544,9 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
-                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+                context.resources.pipes_subprocess_client.run(
+                    command=cmd, context=context
+                )
 
                 return Output(
                     value="ok",
@@ -564,7 +567,9 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
-                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+                context.resources.pipes_subprocess_client.run(
+                    command=cmd, context=context
+                )
 
                 return Output(
                     value="ok",
@@ -631,7 +636,9 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
-                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+                context.resources.pipes_subprocess_client.run(
+                    command=cmd, context=context
+                )
 
                 return Output(
                     value="ok",
@@ -655,7 +662,9 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
-                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+                context.resources.pipes_subprocess_client.run(
+                    command=cmd, context=context
+                )
 
                 return Output(
                     value="ok",
@@ -678,7 +687,9 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
-                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+                context.resources.pipes_subprocess_client.run(
+                    command=cmd, context=context
+                )
 
                 return Output(
                     value="ok",

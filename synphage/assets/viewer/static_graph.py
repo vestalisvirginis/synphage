@@ -38,19 +38,23 @@ def gene_uniqueness(
         pl.read_parquet(path_to_dataset)
         .filter(
             (pl.col("name").is_in(record_name))
-            & ((pl.col("source_name").is_in(record_name)) | (pl.col("source_name")).is_null())
+            & (
+                (pl.col("source_name").is_in(record_name))
+                | (pl.col("source_name")).is_null()
+            )
         )
         .with_columns(
             pl.col("name").n_unique().alias("total_seq"),
-            pl.when(pl.col('source_name').is_null()).then(pl.lit(0)).otherwise(pl.lit(1)).alias("counter_start")
+            pl.when(pl.col("source_name").is_null())
+            .then(pl.lit(0))
+            .otherwise(pl.lit(1))
+            .alias("counter_start"),
         )
         .group_by("name", "gene", "locus_tag", "total_seq", "counter_start")
         .len()
-        .with_columns((pl.col('len')+pl.col('counter_start')-1).alias('count'))
+        .with_columns((pl.col("len") + pl.col("counter_start") - 1).alias("count"))
         .with_columns(
-            (pl.col("count") / (pl.col("total_seq")-1) * 100).alias(
-                "perc_presence"
-            )
+            (pl.col("count") / (pl.col("total_seq") - 1) * 100).alias("perc_presence")
         )
     )
 
@@ -68,7 +72,7 @@ def _assess_file_content(genome: SeqRecord.SeqRecord) -> bool:  # Duplicated fun
             if _gene_count > 1:
                 _gene_value = True
                 break
-#[gb['gb_type'] for gb in pl.read_parquet('temp/development/data/tables/gene_uniqueness.parquet').group_by('name', 'gb_type').count().iter_rows(named=True) if gb['name']=='NC_000964']
+    # [gb['gb_type'] for gb in pl.read_parquet('temp/development/data/tables/gene_uniqueness.parquet').group_by('name', 'gb_type').count().iter_rows(named=True) if gb['name']=='NC_000964']
     return _gene_value
 
 
@@ -195,7 +199,7 @@ def create_graph(
 ) -> GenomeDiagram.Diagram:
     # Define the paths
     # _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
-    
+
     _gb_folder = context.resources.local_resource.get_paths()["GENBANK_DIR"]
     # _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
     _synteny_folder = context.resources.local_resource.get_paths()["SYNTENY_DIR"]
@@ -324,13 +328,8 @@ def create_graph(
 
         _X_vs_Y = (
             pl.read_parquet(_uniq_dir)
-            .filter(
-                (pl.col("source_name") == _X)
-                & (pl.col("query_name") == _Y)
-            )
-            .select(
-                "source_locus_tag", "query_locus_tag", "percentage_of_identity"
-            )
+            .filter((pl.col("source_name") == _X) & (pl.col("query_name") == _Y))
+            .select("source_locus_tag", "query_locus_tag", "percentage_of_identity")
         )
 
         for _id_X, _id_Y, _perc in _X_vs_Y.iter_rows():
@@ -362,7 +361,7 @@ def create_graph(
             )
             _gd_diagram.cross_track_links.append(CrossLink(_F_x, _F_y, _color, _border))
     context.log.info("Cross-links have been appended")
-    
+
     _gene_color_palette = gene_uniqueness(_uniq_dir, _record_names)
     context.log.info(f"Writing: {str(_colour_dir)}")
     os.makedirs(Path(_colour_dir).parent, exist_ok=True)
@@ -371,15 +370,22 @@ def create_graph(
 
     for _record_name, _record in _records.items():
         _gd_feature_set = _feature_sets[_record_name]
-        #_gene_value = _assess_file_content(_record)
-        _gene_value =[gbt['gb_type'] for gbt in pl.read_parquet(_uniq_dir).group_by('name', 'gb_type').len().iter_rows(named=True) if gbt['name']==_record_name][0]
-        if _gene_value=='locus_tag' or _gene_value=='gene':
+        # _gene_value = _assess_file_content(_record)
+        _gene_value = [
+            gbt["gb_type"]
+            for gbt in pl.read_parquet(_uniq_dir)
+            .group_by("name", "gb_type")
+            .len()
+            .iter_rows(named=True)
+            if gbt["name"] == _record_name
+        ][0]
+        if _gene_value == "locus_tag" or _gene_value == "gene":
             for _feature in _record.features:
                 if _feature.type != "gene":
                     # Exclude this feature
                     continue
                 try:
-                    if _gene_value=='locus_tag':
+                    if _gene_value == "locus_tag":
                         _perc = (
                             _gene_color_palette.filter(
                                 (pl.col("name") == _record_name)
@@ -476,7 +482,7 @@ def create_graph(
                     # Exclude this feature
                     continue
                 try:
-                    if _gene_value=='cds_locus_tag':
+                    if _gene_value == "cds_locus_tag":
                         _perc = (
                             _gene_color_palette.filter(
                                 (pl.col("name") == _record_name)

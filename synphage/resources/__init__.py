@@ -16,5 +16,5 @@ RESOURCES_LOCAL = {
     ),
     "ncbi_connection": ncbi_resource,
     "io_manager": init_local_io_manager.get_io_manager(),
-    "pipes_subprocess_client": PipesSubprocessClient()
+    "pipes_subprocess_client": PipesSubprocessClient(),
 }
