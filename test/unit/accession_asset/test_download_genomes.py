@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
 
-from dagster import build_asset_context, materialize_to_memory, asset
+from dagster import build_asset_context, materialize_to_memory
 
-from synphage.assets.ncbi_connect.accession import downloaded_genomes, QueryConfig
+from synphage.assets.ncbi_connect.accession import downloaded_genomes
 from synphage.resources.local_resource import InputOutputConfig
 
 
