@@ -1,4 +1,4 @@
-from dagster import asset, Config, MetadataValue, AssetObservation
+from dagster import asset, Config, MetadataValue, AssetObservation, AssetSpec
 
 import enum
 import os
@@ -93,12 +93,16 @@ class Genome(Config):
 
 
 @asset(
+    deps=[
+        AssetSpec("transform_blastn", skippable=True),
+        AssetSpec("transform_blastp", skippable=True),
+    ],
     description="Return a dict from the sequence paths and their orientation.",
     required_resource_keys={"local_resource"},
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context, config: Genome, transform_blastn, transform_blastp) -> dict:
+def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
     # _path_seq = str(
     #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
