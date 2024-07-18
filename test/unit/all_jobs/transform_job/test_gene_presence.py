@@ -5,7 +5,7 @@ import polars as pl
 from pathlib import Path
 from dagster import build_op_context
 
-from synphage.jobs import gene_presence
+#from synphage.jobs import gene_presence
 
 
 BLASTN_TABLE = (

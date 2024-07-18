@@ -1,4 +1,4 @@
-from dagster import asset, Config, EnvVar, MetadataValue, AssetObservation
+from dagster import asset, Config, MetadataValue, AssetObservation, AssetSpec
 
 import enum
 import os
@@ -93,12 +93,16 @@ class Genome(Config):
 
 
 @asset(
+    deps=[
+        AssetSpec("transform_blastn", skippable=True),
+        AssetSpec("transform_blastp", skippable=True),
+    ],
     description="Return a dict from the sequence paths and their orientation.",
     required_resource_keys={"local_resource"},
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context, config: Genome, transform_blastn, transform_blastp) -> dict:
+def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
     # _path_seq = str(
     #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
@@ -211,10 +215,8 @@ def create_graph(
     # Which blast summary table ?
     _tables_path = context.resources.local_resource.get_paths()["TABLES_DIR"]
     if config.graph_type == "blastp":
-        _blast_dir = str(Path(_tables_path) / "blastp_summary.parquet")
         _uniq_dir = str(Path(_tables_path) / "protein_uniqueness.parquet")
     else:
-        _blast_dir = str(Path(_tables_path) / "blastn_summary.parquet")
         _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
 
     # _uniq_dir = str(

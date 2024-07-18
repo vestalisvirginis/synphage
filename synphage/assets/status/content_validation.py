@@ -6,7 +6,6 @@ from dagster import (
     AssetIn,
     AssetExecutionContext,
     MetadataValue,
-    PipesSubprocessClient,
     file_relative_path,
 )
 

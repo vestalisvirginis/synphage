@@ -1,5 +1,5 @@
 import pytest
-from synphage.jobs import setup_config, PipeConfig
+#from synphage.jobs import setup_config, PipeConfig
 
 
 @pytest.mark.skip(reason="need to rewrite test to accomodate changes")

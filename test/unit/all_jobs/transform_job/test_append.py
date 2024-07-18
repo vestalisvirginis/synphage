@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path, PosixPath
 
-from synphage.jobs import append, PipeConfig
+#from synphage.jobs import append, PipeConfig
 
 
 TABLES = "test/fixtures/assets_testing_folder/transform_2/tables"
