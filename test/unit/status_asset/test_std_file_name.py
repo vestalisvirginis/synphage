@@ -2,7 +2,7 @@ import pytest
 import os
 from pathlib import Path
 
-from synphage.assets.status.gb_file_status import _standardise_file_extention
+#from synphage.assets.status.gb_file_status import _standardise_file_extention
 
 
 @pytest.mark.skip(reason="need to rewrite test to accomodate changes")

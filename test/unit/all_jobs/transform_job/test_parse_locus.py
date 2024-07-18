@@ -4,7 +4,7 @@ import polars as pl
 
 from dagster import build_op_context
 
-from synphage.jobs import parse_locus, PipeConfig
+#from synphage.jobs import parse_locus, PipeConfig
 
 
 SOURCE = "test/fixtures/assets_testing_folder/transform/genbank"
