@@ -4,7 +4,6 @@ from Bio import SeqIO
 from Bio.Seq import translate
 from toolz import compose, juxt, first
 from toolz.curried import map as mapc
-from operator import itemgetter as it
 from operator import attrgetter as at
 from operator import methodcaller as mc
 from operator import eq

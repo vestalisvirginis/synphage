@@ -17,8 +17,6 @@ import os
 import pickle
 import duckdb
 import shutil
-import polars as pl
-import pandas as pd
 
 from pathlib import Path
 from collections import namedtuple

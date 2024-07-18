@@ -1,4 +1,4 @@
-from dagster import asset, Config, EnvVar, MetadataValue, AssetObservation
+from dagster import asset, Config, MetadataValue, AssetObservation
 
 import enum
 import os
@@ -211,10 +211,8 @@ def create_graph(
     # Which blast summary table ?
     _tables_path = context.resources.local_resource.get_paths()["TABLES_DIR"]
     if config.graph_type == "blastp":
-        _blast_dir = str(Path(_tables_path) / "blastp_summary.parquet")
         _uniq_dir = str(Path(_tables_path) / "protein_uniqueness.parquet")
     else:
-        _blast_dir = str(Path(_tables_path) / "blastn_summary.parquet")
         _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
 
     # _uniq_dir = str(

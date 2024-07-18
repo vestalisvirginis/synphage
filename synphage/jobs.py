@@ -1,39 +1,14 @@
 from dagster import (
-    EnvVar,
     AssetSelection,
     define_asset_job,
-    op,
-    job,
-    DynamicOutput,
-    DynamicOut,
-    Nothing,
-    In,
-    RunConfig,
-    Config,
-    AssetKey,
     ExperimentalWarning,
     ConfigArgumentWarning,
 )
 
-import os
-import tempfile
-import duckdb
-import requests
-import polars as pl
-from functools import partial
-from Bio import SeqIO
-from operator import methodcaller as mc
-from operator import attrgetter as at
-from operator import itemgetter as it
-from operator import eq
-from toolz import first, compose
-from pathlib import Path
 import warnings
 
 warnings.filterwarnings("ignore", category=ExperimentalWarning)
 warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
-
-TEMP_DIR = tempfile.gettempdir()
 
 
 # Data acquisition
