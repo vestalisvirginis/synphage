@@ -6,10 +6,14 @@ from dagster import (
     AssetIn,
     AssetExecutionContext,
     MetadataValue,
+    PipesSubprocessClient,
+    file_relative_path,
+
 )
 
 import os
 import pickle
+import shutil
 import duckdb
 import polars as pl
 import tempfile
@@ -132,7 +136,7 @@ def _gb_transformation_settings(
         "description": asset_description,
         "ins": {input_name.lower(): AssetIn()},
         "io_manager_key": "io_manager",
-        "required_resource_keys": {"local_resource"},
+        "required_resource_keys": {"local_resource", "pipes_subprocess_client"},
         "metadata": {"owner": "Virginie Grosboillot"},
         "compute_kind": "Transformation",
     }
@@ -148,7 +152,8 @@ def gb_validation(key, name, check_specs, check, description):
             asset_description=description,
         )
     )
-    def asset_template(context: AssetExecutionContext, create_genbank_df):
+    # def asset_template(context: AssetExecutionContext, create_genbank_df):
+    def asset_template(context: AssetExecutionContext, reload_ui_asset):
         entity = name
         fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
         path = str(Path(fs) / "gb_parsing")
@@ -478,6 +483,7 @@ def df_transformation(key, input_name, description):
         )
     )
     def asset_template(context, **kwargs):
+        cmd = [shutil.which("python"), file_relative_path(__file__, "external_code.py")]
         data, gb_type = kwargs[input_name]
         entity = key
         fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
@@ -513,6 +519,8 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
+                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+                
                 return Output(
                     value="ok",
                     metadata={
@@ -535,6 +543,8 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
+                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -554,6 +564,8 @@ def df_transformation(key, input_name, description):
                     .pl()
                 ).write_parquet(parquet_destination)
 
+                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -572,6 +584,9 @@ def df_transformation(key, input_name, description):
                 .execute("select * from genbank")
                 .pl()
             ).write_parquet(parquet_destination)
+
+            context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
             return Output(
                 value="ok",
                 metadata={
@@ -590,6 +605,8 @@ def df_transformation(key, input_name, description):
                 .execute("select * from genbank")
                 .pl()
             ).write_parquet(parquet_destination)
+
+            context.resources.pipes_subprocess_client.run(command=cmd, context=context)
 
             return Output(
                 value="ok",
@@ -613,6 +630,9 @@ def df_transformation(key, input_name, description):
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
+
+                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -634,6 +654,9 @@ def df_transformation(key, input_name, description):
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
+
+                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -654,6 +677,9 @@ def df_transformation(key, input_name, description):
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
+
+                context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
                 return Output(
                     value="ok",
                     metadata={
@@ -663,6 +689,9 @@ def df_transformation(key, input_name, description):
                     },
                 )
         else:
+
+            context.resources.pipes_subprocess_client.run(command=cmd, context=context)
+
             return Output(
                 value="Not ok",
                 metadata={
@@ -763,3 +792,18 @@ def load_dynamic():
 
 
 my_dynamic_assets = load_dynamic()
+
+
+# @asset
+# def reload_ui_downstream_assets(
+#     context: AssetExecutionContext, pipes_subprocess_client: PipesSubprocessClient, my_dynamic_assets
+# ) -> Output:
+#     # Command to reload the UI
+#     cmd = [shutil.which("python"), file_relative_path(__file__, "external_code.py")]
+#     # return pipes_subprocess_client.run(
+#     #     command=cmd, context=context
+#     # ).get_materialize_result()
+#     pipes_subprocess_client.run(
+#         command=cmd, context=context
+#     )
+#     return Output(value = "Definitions have been reloaded")

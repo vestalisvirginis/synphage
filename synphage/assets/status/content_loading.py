@@ -8,11 +8,16 @@ from dagster import (
     In,
     Nothing,
     AssetSpec,
+    AssetExecutionContext,
+    file_relative_path,
+    Output,
+
 )
 
 import os
 import pickle
 import duckdb
+import shutil
 import polars as pl
 import pandas as pd
 
@@ -163,3 +168,20 @@ def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
     results = files.map(partial(parse_gb, config_gb))
     all_gb = append_gb(config_gb, results.collect())
     return all_gb
+
+
+@asset(
+    required_resource_keys={"pipes_subprocess_client"},
+)
+def reload_ui_asset(
+    context: AssetExecutionContext, create_genbank_df
+) -> Output:
+    # Command to reload the UI
+    cmd = [shutil.which("python"), file_relative_path(__file__, "external_code.py")]
+    # return pipes_subprocess_client.run(
+    #     command=cmd, context=context
+    # ).get_materialize_result()
+    context.resources.pipes_subprocess_client.run(
+        command=cmd, context=context
+    )
+    return Output(value = "Definitions have been reloaded")
