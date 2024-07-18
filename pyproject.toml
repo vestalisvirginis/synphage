@@ -28,7 +28,7 @@ dependencies = [
     "polars >= 1.0.0",
     "pyarrow >= 15.0.0",
     "requests >= 2.31.0",
-    "pycairo == 1.26.0",
+    "pycairo == 1.26.1",
     "svgutils == 0.3.4",
     "cairosvg == 2.7.1",
 ]
