@@ -1,8 +1,9 @@
 from dagster import load_assets_from_package_module
 
-from . import ncbi_connect, status, blaster, viewer
+from . import ncbi_connect, user_data, status, blaster, viewer
 
 NCBI_CONNECT = "NCBI_connect"
+USERS_INPUT = "Users_input"
 STATUS = "Status"
 BLASTER = "Blaster"
 VIEWER = "Viewer"
@@ -10,6 +11,11 @@ VIEWER = "Viewer"
 ncbi_connect_assets = load_assets_from_package_module(
     package_module=ncbi_connect,
     group_name=NCBI_CONNECT,
+)
+
+user_input_assets = load_assets_from_package_module(
+    package_module=user_data,
+    group_name=USERS_INPUT,
 )
 
 status_assets = load_assets_from_package_module(

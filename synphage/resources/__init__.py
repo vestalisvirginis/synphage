@@ -1,16 +1,20 @@
-import os
-import tempfile
-
-from pathlib import Path
-
+from .local_resource import InputOutputConfig, LocalFilesystemIOManager
 from .ncbi_resource import ncbi_resource
 
-from dagster import EnvVar, FilesystemIOManager
+import os
+from dagster import PipesSubprocessClient
+
+
+init_local_io_manager = LocalFilesystemIOManager(
+    input_dir=str(os.getenv("DATA_DIR")), output_dir=str(os.getenv("OUTPUT_DIR"))
+)
 
 
 RESOURCES_LOCAL = {
-    "ncbi_connection": ncbi_resource,
-    "io_manager": FilesystemIOManager(
-        base_dir=str(Path(os.getenv(EnvVar("DATA_DIR"), tempfile.gettempdir())) / "fs")
+    "local_resource": InputOutputConfig(
+        input_dir=str(os.getenv("DATA_DIR")), output_dir=str(os.getenv("OUTPUT_DIR"))
     ),
+    "ncbi_connection": ncbi_resource,
+    "io_manager": init_local_io_manager.get_io_manager(),
+    "pipes_subprocess_client": PipesSubprocessClient(),
 }

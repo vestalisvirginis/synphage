@@ -10,8 +10,8 @@ clean: # Remove workspace files
 	@rm -rf .scannerwork
 	@rm -rf ./dist
 	@rm -f test/fixtures/assets_testing_folder/ncbi_download/fetch/download/CP045811.1.gb
-	@rm -rf test/fixtures/assets_testing_folder/sequence_quality/genbank
-	@rm -rf test/fixtures/assets_testing_folder/sequence_quality_with_history/genbank
+	@rm -rf test/fixtures/assets_testing_folder/download_to_genbank/genbank
+	@rm -rf test/fixtures/assets_testing_folder/download_to_genbank_with_history/genbank
 	@rm -rf test/fixtures/assets_testing_folder/blasting/gene_identity
 	@rm -rf test/fixtures/assets_testing_folder/blasting_with_history/gene_identity
 	@rm -rf test/fixtures/assets_testing_folder/synteny/synteny

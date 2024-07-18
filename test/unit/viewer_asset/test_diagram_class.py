@@ -7,6 +7,7 @@ def test_diagram_class():
     assert callable(Diagram)
     configuration = Diagram()
     assert hasattr(configuration, "title")
+
     assert hasattr(configuration, "colours")
     assert hasattr(configuration, "gradient")
     assert hasattr(configuration, "output_format")
@@ -15,9 +16,6 @@ def test_diagram_class():
     assert hasattr(configuration, "graph_fragments")
     assert hasattr(configuration, "graph_start")
     assert hasattr(configuration, "graph_end")
-    assert hasattr(configuration, "output_folder")
-    assert hasattr(configuration, "blastn_dir")
-    assert hasattr(configuration, "uniq_dir")
 
 
 @pytest.mark.parametrize(
@@ -27,6 +25,7 @@ def test_diagram_class():
             Diagram(),
             {
                 "title": "synteny_plot",
+                "graph_type": "blastn",
                 "colours": [
                     "#fde725",
                     "#90d743",
@@ -43,14 +42,12 @@ def test_diagram_class():
                 "graph_fragments": 1,
                 "graph_start": 0,
                 "graph_end": None,
-                "output_folder": "synteny",
-                "blastn_dir": "tables/blastn_summary.parquet",
-                "uniq_dir": "tables/uniqueness.parquet",
             },
         ],
         [
             Diagram(
                 title="test_title",
+                graph_type="blastp",
                 colours=["B", "R", "V", "N", "Y", "O", "W"],
                 gradient="R",
                 output_format="png",
@@ -59,12 +56,10 @@ def test_diagram_class():
                 graph_fragments=3,
                 graph_start=30000,
                 graph_end=130000,
-                output_folder="a",
-                blastn_dir="b.parquet",
-                uniq_dir="c.parquet",
             ),
             {
                 "title": "test_title",
+                "graph_type": "blastp",
                 "colours": ["B", "R", "V", "N", "Y", "O", "W"],
                 "gradient": "R",
                 "output_format": "png",
@@ -73,9 +68,6 @@ def test_diagram_class():
                 "graph_fragments": 3,
                 "graph_start": 30000,
                 "graph_end": 130000,
-                "output_folder": "a",
-                "blastn_dir": "b.parquet",
-                "uniq_dir": "c.parquet",
             },
         ],
     ],

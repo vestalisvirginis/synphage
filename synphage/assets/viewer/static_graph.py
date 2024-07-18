@@ -8,6 +8,7 @@ import tempfile
 
 import polars as pl
 
+from pydantic import Field
 from io import BytesIO
 from datetime import datetime
 from typing import Optional
@@ -37,15 +38,23 @@ def gene_uniqueness(
         pl.read_parquet(path_to_dataset)
         .filter(
             (pl.col("name").is_in(record_name))
-            & (pl.col("source_genome_name").is_in(record_name))
-        )
-        .with_columns(pl.col("name").n_unique().alias("total_seq"))
-        .group_by("name", "gene", "locus_tag", "total_seq")
-        .count()
-        .with_columns(
-            ((pl.col("count") - 1) / (pl.col("total_seq") - 1) * 100).alias(
-                "perc_presence"
+            & (
+                (pl.col("source_name").is_in(record_name))
+                | (pl.col("source_name")).is_null()
             )
+        )
+        .with_columns(
+            pl.col("name").n_unique().alias("total_seq"),
+            pl.when(pl.col("source_name").is_null())
+            .then(pl.lit(0))
+            .otherwise(pl.lit(1))
+            .alias("counter_start"),
+        )
+        .group_by("name", "gene", "locus_tag", "total_seq", "counter_start")
+        .len()
+        .with_columns((pl.col("len") + pl.col("counter_start") - 1).alias("count"))
+        .with_columns(
+            (pl.col("count") / (pl.col("total_seq") - 1) * 100).alias("perc_presence")
         )
     )
 
@@ -63,7 +72,7 @@ def _assess_file_content(genome: SeqRecord.SeqRecord) -> bool:  # Duplicated fun
             if _gene_count > 1:
                 _gene_value = True
                 break
-
+    # [gb['gb_type'] for gb in pl.read_parquet('temp/development/data/tables/gene_uniqueness.parquet').group_by('name', 'gb_type').count().iter_rows(named=True) if gb['name']=='NC_000964']
     return _gene_value
 
 
@@ -85,13 +94,18 @@ class Genome(Config):
 
 @asset(
     description="Return a dict from the sequence paths and their orientation.",
+    required_resource_keys={"local_resource"},
     compute_kind="Python",
     metadata={"owner": "Virginie Grosboillot"},
 )
-def create_genome(context, config: Genome) -> dict:
+def create_genome(context, config: Genome, transform_blastn, transform_blastp) -> dict:
     # Path to sequence file
+    # _path_seq = str(
+    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
+    # )
     _path_seq = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
+        Path(context.resources.local_resource.get_paths()["SYNPHAGE_DATA"])
+        / config.sequence_file
     )
     context.log.info(f"File containing the sequences to plot: {_path_seq}")
 
@@ -116,10 +130,8 @@ def create_genome(context, config: Genome) -> dict:
         )
 
     # Asset metadata
-    _time = datetime.now()
     context.add_output_metadata(
         metadata={
-            "text_metadata": f"Sequences to plot {_time.isoformat()} (UTC).",
             "num_sqcs": len(_sequences),
             "sequences": MetadataValue.json(_sequences),
         }
@@ -152,6 +164,10 @@ def _get_feature(
 
 class Diagram(Config):
     title: str = "synteny_plot"
+    graph_type: str = Field(
+        default="blastn",
+        description="Data to plot. Value=['blastn' | 'blastp']",
+    )
     colours: list[str] = [
         "#fde725",
         "#90d743",
@@ -168,13 +184,11 @@ class Diagram(Config):
     graph_fragments: int = 1
     graph_start: int = 0
     graph_end: Optional[int] = None
-    output_folder: str = "synteny"
-    blastn_dir: str = str(Path("tables") / "blastn_summary.parquet")
-    uniq_dir: str = str(Path("tables") / "uniqueness.parquet")
 
 
 @asset(
     description="Transform a list of genomes into a genome diagram",
+    required_resource_keys={"local_resource"},
     compute_kind="Biopython",
     metadata={
         "owner": "Virginie Grosboillot",
@@ -184,17 +198,29 @@ def create_graph(
     context, create_genome: dict, config: Diagram
 ) -> GenomeDiagram.Diagram:
     # Define the paths
-    _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
-    _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
-    _blastn_dir = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
-        / "tables"
-        / "blastn_summary.parquet"
-    )
-    _uniq_dir = str(
-        Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
-    )
-    _colour_dir = str(Path(_synteny_folder) / "colour_table")
+    # _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
+
+    _gb_folder = context.resources.local_resource.get_paths()["GENBANK_DIR"]
+    # _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
+    _synteny_folder = context.resources.local_resource.get_paths()["SYNTENY_DIR"]
+    # _blastn_dir = str(
+    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
+    #     / "tables"
+    #     / "blastn_summary.parquet"
+    # )
+    # Which blast summary table ?
+    _tables_path = context.resources.local_resource.get_paths()["TABLES_DIR"]
+    if config.graph_type == "blastp":
+        _blast_dir = str(Path(_tables_path) / "blastp_summary.parquet")
+        _uniq_dir = str(Path(_tables_path) / "protein_uniqueness.parquet")
+    else:
+        _blast_dir = str(Path(_tables_path) / "blastn_summary.parquet")
+        _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
+
+    # _uniq_dir = str(
+    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
+    # )
+    _colour_dir = str(Path(_synteny_folder) / "colour_table.parquet")
 
     # Set name for the diagram
     _name_graph = config.title
@@ -240,7 +266,6 @@ def create_graph(
     # #     )
     #     colour_gradient = ["#FFFFFF", "#B22222"]
     colour_gradient = config.gradient
-
     # Read sequences for each genome and assign them in a variable
     _records = {}
 
@@ -261,7 +286,6 @@ def create_graph(
         if _i + 1 < len(_record_names)
     ]
     context.log.info(f"List of the records name: {_record_names}")
-
     # Instanciate the graphic, features, seq_order
     _gd_diagram = GenomeDiagram.Diagram(_name_graph)
     _feature_sets = {}
@@ -293,7 +317,6 @@ def create_graph(
         _seq_order[_record_name] = _i
 
     context.log.info("Seq order has been determined")
-
     # We add dummy features to the tracks for each cross-link BEFORE we add the
     # arrow features for the genes. This ensures the genes appear on top:
     for _X, _Y, _X_vs_Y in _comparison_tuples:
@@ -304,11 +327,8 @@ def create_graph(
         _set_Y = _feature_sets[_Y]
 
         _X_vs_Y = (
-            pl.read_parquet(_blastn_dir)
-            .filter(
-                (pl.col("source_genome_name") == _X)
-                & (pl.col("query_genome_name") == _Y)
-            )
+            pl.read_parquet(_uniq_dir)
+            .filter((pl.col("source_name") == _X) & (pl.col("query_name") == _Y))
             .select("source_locus_tag", "query_locus_tag", "percentage_of_identity")
         )
 
@@ -350,47 +370,89 @@ def create_graph(
 
     for _record_name, _record in _records.items():
         _gd_feature_set = _feature_sets[_record_name]
-
-        _gene_value = _assess_file_content(_record)
-        if _gene_value:
+        # _gene_value = _assess_file_content(_record)
+        _gene_value = [
+            gbt["gb_type"]
+            for gbt in pl.read_parquet(_uniq_dir)
+            .group_by("name", "gb_type")
+            .len()
+            .iter_rows(named=True)
+            if gbt["name"] == _record_name
+        ][0]
+        if _gene_value == "locus_tag" or _gene_value == "gene":
             for _feature in _record.features:
                 if _feature.type != "gene":
                     # Exclude this feature
                     continue
                 try:
-                    _perc = (
-                        _gene_color_palette.filter(
-                            (pl.col("name") == _record_name)
-                            & (
-                                pl.col("locus_tag")
-                                == _feature.qualifiers["locus_tag"][0]
+                    if _gene_value == "locus_tag":
+                        _perc = (
+                            _gene_color_palette.filter(
+                                (pl.col("name") == _record_name)
+                                & (
+                                    pl.col("locus_tag")
+                                    == _feature.qualifiers["locus_tag"][0]
+                                )
                             )
+                            .select("perc_presence")
+                            .item()
                         )
-                        .select("perc_presence")
-                        .item()
-                    )
-                    if _perc == 0:
-                        _gene_color = colors.HexColor(colour_palette[0])
-                    elif 0 < _perc <= 20:
-                        _gene_color = colors.HexColor(colour_palette[1])
-                    elif 20 < _perc <= 40:
-                        _gene_color = colors.HexColor(colour_palette[2])
-                    elif 40 < _perc <= 60:
-                        _gene_color = colors.HexColor(colour_palette[3])
-                    elif 60 < _perc <= 80:
-                        _gene_color = colors.HexColor(
-                            colour_palette[4]
-                        )  # gene_color = colors.HexColor('#35b779')
-                    elif 80 < _perc < 100:
-                        _gene_color = colors.HexColor(
-                            colour_palette[5]
-                        )  # gene_color = colors.HexColor('#90d743')
-                    elif _perc == 100:
-                        _gene_color = colors.HexColor(
-                            colour_palette[6]
-                        )  # gene_color = colors.HexColor('#fde725')
+                        if _perc == 0:
+                            _gene_color = colors.HexColor(colour_palette[0])
+                        elif 0 < _perc <= 20:
+                            _gene_color = colors.HexColor(colour_palette[1])
+                        elif 20 < _perc <= 40:
+                            _gene_color = colors.HexColor(colour_palette[2])
+                        elif 40 < _perc <= 60:
+                            _gene_color = colors.HexColor(colour_palette[3])
+                        elif 60 < _perc <= 80:
+                            _gene_color = colors.HexColor(
+                                colour_palette[4]
+                            )  # gene_color = colors.HexColor('#35b779')
+                        elif 80 < _perc < 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[5]
+                            )  # gene_color = colors.HexColor('#90d743')
+                        elif _perc == 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[6]
+                            )  # gene_color = colors.HexColor('#fde725')
+                        else:
+                            _gene_color = colors.black
                     else:
-                        _gene_color = colors.black
+                        _perc = (
+                            _gene_color_palette.filter(
+                                (pl.col("name") == _record_name)
+                                & (
+                                    pl.col("locus_tag")
+                                    == _feature.qualifiers["gene"][0]
+                                )
+                            )
+                            .select("perc_presence")
+                            .item()
+                        )
+                        if _perc == 0:
+                            _gene_color = colors.HexColor(colour_palette[0])
+                        elif 0 < _perc <= 20:
+                            _gene_color = colors.HexColor(colour_palette[1])
+                        elif 20 < _perc <= 40:
+                            _gene_color = colors.HexColor(colour_palette[2])
+                        elif 40 < _perc <= 60:
+                            _gene_color = colors.HexColor(colour_palette[3])
+                        elif 60 < _perc <= 80:
+                            _gene_color = colors.HexColor(
+                                colour_palette[4]
+                            )  # gene_color = colors.HexColor('#35b779')
+                        elif 80 < _perc < 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[5]
+                            )  # gene_color = colors.HexColor('#90d743')
+                        elif _perc == 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[6]
+                            )  # gene_color = colors.HexColor('#fde725')
+                        else:
+                            _gene_color = colors.black
                 except:
                     _gene_color = colors.white
                 try:
@@ -420,39 +482,74 @@ def create_graph(
                     # Exclude this feature
                     continue
                 try:
-                    _perc = (
-                        _gene_color_palette.filter(
-                            (pl.col("name") == _record_name)
-                            & (
-                                pl.col("locus_tag")
-                                == _feature.qualifiers["protein_id"][0][:-2]
+                    if _gene_value == "cds_locus_tag":
+                        _perc = (
+                            _gene_color_palette.filter(
+                                (pl.col("name") == _record_name)
+                                & (
+                                    pl.col("locus_tag")
+                                    == _feature.qualifiers["locus_tag"][0]
+                                )
                             )
+                            .select("perc_presence")
+                            .item()
                         )
-                        .select("perc_presence")
-                        .item()
-                    )
-                    if _perc == 0:
-                        _gene_color = colors.HexColor(colour_palette[0])
-                    elif 0 < _perc <= 20:
-                        _gene_color = colors.HexColor(colour_palette[1])
-                    elif 20 < _perc <= 40:
-                        _gene_color = colors.HexColor(colour_palette[2])
-                    elif 40 < _perc <= 60:
-                        _gene_color = colors.HexColor(colour_palette[3])
-                    elif 60 < _perc <= 80:
-                        _gene_color = colors.HexColor(
-                            colour_palette[4]
-                        )  # gene_color = colors.HexColor('#35b779')
-                    elif 80 < _perc < 100:
-                        _gene_color = colors.HexColor(
-                            colour_palette[5]
-                        )  # gene_color = colors.HexColor('#90d743')
-                    elif _perc == 100:
-                        _gene_color = colors.HexColor(
-                            colour_palette[6]
-                        )  # gene_color = colors.HexColor('#fde725')
+                        if _perc == 0:
+                            _gene_color = colors.HexColor(colour_palette[0])
+                        elif 0 < _perc <= 20:
+                            _gene_color = colors.HexColor(colour_palette[1])
+                        elif 20 < _perc <= 40:
+                            _gene_color = colors.HexColor(colour_palette[2])
+                        elif 40 < _perc <= 60:
+                            _gene_color = colors.HexColor(colour_palette[3])
+                        elif 60 < _perc <= 80:
+                            _gene_color = colors.HexColor(
+                                colour_palette[4]
+                            )  # gene_color = colors.HexColor('#35b779')
+                        elif 80 < _perc < 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[5]
+                            )  # gene_color = colors.HexColor('#90d743')
+                        elif _perc == 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[6]
+                            )  # gene_color = colors.HexColor('#fde725')
+                        else:
+                            _gene_color = colors.black
                     else:
-                        _gene_color = colors.black
+                        _perc = (
+                            _gene_color_palette.filter(
+                                (pl.col("name") == _record_name)
+                                & (
+                                    pl.col("locus_tag")
+                                    == _feature.qualifiers["protein_id"][0]
+                                )
+                            )
+                            .select("perc_presence")
+                            .item()
+                        )
+                        if _perc == 0:
+                            _gene_color = colors.HexColor(colour_palette[0])
+                        elif 0 < _perc <= 20:
+                            _gene_color = colors.HexColor(colour_palette[1])
+                        elif 20 < _perc <= 40:
+                            _gene_color = colors.HexColor(colour_palette[2])
+                        elif 40 < _perc <= 60:
+                            _gene_color = colors.HexColor(colour_palette[3])
+                        elif 60 < _perc <= 80:
+                            _gene_color = colors.HexColor(
+                                colour_palette[4]
+                            )  # gene_color = colors.HexColor('#35b779')
+                        elif 80 < _perc < 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[5]
+                            )  # gene_color = colors.HexColor('#90d743')
+                        elif _perc == 100:
+                            _gene_color = colors.HexColor(
+                                colour_palette[6]
+                            )  # gene_color = colors.HexColor('#fde725')
+                        else:
+                            _gene_color = colors.black
                 except:
                     _gene_color = colors.white
                 for _k, _v in _feature.qualifiers.items():
