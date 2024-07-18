@@ -18,6 +18,7 @@ from dagster import (
 import os
 import tempfile
 import duckdb
+import requests
 import polars as pl
 from functools import partial
 from Bio import SeqIO
@@ -39,29 +40,31 @@ TEMP_DIR = tempfile.gettempdir()
 
 # Job 1 : get data from the user
 get_user_data = define_asset_job(
-    name="get_user_data", selection=AssetSelection.groups("Users_input")
+    name="get_user_data", selection=(AssetSelection.groups("Users_input") | AssetSelection.groups("Status") & AssetSelection.assets('genbank_history').downstream(depth=2))
 )
 
 # Job 2 : download gb files from the ncbi database
 download = define_asset_job(
-    name="download", selection=AssetSelection.groups("NCBI_connect")
+    name="download", selection=(AssetSelection.groups("NCBI_connect") | AssetSelection.groups("Status") & AssetSelection.assets('genbank_history').downstream(depth=2))
 )
 
 # Job 3 : validations with to reload + refresh UI
+validations = define_asset_job(
+    name="make_validation", selection=AssetSelection.groups("Status") & AssetSelection.assets('reload_ui_asset').downstream(depth=3))
 
 # Job 4 : blastn
 blastn = define_asset_job(
-    name="make_blastn", selection=(AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_n").downstream())
+    name="make_blastn", selection=(AssetSelection.assets("append_processed_df") | AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_n").downstream())
 )
 
 # Job 5 : blastp
 blastp = define_asset_job(
-    name="make_blastp", selection=(AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_p").downstream())
+    name="make_blastp", selection=(AssetSelection.assets("append_processed_df") | AssetSelection.groups("Blaster") & AssetSelection.assets("create_fasta_p").downstream())
 )
 
 # Job 6 : blastn and blastp combined
 all_blast = define_asset_job(
-    name="make_all_blast", selection=(AssetSelection.groups("Blaster"))
+    name="make_all_blast", selection=(AssetSelection.assets("append_processed_df") | AssetSelection.groups("Blaster"))
 )
 
 # Job 7 : create the synteny diagram
