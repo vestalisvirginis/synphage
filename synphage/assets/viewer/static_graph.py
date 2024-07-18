@@ -38,13 +38,17 @@ def gene_uniqueness(
         pl.read_parquet(path_to_dataset)
         .filter(
             (pl.col("name").is_in(record_name))
-            & (pl.col("source_name").is_in(record_name))
+            & ((pl.col("source_name").is_in(record_name)) | (pl.col("source_name")).is_null())
         )
-        .with_columns(pl.col("name").n_unique().alias("total_seq"))
-        .group_by("name", "gene", "locus_tag", "total_seq")
-        .count()
         .with_columns(
-            (pl.col("count") / pl.col("total_seq") * 100).alias(
+            pl.col("name").n_unique().alias("total_seq"),
+            pl.when(pl.col('source_name').is_null()).then(pl.lit(0)).otherwise(pl.lit(1)).alias("counter_start")
+        )
+        .group_by("name", "gene", "locus_tag", "total_seq", "counter_start")
+        .len()
+        .with_columns((pl.col('len')+pl.col('counter_start')-1).alias('count'))
+        .with_columns(
+            (pl.col("count") / (pl.col("total_seq")-1) * 100).alias(
                 "perc_presence"
             )
         )
@@ -176,9 +180,6 @@ class Diagram(Config):
     graph_fragments: int = 1
     graph_start: int = 0
     graph_end: Optional[int] = None
-    output_folder: str = "synteny"
-    blastn_dir: str = str(Path("tables") / "blastn_summary.parquet")
-    uniq_dir: str = str(Path("tables") / "uniqueness.parquet")
 
 
 @asset(
@@ -194,6 +195,7 @@ def create_graph(
 ) -> GenomeDiagram.Diagram:
     # Define the paths
     # _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
+    
     _gb_folder = context.resources.local_resource.get_paths()["GENBANK_DIR"]
     # _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
     _synteny_folder = context.resources.local_resource.get_paths()["SYNTENY_DIR"]
@@ -260,7 +262,6 @@ def create_graph(
     # #     )
     #     colour_gradient = ["#FFFFFF", "#B22222"]
     colour_gradient = config.gradient
-
     # Read sequences for each genome and assign them in a variable
     _records = {}
 
@@ -281,7 +282,6 @@ def create_graph(
         if _i + 1 < len(_record_names)
     ]
     context.log.info(f"List of the records name: {_record_names}")
-
     # Instanciate the graphic, features, seq_order
     _gd_diagram = GenomeDiagram.Diagram(_name_graph)
     _feature_sets = {}
@@ -313,7 +313,6 @@ def create_graph(
         _seq_order[_record_name] = _i
 
     context.log.info("Seq order has been determined")
-
     # We add dummy features to the tracks for each cross-link BEFORE we add the
     # arrow features for the genes. This ensures the genes appear on top:
     for _X, _Y, _X_vs_Y in _comparison_tuples:
@@ -363,7 +362,7 @@ def create_graph(
             )
             _gd_diagram.cross_track_links.append(CrossLink(_F_x, _F_y, _color, _border))
     context.log.info("Cross-links have been appended")
-
+    
     _gene_color_palette = gene_uniqueness(_uniq_dir, _record_names)
     context.log.info(f"Writing: {str(_colour_dir)}")
     os.makedirs(Path(_colour_dir).parent, exist_ok=True)
