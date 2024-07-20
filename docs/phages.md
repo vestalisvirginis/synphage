@@ -11,14 +11,22 @@ Lactococcus phage genomes can be mosaic and are relevant for the diary industry.
 
 ## Running 'synphage' pipeline  
 
-To get familiar with `synphage` capabilities, you can reproduce the step-by-step example describe below. To get started, go to `step 1`.  
+To get familiar with `synphage` capabilities, you can reproduce the step-by-step example describe below. To get started, go to [step 1](#step1-phage-example).  
 
-*Prerequisite:* you need to have `synphage` install in a python environnment or in a docker container (see installation + link to page).  
+*Prerequisite:* you need to have `synphage` installed in a python environment or in a docker container (see [Installation](installation.md#pip-install)) and running. Open the Dagster UI in your browser to get started.
+<figure markdown="span">
+    ![Dagster home page](./images/phages/dagster_landing_page.png)
+    <figcaption>Dagster UI - landing page</figcaption>
+</figure>
 
-### Step 1: Download the data of interest
+
+### Step 1: Download the data of interest <a id="step1-phage-example"></a>
 
 Go to Dagster_home -> Jobs -> download.  
-(# ref job assets before materialization)
+<figure markdown="span">
+    ![Dagster home page](./images/phages/dagster_landing_page.png)
+    <figcaption>Dagster UI - landing page</figcaption>
+</figure>
 
 This job needs to requir e configuration  
 To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled Materialize all) and select `Open launchpad`.  
