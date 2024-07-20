@@ -61,6 +61,7 @@ theme:
 markdown_extensions:
   - tables
   - admonition
+  - md_in_html
   - pymdownx.details  # coloured box
   # - codehilite
   # - pymdownx.highlight
