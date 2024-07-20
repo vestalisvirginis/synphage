@@ -602,8 +602,15 @@ def create_graph(
     height = math.trunc(float(root.attrib.get("height")))
 
     # Fixed labels left
-    text_elements = root.xpath("*/*[1]/*[4]/*/*/*[not(text() = '')]")
-    text_labels = list(filter(lambda x: x.tag.endswith("text") and (x.text and (x.text.strip() != '')), text_elements))
+    context.log.info(_path_output)
+    text_elements = root.xpath('.//*[local-name()="text"]')
+    context.log.info(f"Found: {str(len(text_elements))} text elements")
+
+    # Filter predicates
+    _has_key = lambda x: x.text and (x.text.strip() != '') and (x.text.strip() in _record_names)
+    text_labels = list(filter(_has_key, text_elements))
+    context.log.info(f"Found: {str(len(text_labels))} key labels")
+    
     for t in text_labels:
         t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
         label = t.text
