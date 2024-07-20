@@ -607,6 +607,8 @@ def create_graph(
     for t in text_labels:
         t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
         label = t.text
+        title = etree.SubElement(t, 'title')
+        title.text = t.text
         if len(label) > 8:
             label = label[:3] + ".." + label[-3:]
         t.text = label
