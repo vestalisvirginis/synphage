@@ -24,16 +24,27 @@ To get familiar with `synphage` capabilities, you can reproduce the step-by-step
 
 Go to Dagster_home -> Jobs -> download.  
 <figure markdown="span">
-    ![Dagster home page](./images/phages/dagster_landing_page.png)
-    <figcaption>Dagster UI - landing page</figcaption>
+    ![Download job - overview](./images/phages/download_job_overview.png)
+    <figcaption>Overview of the download job</figcaption>
 </figure>
 
-This job needs to requir e configuration  
-To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled Materialize all) and select `Open launchpad`.  
-Enter the keywords (Accession names for the genomes previously selected.) to query the NCBI database:  
+In order to query our genomes of interest, we need to pass query to the `search-key` in the configuration panel.  
+<figure markdown="span">
+    ![Lauchpad](./images/phages/launchpad_button.png){ width="200", align=right }
+    <figcaption>Access the lauchpad to the job configuration</figcaption>
+</figure>
+To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled `Materialize all`) and select `Open launchpad`.  
+
+<figure markdown="span">
+    ![Lauchpad](./images/phages/launchpad_button.png){ width="200", align=right }
+    <figcaption>Access the lauchpad to the job configuration</figcaption>
+</figure>
+Enter the following keywords (Accession names for the genomes previously selected in this case) to query the NCBI database:  
 
 === "search_key"
-KP793101[Accession] OR KP793102[Accession] OR KP793103[Accession] OR KP793105[Accession] OR KP793104[Accession] OR KP793107[Accession] OR KP793106[Accession] OR KP793108[Accession] OR KP793109[Accession] OR KP793112[Accession] OR KP793114[Accession] OR KP793113[Accession] OR KP793110[Accession] OR KP793115[Accession] OR KP793117[Accession] OR KP793118[Accession] OR KP793122[Accession] OR KP793116[Accession] OR KP793120[Accession] OR KP793121[Accession] OR KP793123[Accession] OR KP793126[Accession] OR KP793127[Accession] OR KP793125[Accession] OR KP793124[Accession] OR KP793128[Accession] OR KP793130[Accession] OR KP793129[Accession] OR KP793132[Accession] OR KP793131[Accession] OR KP793133[Accession] OR KP793135[Accession] OR KP793134[Accession] OR KP793111[Accession] OR KP793119[Accession]
+    ``` bash
+    KP793101[Accession] OR KP793102[Accession] OR KP793103[Accession] OR KP793105[Accession] OR KP793104[Accession] OR KP793107[Accession] OR KP793106[Accession] OR KP793108[Accession] OR KP793109[Accession] OR KP793112[Accession] OR KP793114[Accession] OR KP793113[Accession] OR KP793110[Accession] OR KP793115[Accession] OR KP793117[Accession] OR KP793118[Accession] OR KP793122[Accession] OR KP793116[Accession] OR KP793120[Accession] OR KP793121[Accession] OR KP793123[Accession] OR KP793126[Accession] OR KP793127[Accession] OR KP793125[Accession] OR KP793124[Accession] OR KP793128[Accession] OR KP793130[Accession] OR KP793129[Accession] OR KP793132[Accession] OR KP793131[Accession] OR KP793133[Accession] OR KP793135[Accession] OR KP793134[Accession] OR KP793111[Accession] OR KP793119[Accession]
+    ```
 
 Select `Materialize`, in the right bottom corner.  
 

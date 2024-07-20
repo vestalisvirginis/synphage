@@ -16,3 +16,7 @@ figure {
   font-size: smaller;
   text-indent: 0;
 }
+
+code {
+  white-space : pre-wrap !important;
+}
