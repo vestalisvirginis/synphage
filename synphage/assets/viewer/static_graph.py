@@ -601,6 +601,22 @@ def create_graph(
     width = math.trunc(float(root.attrib.get("width")))
     height = math.trunc(float(root.attrib.get("height")))
 
+    # Fixed labels left
+    text_elements = root.xpath("*/*[1]/*[4]/*/*/*[not(text() = '')]")
+    text_labels = list(filter(lambda x: x.tag.endswith("text") and (x.text and (x.text.strip() != '')), text_elements))
+    for t in text_labels:
+        t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
+        label = t.text
+        title = etree.SubElement(t, 'title')
+        title.text = t.text
+        if len(label) > 8:
+            label = label[:3] + ".." + label[-3:]
+        t.text = label
+
+    
+    with open(_path_output, "wb") as label_writer:
+        label_writer.write(etree.tostring(root))
+
     context.log.info(f"W: {width}, H: {height}")
 
     xpos = int(math.trunc(width * 0.68))
