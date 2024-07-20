@@ -117,7 +117,23 @@ def parse_gb(context, setup_config: ValidationConfig, file: str):
     source = context.resources.local_resource.get_paths()["GENBANK_DIR"]
     full_path = str(Path(source) / f"{file}.gb")
     df = genbank_to_dataframe(full_path)
-    df.write_parquet(f"{target}/{file}.parquet")
+    (
+        duckdb.connect(":memory:")
+        .execute(
+            """
+                CREATE or REPLACE TABLE genbank (
+                cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
+                start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
+                taxonomy varchar[], filename string);"""
+        )
+        .execute(
+            f"INSERT INTO genbank by position (select * from df)"
+        )
+        .execute("select * from genbank")
+        .pl()
+        .write_parquet(f"{target}/{file}.parquet")
+    )
+    #df.write_parquet()
     return df
 
 
