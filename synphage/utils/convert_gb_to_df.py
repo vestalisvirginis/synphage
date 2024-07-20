@@ -6,7 +6,7 @@ from toolz import compose, juxt, first
 from toolz.curried import map as mapc
 from operator import attrgetter as at
 from operator import methodcaller as mc
-from operator import eq
+from operator import eq, gt
 from functools import partial
 
 
@@ -46,7 +46,7 @@ def genbank_to_dataframe(filename: str):
 
     _type_cds = compose(partial(eq, "CDS"), at("type"))
     _type_gene = compose(partial(eq, "gene"), at("type"))
-
+    
     # process cds features related information
     data_cds = list(
         map(
@@ -82,7 +82,7 @@ def genbank_to_dataframe(filename: str):
     cds = pl.concat(items=[df_cds, df_cds_pk, df_cds_extract], how="horizontal").rename(
         mapping={"gene": "cds_gene", "locus_tag": "cds_locus_tag"}
     )
-
+    
     # process gene features related information
     data_gene = list(
         map(
@@ -124,10 +124,19 @@ def genbank_to_dataframe(filename: str):
     )
 
     # join all the dataframes
-    # df = cds.join(
-    #     other=gene, on=["start", "end", "strand", "extract"], how="full", coalesce=True
-    # )
-    df = cds.join(other=gene, on=["start", "end", "strand"], how="full", coalesce=True)
+    CDS_COLUMNS = ["cds_gene","cds_locus_tag","protein_id","function","product","translation","transl_table","codon_start","start","end","strand","cds_extract"]
+    GENE_COLUMNS = ["gene","locus_tag","extract","translation_fn"]
+    GENERIC_COLUMNS = ["id","name","description","topology","organism","taxonomy","filename"]
+
+    sizes = gt(first(cds.shape),0), gt(first(gene.shape),0)
+    match sizes:
+        case (True, True):
+            df = cds.join(other=gene, on=["start", "end", "strand"], how="full", coalesce=True)
+        case (True, False):
+            df = cds.with_columns(*[pl.lit(None).alias(c) for c in GENE_COLUMNS])
+        case (False, True):
+            df = gene.with_columns(*[pl.lit(None).alias(c) for c in CDS_COLUMNS])
+        
     df = df.with_columns(
         id=pl.lit(id),
         name=pl.lit(name),
@@ -136,6 +145,6 @@ def genbank_to_dataframe(filename: str):
         organism=pl.lit(organism),
         taxonomy=pl.lit(taxonomy),
         filename=pl.lit(filename),
-    )
-
+    ).select(*[pl.col(c) for c in CDS_COLUMNS + GENE_COLUMNS + GENERIC_COLUMNS])
+    
     return df
