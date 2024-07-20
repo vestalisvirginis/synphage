@@ -1,10 +1,11 @@
-from dagster import asset, Config, MetadataValue, AssetObservation, AssetSpec
+from dagster import asset, Config, MetadataValue, AssetObservation, AssetSpec, ExperimentalWarning
 
 import enum
 import os
 import base64
 import math
 import tempfile
+import warnings
 
 import polars as pl
 
@@ -24,6 +25,7 @@ from lxml import etree
 from string import Template
 from PIL import ImageColor
 
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 TEMP_DIR = tempfile.gettempdir()
 
@@ -602,8 +604,12 @@ def create_graph(
     height = math.trunc(float(root.attrib.get("height")))
 
     # Fixed labels left
-    text_elements = root.xpath("*/*[1]/*[4]/*/*/*[not(text() = '')]")
-    text_labels = list(filter(lambda x: x.tag.endswith("text") and (x.text and (x.text.strip() != '')), text_elements))
+    text_elements = root.xpath('.//*[local-name()="text"]')
+
+    # Filter predicates
+    _has_key = lambda x: x.text and (x.text.strip() != '') and (x.text.strip() in _record_names)
+    text_labels = list(filter(_has_key, text_elements))
+    
     for t in text_labels:
         t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
         label = t.text
@@ -612,7 +618,6 @@ def create_graph(
         if len(label) > 8:
             label = label[:3] + ".." + label[-3:]
         t.text = label
-
     
     with open(_path_output, "wb") as label_writer:
         label_writer.write(etree.tostring(root))
