@@ -1,12 +1,15 @@
-from dagster import asset
+from dagster import asset, ExperimentalWarning
 
 import os
 import pickle
+import warnings
 import polars as pl
 
 from pathlib import Path
 from typing import List
 from collections import namedtuple
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 FastaNRecord = namedtuple("FastaNRecord", "new,history")
