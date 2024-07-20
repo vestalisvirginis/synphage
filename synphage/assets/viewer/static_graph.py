@@ -604,14 +604,11 @@ def create_graph(
     height = math.trunc(float(root.attrib.get("height")))
 
     # Fixed labels left
-    context.log.info(_path_output)
     text_elements = root.xpath('.//*[local-name()="text"]')
-    context.log.info(f"Found: {str(len(text_elements))} text elements")
 
     # Filter predicates
     _has_key = lambda x: x.text and (x.text.strip() != '') and (x.text.strip() in _record_names)
     text_labels = list(filter(_has_key, text_elements))
-    context.log.info(f"Found: {str(len(text_labels))} key labels")
     
     for t in text_labels:
         t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
@@ -621,7 +618,6 @@ def create_graph(
         if len(label) > 8:
             label = label[:3] + ".." + label[-3:]
         t.text = label
-
     
     with open(_path_output, "wb") as label_writer:
         label_writer.write(etree.tostring(root))
