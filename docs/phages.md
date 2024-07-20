@@ -1,7 +1,12 @@
 # Synteny diagram of bacteriophage genomes with 'synphage'
 
-For this step-by-step example, a group of closely related Lactococcus phages has been selected based on name from [Bacterial and Viral Bioinformatics Resource Center (BV-BRC)](https://www.bv-brc.org/).  
-(# ref screenshot) https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&filter=keyword(Lactococcus)
+For this step-by-step example, a group of closely related Lactococcus phages has been selected based on name from [Bacterial and Viral Bioinformatics Resource Center (BV-BRC)](https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&filter=keyword(Lactococcus)).  
+
+<figure markdown="span">
+    ![Selected Lactococcus phages](./images/phages/lactococcus_bv_brc.png)
+    <figcaption>Selected *Lactococcus* phages for this example</figcaption>
+</figure>  
+
 Lactococcus phage genomes can be mosaic and are relevant for the diary industry.  
 
 ## Running 'synphage' pipeline  
