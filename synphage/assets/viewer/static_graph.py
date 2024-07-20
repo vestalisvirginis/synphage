@@ -1,10 +1,11 @@
-from dagster import asset, Config, MetadataValue, AssetObservation, AssetSpec
+from dagster import asset, Config, MetadataValue, AssetObservation, AssetSpec, ExperimentalWarning
 
 import enum
 import os
 import base64
 import math
 import tempfile
+import warnings
 
 import polars as pl
 
@@ -24,6 +25,7 @@ from lxml import etree
 from string import Template
 from PIL import ImageColor
 
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 TEMP_DIR = tempfile.gettempdir()
 
