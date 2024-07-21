@@ -23,6 +23,15 @@ To get familiar with `synphage` capabilities, you can reproduce the step-by-step
 ### Step 1: Download the data of interest <a id="step1-phage-example"></a>
 
 Go to Dagster_home -> Jobs -> download.  
+<!-- #![Job_1](./images/phages/job_1.webm) -->
+
+
+<iframe width="560" height="315"
+src="http://0.0.0.0:8000/synphage/images/phages/job_1.webm" 
+frameborder="0" 
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+allowfullscreen></iframe>
+
 <figure markdown="span">
     ![Download job - overview](./images/phages/download_job_overview.png)
     <figcaption>Overview of the download job</figcaption>
@@ -73,18 +82,38 @@ Go to Dagster_home -> Jobs -> make_validations.
     ![Job overview - Validation Job](./images/phages/validation_job_overview.png)
     <figcaption>Overview of the validation job</figcaption>
 </figure>
-This job runs validation on each of the files that have been downloaded to check what data are avalible for each sequences.
-This validation is essention for the smooth execution of the downstream jobs.  
+<figure markdown="span">
+    ![ZoomIn- Validation Job](./images/phages/validation_zoom_in.png)
+    <figcaption>Zoom In </figcaption>
+</figure>
 
-Select `Materialize all` (black box located on the up right corner).  
+Select `Materialize all` (black box located on the up right corner).
 
-The first asset shows the results for the checks, for example, for sequence (XXX) --> describes the checks.  
-(# ref checks on the asset , + check details)
- 
-The second asset apply some logic according to the check results to know what features the consider for downstream processing of the data. For example, sequence XXX will be processed as YYY.  
-(# ref metadata assets)
+This job runs checks on each of the files that have been downloaded. The number of checks that pass or fail are directly visible on the assets and reflects how complete each dataset is.
+The result table for the checks is available in the metadata panel and the detailed results for the checks can be accessed either from the right panel under `Checks -> View all check details` or by selecting the asset and then the `Checks` tab.  
 
-The third asset write the transform dataset.  
+<figure markdown="span">
+    ![Assets with checks - Validation Job](./images/phages/validation_assets_with_checks.png)
+    <figcaption>The assets display the number of failed and passed checks.</figcaption>
+    ![Check table - Validation Job](./images/phages/validation_check_table.png)
+    <figcaption>Result table for the check, accessible from the metadata panel.</figcaption>
+    ![Check result overview - Validation Job](./images/phages/validation_checks_rightpanel.png)
+    <figcaption>Check results are accessible via the right panel.</figcaption>
+    ![Asset check results - Validation Job](./images/phages/validation_check_results.png)
+    <figcaption>Full asset check results.</figcaption>
+</figure>
+
+The metadata attached to the second step of the validation, inform the user about the logic apply to the file, more precisely what feature type the software will be using for downstream processing and what attribute will be used as unique identifier for the coding genes.
+<figure markdown="span">
+    ![Logic - Validation Job](./images/phages/validation_apply_logic.png)
+    <figcaption>Step 2 of the validation with metadata.</figcaption>
+</figure>
+
+The metadata attached to the last step of the validation, render an overview of the transformed data.
+<figure markdown="span">
+    ![Transformation - Validation Job](./images/phages/validation_transformation.png)
+    <figcaption>Step 3 of the validation with metadata.</figcaption>
+</figure>  
 
 
 ### Step 3: Run the blast
