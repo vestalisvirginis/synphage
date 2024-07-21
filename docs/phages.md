@@ -31,13 +31,13 @@ Go to Dagster_home -> Jobs -> download.
 In order to query our genomes of interest, we need to pass query to the `search-key` in the configuration panel.  
 To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled `Materialize all`) and select `Open launchpad`.  
 <figure markdown="span">
-    ![Warning message - Download Job](./images/phages/download_warning_message.png){ width="200", align=left}
-    <!-- <figcaption>Warning message - Download job</figcaption> -->
-    ![Lauchpad](./images/phages/launchpad_button.png){ width="200", align=right}
-    <!-- <figcaption>Access the lauchpad to the job configuration</figcaption> -->
+    ![Warning message - Download Job](./images/phages/download_warning_message.png){ width="200"}
+    <figcaption>Warning message - Download job</figcaption>
+    ![Lauchpad](./images/phages/launchpad_button.png){ width="200"}
+    <figcaption>Access the lauchpad to the job configuration</figcaption>
 </figure>
 
-Enter the following keywords (Accession names for the genomes previously selected in this case) to query the NCBI database:  
+A warning will pop-up, press `Confirm` and configure the `search_key` parameter, changing the default value with the following keywords (Accession names for the genomes previously selected in this case) to query the NCBI database:  
 
 === "search_key"
     ``` bash
@@ -51,11 +51,15 @@ Enter the following keywords (Accession names for the genomes previously selecte
 
 Select `Materialize`, in the right bottom corner.  
 
-(# ref metadata example of fetch genome --> number of files and file names)  
-
-When the job finishes its executon, we can move to step 2 to run the validation on the data.
+Most of the assets provides metadata after successful complition of the run. These metadata allow the user to easily follow the smooth execution of the job.
 <figure markdown="span">
-    ![Executed - Download Job](./images/phages/download_config_windows.png)
+    ![Metadata fetch genome - Download Job](./images/phages/download_metadata_example.png)
+    <figcaption>Example of metadata provided for the `fetch_genome` asset. After complition the user can see the number and the name of GenBank files that have been downloaded.</figcaption>
+</figure>
+
+When the job finishes its executon, we can move to `step 2` to run the validation on the data.
+<figure markdown="span">
+    ![Executed - Download Job](./images/phages/download_after_execution.png)
     <figcaption>Job is terminated</figcaption>
 </figure>
 
@@ -65,8 +69,12 @@ When the job finishes its executon, we can move to step 2 to run the validation 
 (For more detailed information on this step, check the doc(link to doc))  
 
 Go to Dagster_home -> Jobs -> make_validations.  
-(# ref job assets before materialization)
-This job runs validation on each of the files that have been downloaded.  
+<figure markdown="span">
+    ![Job overview - Validation Job](./images/phages/validation_job_overview.png)
+    <figcaption>Overview of the validation job</figcaption>
+</figure>
+This job runs validation on each of the files that have been downloaded to check what data are avalible for each sequences.
+This validation is essention for the smooth execution of the downstream jobs.  
 
 Select `Materialize all` (black box located on the up right corner).  
 
