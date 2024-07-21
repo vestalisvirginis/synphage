@@ -121,24 +121,58 @@ The metadata attached to the last step of the validation, render an overview of 
 For this example, blastn was run on the dataset.  
 
 Go to Dagster_home -> Jobs -> make_blastn  
-(# ref asset before materialisation)
+<figure markdown="span">
+    ![Overview - Blastn Job](./images/phages/blastn_job_overview.png)
+    <figcaption>Overview of the blastn job</figcaption>
+</figure>  
 
-Select `Materialize all` (black box located on the up right corner).  
-(# ref asset after materialisation)
+Select `Materialize all` (black box located on the up right corner). 
 
+<figure markdown="span">
+    ![Completed - Blastn Job](./images/phages/blastn_after_completion.png)
+    <figcaption>Completed job</figcaption>
+</figure> 
+
+Checks are run at the beginning of the job to verify that the key and identifier used for each of the coding element are unique over all the sequences.
+<figure markdown="span">
+    ![Checks - Blastn Job](./images/phages/blastn_checks_df.png)
+    <figcaption>The checks confirm the uniqueness of the chosen identifier for each of the coding elements.</figcaption>
+</figure> 
+
+Several files are generated during this step.
 === "create_fasta_n"
-    --8<-- "fasta example.md:name"
+    ``` title="KP793103_1.fna"
+    --8<-- "KP793103_1.fna::7"
+    ```
 
 === "create_blast_n_db"
---8<-- "fasta example.md:name"
+    ``` title="KP793103_1"
+    KP793103_1.ndb
+    KP793103_1.nhr
+    KP793103_1.nim
+    KP793103_1.not
+    KP793103_1.nsq
+    KP793103_1.ntf
+    KP793103_1.nto
+    ```
 
 === "get_blastn"
---8<-- "json output example.md:name"
+    ``` title="KP793103_1_vs_KP793107_1"
+    --8<-- "KP793103_1_vs_KP793107_1:19:51"
+    ```
+
 === "transform_blastn"
---8<-- "df example.md:name"
+    ``` title="KP793103_1_vs_KP793107_1.parquet"
+    --8<-- "blastn_df.md:1:5"
+    ```
+
+=== "unified_dataframe"
+    ``` title="gene_uniqueness.parquet"
+    --8<-- "gene_uniqueness.md"
+    ```
 
 The generated `gene_uniqueness.parquet` file is used to generate the downstream graphic.  
-This file can be read and manipulated with any DataFrame API the user choose, such as Pandas (ref), Apache Spark (ref), Polars (ref), DuckDB (ref) but also in a non-programmatic manner using softwares such as Tad (ref).  
+This file can be read and manipulated with any DataFrame API the user choose, such as [Pandas](https://pandas.pydata.org/), [Apache Spark](https://spark.apache.org/docs/latest/api/python/index.html), [Polars](https://docs.pola.rs/api/python/stable/reference/index.html), [DuckDB](https://duckdb.org/) but also in a non-programmatic manner using softwares such as [Tad](https://www.tadviewer.com/).  
 
 
 ### Step 4: Generate the plot
@@ -166,3 +200,8 @@ Examples of two queries in the data tables as in the paper figure
 Conclusion
 
 
+
+
+
+
+'search_target','query_id','query_key','query_len','number_of_hits','source_key','num','bit_score','score','evalue','identity','query_from', 'query_to','query_strand','hit_from','hit_to','hit_strand',"align_len",'gaps', 'percentage_of_identity'
