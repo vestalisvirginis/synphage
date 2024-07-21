@@ -61,6 +61,7 @@ theme:
 markdown_extensions:
   - tables
   - admonition
+  - md_in_html
   - pymdownx.details  # coloured box
   # - codehilite
   # - pymdownx.highlight
@@ -70,7 +71,7 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 #   - pymdownx.keys
-#   - pymdownx.snippets
+  - pymdownx.snippets
   - pymdownx.tabbed:  # in-content tabs
       alternate_style: true
   - def_list
