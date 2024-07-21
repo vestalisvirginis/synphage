@@ -37,8 +37,8 @@ GENBANK_CHECKS = {
             "cds_gene",
             "cds_locus_tag",
             "protein_id",
-            "start",
-            "end",
+            "start_sequence",
+            "end_sequence",
             "strand",
             "extract",
         ],
@@ -54,8 +54,8 @@ GENBANK_CHECKS = {
             "cds_gene",
             "cds_locus_tag",
             "protein_id",
-            "start",
-            "end",
+            "start_sequence",
+            "end_sequence",
         ],
         "check_value": None,
         "check_description": "Validate the uniqueness of each value presents in the column",
@@ -764,7 +764,7 @@ def load_dynamic():
     if os.path.exists(path):
         # asset_names = [Path(file).stem for file in os.listdir(path)]
         entities = pickle.load(open(path, "rb"))
-        asset_names = entities.history
+        asset_names = [Path(e).stem for e in entities.history]
     else:
         asset_names = []
     assets = []

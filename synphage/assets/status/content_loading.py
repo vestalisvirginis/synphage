@@ -54,10 +54,6 @@ def genbank_history(context) -> GenbankRecord:
     _gb_path = context.resources.local_resource.get_paths()["GENBANK_DIR"]
     os.makedirs(_gb_path, exist_ok=True)
 
-    # Path to genbank folder
-    _gb_path = context.resources.local_resource.get_paths()["GENBANK_DIR"]
-    os.makedirs(_gb_path, exist_ok=True)
-
     # Unprocessed files
     _new_files = list(set(os.listdir(_gb_path)).difference(set(_history_files)))
     context.log.info(f"Number of genbank files to be processed: {len(_new_files)}")
@@ -66,7 +62,7 @@ def genbank_history(context) -> GenbankRecord:
     for _file in _new_files:
         _new_items.append(str(Path(_file).stem))
 
-    _updated_history_files = [*_history_files, *_new_items]
+    _updated_history_files = [*_history_files, *_new_files]
 
     context.add_output_metadata(
         metadata={
