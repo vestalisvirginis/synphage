@@ -680,6 +680,7 @@ def create_graph(
     context.add_output_metadata(
         metadata={
             "text_metadata": "A synteny diagram had been created.",
+            "graph_type": config.graph_type,
             "num_sqcs": len(_records),
             "path": _path_output,
             "sequences": MetadataValue.json(_record_names),
