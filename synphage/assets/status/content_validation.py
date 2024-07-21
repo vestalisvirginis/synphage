@@ -16,6 +16,7 @@ import duckdb
 import polars as pl
 import tempfile
 from pathlib import Path
+from Bio.Seq import translate
 
 from synphage.utils.check_factory import _check_severity, _create_check_specs
 
@@ -578,9 +579,11 @@ def df_transformation(key, input_name, description):
                         "df": MetadataValue.md(data.to_pandas().head().to_markdown()),
                     },
                 )
-        elif gb_type == "cds_type":
+        elif gb_type == "cds_locus_tag":
             data = data.filter(pl.col("cds_locus_tag").is_not_null()).with_columns(
-                pl.coalesce(["locus_tag", "cds_locus_tag"]).alias("locus_tag")
+                pl.coalesce(["locus_tag", "cds_locus_tag"]).alias("locus_tag"),
+                pl.coalesce(["extract", "cds_extract"]).alias("extract"),
+                pl.col("cds_extract").map_elements(lambda x: translate(x, stop_symbol="", table=11),return_dtype=pl.String,  skip_nulls=True).alias("translation_fn")
             )
 
             (
@@ -601,7 +604,9 @@ def df_transformation(key, input_name, description):
             )
         elif gb_type == "protein_id":
             data = data.filter(pl.col("protein_id").is_not_null()).with_columns(
-                pl.coalesce(["locus_tag", "protein_id"]).alias("locus_tag")
+                pl.coalesce(["locus_tag", "protein_id"]).alias("locus_tag"),
+                pl.coalesce(["extract", "cds_extract"]).alias("extract"),
+                pl.col("cds_extract").map_elements(lambda x: translate(x, stop_symbol="", table=11),return_dtype=pl.String,  skip_nulls=True).alias("translation_fn")
             )
 
             (
