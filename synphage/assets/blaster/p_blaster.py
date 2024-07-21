@@ -22,6 +22,10 @@ BlastPRecord = namedtuple("BlastPRecord", "new,history")
 )
 def create_fasta_p(context, append_processed_df) -> FastaPRecord:
 
+    # Path to genbank folder
+    _fasta_path = context.resources.local_resource.get_paths()["FASTA_P_DIR"]
+    os.makedirs(_fasta_path, exist_ok=True)
+
     # Check if history of created fasta files
     fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
     _path_history = Path(fs) / "create_fasta_p"
@@ -37,25 +41,20 @@ def create_fasta_p(context, append_processed_df) -> FastaPRecord:
     df, seq, check_df = append_processed_df
 
     listed_files = [
-        f"{Path(path).stem}.fna"
+        str(Path(_fasta_path) / f"{Path(path).stem}.fna")
         for path in df.select("filename").unique().to_series().to_list()
     ]
 
     _T = list(set(listed_files).difference(set(_history_files)))
     context.log.info(f"Number of genomes to convert to fasta: {len(_T)}")
 
-    # Path to genbank folder
-    _fasta_path = context.resources.local_resource.get_paths()["FASTA_P_DIR"]
-    os.makedirs(_fasta_path, exist_ok=True)
-
     # Create fasta files
     _new_fasta = []
     _new_file = []
     for _file in _T:
-        context.log.info(f"The following file {_file} is being processed")
-        _output_dir = str(Path(_fasta_path) / _file)
+        context.log.info(f"The following file {Path(_file).name} is being processed")
 
-        with open(_output_dir, "w") as _f:
+        with open(_file, "w") as _f:
             for data in (
                 df.filter(pl.col("filename").str.contains(Path(_file).stem))
                 .select("key", "translation_fn")
@@ -68,10 +67,10 @@ def create_fasta_p(context, append_processed_df) -> FastaPRecord:
                         data["translation_fn"],
                     )
                 )
-        context.log.info(f"Fasta for {_file} created")
-        _new_fasta.append(_output_dir)
-        _new_file.append(Path(_output_dir).stem)
-        _history_files.append(_output_dir)
+        context.log.info(f"Fasta for {Path(_file).name} created")
+        _new_fasta.append(_file)
+        _new_file.append(Path(_file).name)
+        _history_files.append(_file)
 
     context.log.info("Fasta file creation completed.")
 
