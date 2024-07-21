@@ -583,7 +583,7 @@ def df_transformation(key, input_name, description):
             data = data.filter(pl.col("cds_locus_tag").is_not_null()).with_columns(
                 pl.coalesce(["locus_tag", "cds_locus_tag"]).alias("locus_tag"),
                 pl.coalesce(["extract", "cds_extract"]).alias("extract"),
-                pl.col("extract").map_elements(lambda x: translate(x, stop_symbol="", table=11),return_dtype=pl.String,  skip_nulls=True).alias("translation_fn")
+                pl.col("cds_extract").map_elements(lambda x: translate(x, stop_symbol="", table=11),return_dtype=pl.String,  skip_nulls=True).alias("translation_fn")
             )
 
             (
@@ -606,7 +606,7 @@ def df_transformation(key, input_name, description):
             data = data.filter(pl.col("protein_id").is_not_null()).with_columns(
                 pl.coalesce(["locus_tag", "protein_id"]).alias("locus_tag"),
                 pl.coalesce(["extract", "cds_extract"]).alias("extract"),
-                pl.col("extract").map_elements(lambda x: translate(x, stop_symbol="", table=11),return_dtype=pl.String,  skip_nulls=True).alias("translation_fn")
+                pl.col("cds_extract").map_elements(lambda x: translate(x, stop_symbol="", table=11),return_dtype=pl.String,  skip_nulls=True).alias("translation_fn")
             )
 
             (
