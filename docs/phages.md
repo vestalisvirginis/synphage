@@ -29,16 +29,14 @@ Go to Dagster_home -> Jobs -> download.
 </figure>
 
 In order to query our genomes of interest, we need to pass query to the `search-key` in the configuration panel.  
-<figure markdown="span">
-    ![Lauchpad](./images/phages/launchpad_button.png){ width="200", align=right }
-    <figcaption>Access the lauchpad to the job configuration</figcaption>
-</figure>
 To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled `Materialize all`) and select `Open launchpad`.  
-
 <figure markdown="span">
-    ![Lauchpad](./images/phages/launchpad_button.png){ width="200", align=right }
-    <figcaption>Access the lauchpad to the job configuration</figcaption>
+    ![Warning message - Download Job](./images/phages/download_warning_message.png){ width="200", align=left}
+    <!-- <figcaption>Warning message - Download job</figcaption> -->
+    ![Lauchpad](./images/phages/launchpad_button.png){ width="200", align=right}
+    <!-- <figcaption>Access the lauchpad to the job configuration</figcaption> -->
 </figure>
+
 Enter the following keywords (Accession names for the genomes previously selected in this case) to query the NCBI database:  
 
 === "search_key"
@@ -46,11 +44,20 @@ Enter the following keywords (Accession names for the genomes previously selecte
     KP793101[Accession] OR KP793102[Accession] OR KP793103[Accession] OR KP793105[Accession] OR KP793104[Accession] OR KP793107[Accession] OR KP793106[Accession] OR KP793108[Accession] OR KP793109[Accession] OR KP793112[Accession] OR KP793114[Accession] OR KP793113[Accession] OR KP793110[Accession] OR KP793115[Accession] OR KP793117[Accession] OR KP793118[Accession] OR KP793122[Accession] OR KP793116[Accession] OR KP793120[Accession] OR KP793121[Accession] OR KP793123[Accession] OR KP793126[Accession] OR KP793127[Accession] OR KP793125[Accession] OR KP793124[Accession] OR KP793128[Accession] OR KP793130[Accession] OR KP793129[Accession] OR KP793132[Accession] OR KP793131[Accession] OR KP793133[Accession] OR KP793135[Accession] OR KP793134[Accession] OR KP793111[Accession] OR KP793119[Accession]
     ```
 
+<figure markdown="span">
+    ![Config panel - Download Job](./images/phages/download_config_windows.png)
+    <figcaption>Configuration panel - Download job</figcaption>
+</figure>
+
 Select `Materialize`, in the right bottom corner.  
 
-(# ref job assets after materialisation)
-
 (# ref metadata example of fetch genome --> number of files and file names)  
+
+When the job finishes its executon, we can move to step 2 to run the validation on the data.
+<figure markdown="span">
+    ![Executed - Download Job](./images/phages/download_config_windows.png)
+    <figcaption>Job is terminated</figcaption>
+</figure>
 
 
 ### Step 2: Run data quality checks on the dataset

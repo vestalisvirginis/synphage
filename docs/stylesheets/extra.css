@@ -10,6 +10,10 @@
     color: #ffe600;
   }
 
+.md-typeset figure img {
+  display: inline;
+}
+
 figure {
   text-align: center;
   font-style: italic;
