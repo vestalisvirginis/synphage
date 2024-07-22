@@ -1,0 +1,7 @@
+|    | query_name   | query_locus_tag   | query_gene   | query_protein_id   |   percentage_of_identity | source_name   | source_locus_tag   | source_gene   | source_protein_id   |
+|---:|:-------------|:------------------|:-------------|:-------------------|-------------------------:|:--------------|:-------------------|:--------------|:--------------------|
+|  0 | KP793123     | Phi42_18          |              | ALM64133.1         |                      nan |               |                    |               |                     |
+|  1 | KP793123     | Phi42_19          |              | ALM64134.1         |                      nan |               |                    |               |                     |
+|  2 | KP793123     | Phi42_20          |              | ALM64135.1         |                      nan |               |                    |               |                     |
+|  3 | KP793123     | Phi42_25          |              | ALM64140.1         |                      nan |               |                    |               |                     |
+|  4 | KP793123     | Phi42_26          |              | ALM64141.1         |                      nan |               |                    |               |                     |

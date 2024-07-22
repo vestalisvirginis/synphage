@@ -15,7 +15,7 @@ List of the supported configurations:
     ------- | ----------- | ----  
     `sequence_file` | File containing the plot instruction | sequences.csv  
 
-2. Graphic
+2. Graphic <a id="plot-config"></a>
 
     Field Name | Description | Default Value
     ------- | ----------- | ----

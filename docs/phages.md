@@ -7,7 +7,7 @@ For this step-by-step example, a group of closely related Lactococcus phages has
     <figcaption>Selected *Lactococcus* phages for this example</figcaption>
 </figure>  
 
-Lactococcus phage genomes can be mosaic and are relevant for the diary industry.  
+*Lactococcus* phage genomes can be mosaic and are relevant for the [diary industry](https://doi.org/10.1038/srep21345).  
 
 ## Running 'synphage' pipeline  
 
@@ -23,8 +23,6 @@ To get familiar with `synphage` capabilities, you can reproduce the step-by-step
 ### Step 1: Download the data of interest <a id="step1-phage-example"></a>
 
 Go to Dagster_home -> Jobs -> download.  
-<!-- #![Job_1](./images/phages/job_1.webm) -->
-
 
 <iframe width="560" height="315"
 src="http://0.0.0.0:8000/synphage/images/phages/job_1.webm" 
@@ -178,30 +176,164 @@ This file can be read and manipulated with any DataFrame API the user choose, su
 ### Step 4: Generate the plot
 
 Go to Dagster_home -> Jobs -> make_plot
-(# ref asset before materialisation)
+<figure markdown="span">
+    ![Overview - Plot Job](./images/phages/plot_job_overview.png)
+    <figcaption>Overview of the plot job.</figcaption>
+</figure> 
 
-This job require some configuration:   
-To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled Materialize all) and select `Open launchpad`.  
-Change title and blastn   
+    ???+ info
+        If only the blastn or the blastp pipeline has been run, a warning message will pop-up.
+        Select confirm to run the job. This will not impair the smooth run of step 4.
 
-Select the 'Materialize' botton.   
-(# ref asset after materialisation)
+<figure markdown="span">
+    ![Warning message - Plot Job](./images/phages/plot_warning_massage.png)
+    <figcaption>Warning message - Plot Job.</figcaption>
+</figure> 
 
-Show output graph.  
+    ???+ tip
+        - By default, the graph will be plotted based on the DataFrame generated through the `blastn pipeline`. To plot the data obtained for the blastp, the value for `graph-type` needs to be changed to `blastp`.  
+        - To see the complete configuration for this step, go to the [Configuration](configurations.md#plot-config).  
+        - To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled Materialize all) and select `Open launchpad`.  
+
+<figure markdown="span">
+    ![Launchpad - Plot Job](./images/phages/plot_launchpad.png)
+    <figcaption>Launchpad - Plot Job.</figcaption>
+</figure> 
+
+    ???+ success "create_graph"
+        === "blastn"
+        ``` yaml 
+        ops:
+            create_genome:
+                config:
+                sequence_file: sequences.csv
+            create_graph:
+                config:
+                colours:
+                    - "#fde725"
+                    - "#90d743"
+                    - "#35b779"
+                    - "#21918c"
+                    - "#31688e"
+                    - "#443983"
+                    - "#440154"
+                gradient: "#B22222"
+                graph_fragments: 1
+                graph_pagesize: A4
+                graph_shape: linear
+                graph_start: 0
+                graph_type: blastn
+                output_format: SVG
+                title: synteny_based_on_blastn
+        ```
+        === "blastp"
+        ``` yaml
+        ops:
+            create_genome:
+                config:
+                sequence_file: sequences.csv
+            create_graph:
+                config:
+                colours:
+                    - "#fde725"
+                    - "#90d743"
+                    - "#35b779"
+                    - "#21918c"
+                    - "#31688e"
+                    - "#443983"
+                    - "#440154"
+                gradient: "#B22222"
+                graph_fragments: 1
+                graph_pagesize: A4
+                graph_shape: linear
+                graph_start: 0
+                graph_type: blastp
+                output_format: SVG
+                title: synteny_based_on_blastp
+        ```
+
+Select the 'Materialize' botton.  
+
+<figure markdown="span">
+    ![Completed job - Plot Job](./images/phages/plot_job_overview.png)
+    <figcaption>Job after completion.</figcaption>
+</figure> 
+
+Metadata are also available for the plot, including a preview of the graph.
+
+<figure markdown="span">
+    ![Sequences - Plot Job](./images/phages/plot_sequences.png)
+    <figcaption>Sequences to be plotted.</figcaption>
+    ![Diagram preview - Plot Job](./images/phages/plot_job_overview.png)
+    <figcaption>Preview of the synteny diagram.</figcaption>
+</figure> 
 
 
 ## Analyse the data
 
-Examples of two queries in the data tables as in the paper figure
-- unique genes
-- conserved genes with protein_id....
+The output plot allows to quickly visualise conserved and unique genes among our 35 *Lactococcus* sequences.
+
+In addition, the generated parquet files `gene_uniqueness.parquet` and `protein_uniqueness.parquet`, respectively as output of the blastn and the blastp, allows to query for particular gene of interest.
+
+    ???+ example "gene_uniqueness.parquet"
+    === "unique genes"
+        Query for all the unique genes in sequence XXX
+    === "gene of interest"
+        Query for gene XXX 
+        ``` python
+        pl.read_parquet('temp/documentation_examples/bacteriophages/data/tables/gene_uniqueness.parquet').select('query_name', 'query_locus_tag', 'query_gene', 'query_protein_id', 'percentage_of_identity', 'source_name', 'source_locus_tag', 'source_gene', 'source_protein_id').filter(pl.col('query_name')=='KP793103').filter(pl.col('query_locus_tag')=='Phi19_07')
+        ```
+        ```
+        pl.read_parquet('temp/documentation_examples/bacteriophages/data/tables/gene_uniqueness.parquet').select('query_name', 'query_locus_tag', 'query_gene', 'query_protein_id', 'percentage_of_identity', 'source_name', 'source_locus_tag', 'source_gene', 'source_protein_id').filter(pl.col('query_name')=='KP793123').filter(pl.col('source_name').is_null()).sort('query_locus_tag').to_pandas().to_markdown()
+    ```
+        ┌────────────┬─────────────────┬────────────┬──────────────────┬────────────────────────┬─────────────┬──────────────────┬─────────────┬───────────────────┐
+        │ query_name ┆ query_locus_tag ┆ query_gene ┆ query_protein_id ┆ percentage_of_identity ┆ source_name ┆ source_locus_tag ┆ source_gene ┆ source_protein_id │
+        │ ---        ┆ ---             ┆ ---        ┆ ---              ┆ ---                    ┆ ---         ┆ ---              ┆ ---         ┆ ---               │
+        │ str        ┆ str             ┆ str        ┆ str              ┆ f32                    ┆ str         ┆ str              ┆ str         ┆ str               │
+        ╞════════════╪═════════════════╪════════════╪══════════════════╪════════════════════════╪═════════════╪══════════════════╪═════════════╪═══════════════════╡
+        │ KP793123   ┆ Phi42_18        ┆            ┆ ALM64133.1       ┆ null                   ┆ null        ┆ null             ┆ null        ┆ null              │
+        │ KP793123   ┆ Phi42_19        ┆            ┆ ALM64134.1       ┆ null                   ┆ null        ┆ null             ┆ null        ┆ null              │
+        │ KP793123   ┆ Phi42_20        ┆            ┆ ALM64135.1       ┆ null                   ┆ null        ┆ null             ┆ null        ┆ null              │
+        │ KP793123   ┆ Phi42_25        ┆            ┆ ALM64140.1       ┆ null                   ┆ null        ┆ null             ┆ null        ┆ null              │
+        │ KP793123   ┆ Phi42_26        ┆            ┆ ALM64141.1       ┆ null                   ┆ null        ┆ null             ┆ null        ┆ null              │
+        └────────────┴─────────────────┴────────────┴──────────────────┴────────────────────────┴─────────────┴──────────────────┴─────────────┴───────────────────┘
 
 
-Conclusion
 
+        ┌────────────┬─────────────────┬────────────┬──────────────────┬────────────────────────┬─────────────┬──────────────────┬─────────────┬───────────────────┬─────────────────┬──────────────────────┐
+        │ query_name ┆ query_locus_tag ┆ query_gene ┆ query_protein_id ┆ percentage_of_identity ┆ source_name ┆ source_locus_tag ┆ source_gene ┆ source_protein_id ┆ source_function ┆ source_product       │
+        │ ---        ┆ ---             ┆ ---        ┆ ---              ┆ ---                    ┆ ---         ┆ ---              ┆ ---         ┆ ---               ┆ ---             ┆ ---                  │
+        │ str        ┆ str             ┆ str        ┆ str              ┆ f32                    ┆ str         ┆ str              ┆ str         ┆ str               ┆ str             ┆ str                  │
+        ╞════════════╪═════════════════╪════════════╪══════════════════╪════════════════════════╪═════════════╪══════════════════╪═════════════╪═══════════════════╪═════════════════╪══════════════════════╡
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 100.0                  ┆ KP793101    ┆ Phi4_47          ┆             ┆ ALM63086.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 92.063004              ┆ KP793104    ┆ PhiB1127_49      ┆             ┆ ALM63238.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 94.18                  ┆ KP793105    ┆ Phi193_48        ┆             ┆ ALM63290.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 98.413002              ┆ KP793106    ┆ PhiA1127_48      ┆             ┆ ALM63342.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 91.053001              ┆ KP793108    ┆ Phi512_49        ┆             ┆ ALM63448.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 96.044998              ┆ KP793109    ┆ PhiC0139_49      ┆             ┆ ALM63501.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 94.18                  ┆ KP793111    ┆ Phi192_51        ┆             ┆ ALM64895.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 93.122002              ┆ KP793113    ┆ PhiF17_52        ┆             ┆ ALM63665.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 89.473999              ┆ KP793114    ┆ Phi17_52         ┆             ┆ ALM63721.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 94.18                  ┆ KP793115    ┆ Phi114_49        ┆             ┆ ALM63774.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 94.18                  ┆ KP793116    ┆ Phi1316_50       ┆             ┆ ALM63828.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 93.477997              ┆ KP793117    ┆ PhiG_53          ┆             ┆ ALM63885.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 92.593002              ┆ KP793118    ┆ PhiF0139_52      ┆             ┆ ALM63942.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 95.237999              ┆ KP793119    ┆ Phi105_59        ┆             ┆ ALM64958.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 90.526001              ┆ KP793120    ┆ PhiL18_51        ┆             ┆ ALM63998.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 92.593002              ┆ KP793121    ┆ Phi109_50        ┆             ┆ ALM64052.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 91.579002              ┆ KP793122    ┆ PhiL6_54         ┆             ┆ ALM64110.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 94.709                 ┆ KP793123    ┆ Phi42_54         ┆             ┆ ALM64169.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 94.18                  ┆ KP793124    ┆ Phi44_48         ┆             ┆ ALM64222.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 89.473999              ┆ KP793125    ┆ Phi91127_52      ┆             ┆ ALM64278.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 89.473999              ┆ KP793126    ┆ PhiM5_53         ┆             ┆ ALM64337.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 90.0                   ┆ KP793127    ┆ Phi40_52         ┆             ┆ ALM64394.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 90.526001              ┆ KP793128    ┆ PhiM16_50        ┆             ┆ ALM64449.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 93.477997              ┆ KP793129    ┆ PhiJF1_53        ┆             ┆ ALM64506.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 90.0                   ┆ KP793130    ┆ Phi155_50        ┆             ┆ ALM64561.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 89.473999              ┆ KP793131    ┆ PhiE1127_55      ┆             ┆ ALM64621.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 90.526001              ┆ KP793132    ┆ PhiM1127_55      ┆             ┆ ALM64681.1        ┆                 ┆ hypothetical protein │
+        │ KP793103   ┆ Phi19_46        ┆            ┆ ALM63185.1       ┆ 89.473999              ┆ KP793135    ┆ Phi16_52         ┆             ┆ ALM64839.1        ┆                 ┆ hypothetical protein │
+        └────────────┴─────────────────┴────────────┴──────────────────┴────────────────────────┴─────────────┴──────────────────┴─────────────┴───────────────────┴─────────────────┴──────────────────────┘
 
-
-
-
-
-'search_target','query_id','query_key','query_len','number_of_hits','source_key','num','bit_score','score','evalue','identity','query_from', 'query_to','query_strand','hit_from','hit_to','hit_strand',"align_len",'gaps', 'percentage_of_identity'
+with pl.Config(tbl_cols=-1, tbl_rows=-1):
+pl.read_parquet('temp/documentation_examples/bacteriophages/data/tables/gene_uniqueness.parquet').select('query_name', 'query_locus_tag', 'query_gene', 'query_protein_id', 'percentage_of_identity', 'source_name', 'source_locus_tag', 'source_gene', 'source_protein_id', 'source_function', 'source_product').filter(pl.col('query_name')=='KP793103').filter(pl.col('query_locus_tag')=='Phi19_46').sort('source_name')
