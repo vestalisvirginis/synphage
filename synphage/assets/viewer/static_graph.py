@@ -51,7 +51,9 @@ def gene_uniqueness(
             .otherwise(pl.lit(1))
             .alias("counter_start"),
         )
-        .group_by("query_name", "query_gene", "query_locus_tag", "total_seq", "counter_start")
+        .group_by(
+            "query_name", "query_gene", "query_locus_tag", "total_seq", "counter_start"
+        )
         .len()
         .with_columns((pl.col("len") + pl.col("counter_start") - 1).alias("count"))
         .with_columns(
@@ -606,18 +608,22 @@ def create_graph(
     text_elements = root.xpath('.//*[local-name()="text"]')
 
     # Filter predicates
-    _has_key = lambda x: x.text and (x.text.strip() != '') and (x.text.strip() in _record_names)
+    _has_key = (
+        lambda x: x.text
+        and (x.text.strip() != "")
+        and (x.text.strip() in _record_names)
+    )
     text_labels = list(filter(_has_key, text_elements))
-    
+
     for t in text_labels:
         t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
         label = t.text
-        title = etree.SubElement(t, 'title')
+        title = etree.SubElement(t, "title")
         title.text = t.text
         if len(label) > 8:
             label = label[:3] + ".." + label[-3:]
         t.text = label
-    
+
     with open(_path_output, "wb") as label_writer:
         label_writer.write(etree.tostring(root))
 

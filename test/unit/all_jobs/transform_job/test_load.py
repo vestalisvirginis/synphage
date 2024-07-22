@@ -3,7 +3,7 @@ import types
 
 from dagster import build_op_context
 
-#from synphage.jobs import load, PipeConfig
+# from synphage.jobs import load, PipeConfig
 
 
 @pytest.mark.skip(reason="need to rewrite test to accomodate changes")

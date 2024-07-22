@@ -127,14 +127,12 @@ def parse_gb(context, setup_config: ValidationConfig, file: str):
                 start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
                 taxonomy varchar[], filename string);"""
         )
-        .execute(
-            f"INSERT INTO genbank by position (select * from df)"
-        )
+        .execute(f"INSERT INTO genbank by position (select * from df)")
         .execute("select * from genbank")
         .pl()
         .write_parquet(f"{target}/{file}.parquet")
     )
-    #df.write_parquet()
+    # df.write_parquet()
     return df
 
 
