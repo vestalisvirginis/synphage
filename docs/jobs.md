@@ -118,7 +118,7 @@ Once an element is indicated as materialized, metadata related to the job will b
 
 Once all the assets are materialized, new sequences can be added to the folder and be processed the same way.
 
-### Job 2 : transform job
+### Job 2 : transform job <a id="step2-validation-job"></a>
 
 ![Job 2 pipeline](./images/dagster/dag_job_2.png) 
 

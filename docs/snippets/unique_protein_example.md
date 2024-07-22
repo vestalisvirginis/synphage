@@ -1,0 +1,8 @@
+|    | query_name   | query_locus_tag   | query_gene   | query_protein_id   |   percentage_of_identity | source_name   | source_locus_tag   | source_gene   | source_protein_id   |
+|---:|:-------------|:------------------|:-------------|:-------------------|-------------------------:|:--------------|:-------------------|:--------------|:--------------------|
+|  0 | KP793108     | Phi512_34         |              | ALM63433.1         |                      nan |               |                    |               |                     |
+|  1 | KP793108     | Phi512_45         |              | ALM63444.1         |                      nan |               |                    |               |                     |
+|  2 | KP793119     | Phi105_42         |              | ALM64941.1         |                      nan |               |                    |               |                     |
+|  3 | KP793119     | Phi105_44         |              | ALM64943.1         |                      nan |               |                    |               |                     |
+|  4 | KP793131     | PhiE1127_54       |              | ALM64620.1         |                      nan |               |                    |               |                     |
+|  5 | KP793132     | PhiM1127_03       |              | ALM64629.1         |                      nan |               |                    |               |                     |
