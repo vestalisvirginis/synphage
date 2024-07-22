@@ -6,6 +6,7 @@ import pickle
 
 from pathlib import Path
 from collections import namedtuple
+from synphage.resources.local_resource import OWNER
 
 
 DownloadRecord = namedtuple("DownloadRecord", "new,history")
@@ -16,7 +17,7 @@ DownloadRecord = namedtuple("DownloadRecord", "new,history")
     description="Transfer new downloaded files to the genbank folder and harmonise naming of the files",
     compute_kind="Python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def download_to_genbank(context, fetch_genome) -> DownloadRecord:
     # Check if history of transferred files

@@ -11,18 +11,23 @@ from dagster import (
     AssetExecutionContext,
     file_relative_path,
     Output,
+    ExperimentalWarning,
 )
 
 import os
 import pickle
 import duckdb
 import shutil
+import warnings
 
 from pathlib import Path
 from collections import namedtuple
 from functools import partial
 
 from synphage.utils.convert_gb_to_df import genbank_to_dataframe
+from synphage.resources.local_resource import OWNER
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 GenbankRecord = namedtuple("GenbankRecord", "new,history")
@@ -37,7 +42,7 @@ GenbankRecord = namedtuple("GenbankRecord", "new,history")
     description="Keep track of the genbank files that have been processed",
     compute_kind="Python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def genbank_history(context) -> GenbankRecord:
     # load genbank history
@@ -169,7 +174,7 @@ def append_gb(context, setup_config: ValidationConfig):
 
 @graph_asset(
     description="Create a genbank DataFrame",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
     config_gb = setup_validation_config()

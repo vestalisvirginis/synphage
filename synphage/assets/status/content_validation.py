@@ -7,6 +7,7 @@ from dagster import (
     AssetExecutionContext,
     MetadataValue,
     file_relative_path,
+    ExperimentalWarning,
 )
 
 import os
@@ -15,10 +16,14 @@ import shutil
 import duckdb
 import polars as pl
 import tempfile
+import warnings
 from pathlib import Path
 from Bio.Seq import translate
 
 from synphage.utils.check_factory import _check_severity, _create_check_specs
+from synphage.resources.local_resource import OWNER
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -106,7 +111,7 @@ def _gb_validation_settings(
         "description": asset_description,
         "io_manager_key": "io_manager",
         "required_resource_keys": {"local_resource"},
-        "metadata": {"owner": "Virginie Grosboillot"},
+        "metadata": {"owner": OWNER},
         "compute_kind": "Validation",
         "check_specs": asset_check_specs,
     }
@@ -121,7 +126,7 @@ def _gb_labelling_settings(
         "description": asset_description,
         "ins": {input_name.lower(): AssetIn()},
         "io_manager_key": "io_manager",
-        "metadata": {"owner": "Virginie Grosboillot"},
+        "metadata": {"owner": OWNER},
         "compute_kind": "Validation",
     }
 
@@ -136,7 +141,7 @@ def _gb_transformation_settings(
         "ins": {input_name.lower(): AssetIn()},
         "io_manager_key": "io_manager",
         "required_resource_keys": {"local_resource", "pipes_subprocess_client"},
-        "metadata": {"owner": "Virginie Grosboillot"},
+        "metadata": {"owner": OWNER},
         "compute_kind": "Transformation",
     }
 
