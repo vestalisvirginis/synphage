@@ -2,7 +2,10 @@ from .local_resource import InputOutputConfig, LocalFilesystemIOManager
 from .ncbi_resource import ncbi_resource
 
 import os
-from dagster import PipesSubprocessClient
+import warnings
+from dagster import PipesSubprocessClient, ExperimentalWarning
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 init_local_io_manager = LocalFilesystemIOManager(
