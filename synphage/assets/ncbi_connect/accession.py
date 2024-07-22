@@ -6,6 +6,7 @@ import warnings
 
 from typing import List
 from pathlib import Path
+from synphage.resources.local_resource import OWNER
 
 
 warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
@@ -24,7 +25,7 @@ class QueryConfig(Config):  # type: ignore[misc] # should be ok in 1.8 version o
 @asset(
     description="Setup unique config for asset group",
     compute_kind="Config",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def setup_query_config(config: QueryConfig) -> QueryConfig:
     """Search parameters"""
@@ -36,7 +37,7 @@ def setup_query_config(config: QueryConfig) -> QueryConfig:
     description="Getting the number of records matching the keyword(s) in the specified database",
     compute_kind="NCBI",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def accession_count(context, setup_query_config: QueryConfig) -> int:
     # Search key - default: Myoalterovirus (2 entries in NCBI database Jan 2024)
@@ -72,7 +73,7 @@ def accession_count(context, setup_query_config: QueryConfig) -> int:
     description="Getting all accession Ids corresponding to keyword(s)",
     compute_kind="NCBI",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def accession_ids(context, accession_count, setup_query_config: QueryConfig) -> dict:
     # Search key - default: Myoalterovirus (2 entries in NCBI database Jan 2024)
@@ -115,7 +116,7 @@ def accession_ids(context, accession_count, setup_query_config: QueryConfig) -> 
     description="In case of multiple searches, check what sequences have already been downloaded.",
     compute_kind="python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def downloaded_genomes(context) -> List[str]:
     # Download directory
@@ -141,7 +142,7 @@ def downloaded_genomes(context) -> List[str]:
     description="Download records one by one from the ncbi database",
     compute_kind="NCBI",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def fetch_genome(
     context, accession_ids, downloaded_genomes, setup_query_config: QueryConfig

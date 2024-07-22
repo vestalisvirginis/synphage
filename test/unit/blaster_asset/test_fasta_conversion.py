@@ -2,7 +2,7 @@ import pytest
 from pathlib import PosixPath
 from dagster import materialize_to_memory, build_asset_context, asset
 
-#from synphage.assets.blaster.n_blaster_old import genbank_to_fasta
+# from synphage.assets.blaster.n_blaster_old import genbank_to_fasta
 
 
 TEST_DATA_GB_DIR = "test/fixtures/assets_testing_folder/blasting/genbank/"

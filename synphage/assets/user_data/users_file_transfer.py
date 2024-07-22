@@ -12,6 +12,7 @@ import pickle
 
 from pathlib import Path
 from collections import namedtuple
+from synphage.resources.local_resource import OWNER
 
 
 UsersRecord = namedtuple("UsersRecord", "new,history")
@@ -37,7 +38,7 @@ def has_files(context: AssetExecutionContext):
     deps=["empty"],
     description="Empty directory warning.",
     compute_kind="Python",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def empty_dir(context) -> str:
     context.add_output_metadata(
@@ -54,7 +55,7 @@ def empty_dir(context) -> str:
     description="Transfer user's files to the genbank folder and harmonise naming of the files",
     compute_kind="Python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def users_to_genbank(context) -> UsersRecord:
     users_dir = context.resources.local_resource.get_paths()["USER_DATA"]

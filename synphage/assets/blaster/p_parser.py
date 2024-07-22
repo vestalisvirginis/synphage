@@ -16,6 +16,7 @@ import polars as pl
 
 from pathlib import Path
 from functools import partial
+from synphage.resources.local_resource import OWNER
 
 
 class PPipeConfig(Config):
@@ -117,7 +118,7 @@ def protein_presence(
 
 @graph_asset(
     description="Create a genbank DataFrame",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def transform_blastp(get_blastp):
     config_blastp = setup_pconfig.alias("blastp")()

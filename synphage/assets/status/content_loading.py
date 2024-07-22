@@ -11,18 +11,23 @@ from dagster import (
     AssetExecutionContext,
     file_relative_path,
     Output,
+    ExperimentalWarning,
 )
 
 import os
 import pickle
 import duckdb
 import shutil
+import warnings
 
 from pathlib import Path
 from collections import namedtuple
 from functools import partial
 
 from synphage.utils.convert_gb_to_df import genbank_to_dataframe
+from synphage.resources.local_resource import OWNER
+
+warnings.filterwarnings("ignore", category=ExperimentalWarning)
 
 
 GenbankRecord = namedtuple("GenbankRecord", "new,history")
@@ -37,7 +42,7 @@ GenbankRecord = namedtuple("GenbankRecord", "new,history")
     description="Keep track of the genbank files that have been processed",
     compute_kind="Python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def genbank_history(context) -> GenbankRecord:
     # load genbank history
@@ -122,14 +127,12 @@ def parse_gb(context, setup_config: ValidationConfig, file: str):
                 start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
                 taxonomy varchar[], filename string);"""
         )
-        .execute(
-            f"INSERT INTO genbank by position (select * from df)"
-        )
+        .execute(f"INSERT INTO genbank by position (select * from df)")
         .execute("select * from genbank")
         .pl()
         .write_parquet(f"{target}/{file}.parquet")
     )
-    #df.write_parquet()
+    # df.write_parquet()
     return df
 
 
@@ -169,7 +172,7 @@ def append_gb(context, setup_config: ValidationConfig):
 
 @graph_asset(
     description="Create a genbank DataFrame",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
     config_gb = setup_validation_config()

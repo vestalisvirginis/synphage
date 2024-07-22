@@ -23,6 +23,7 @@ from cairosvg import svg2png
 from lxml import etree
 from string import Template
 from PIL import ImageColor
+from synphage.resources.local_resource import OWNER
 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -37,20 +38,22 @@ def gene_uniqueness(
     _gene_uniqueness_df = (
         pl.read_parquet(path_to_dataset)
         .filter(
-            (pl.col("name").is_in(record_name))
+            (pl.col("query_name").is_in(record_name))
             & (
                 (pl.col("source_name").is_in(record_name))
                 | (pl.col("source_name")).is_null()
             )
         )
         .with_columns(
-            pl.col("name").n_unique().alias("total_seq"),
+            pl.col("query_name").n_unique().alias("total_seq"),
             pl.when(pl.col("source_name").is_null())
             .then(pl.lit(0))
             .otherwise(pl.lit(1))
             .alias("counter_start"),
         )
-        .group_by("name", "gene", "locus_tag", "total_seq", "counter_start")
+        .group_by(
+            "query_name", "query_gene", "query_locus_tag", "total_seq", "counter_start"
+        )
         .len()
         .with_columns((pl.col("len") + pl.col("counter_start") - 1).alias("count"))
         .with_columns(
@@ -100,7 +103,7 @@ class Genome(Config):
     description="Return a dict from the sequence paths and their orientation.",
     required_resource_keys={"local_resource"},
     compute_kind="Python",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
@@ -195,7 +198,7 @@ class Diagram(Config):
     required_resource_keys={"local_resource"},
     compute_kind="Biopython",
     metadata={
-        "owner": "Virginie Grosboillot",
+        "owner": OWNER,
     },
 )
 def create_graph(
@@ -374,12 +377,12 @@ def create_graph(
         _gd_feature_set = _feature_sets[_record_name]
         # _gene_value = _assess_file_content(_record)
         _gene_value = [
-            gbt["gb_type"]
+            gbt["query_gb_type"]
             for gbt in pl.read_parquet(_uniq_dir)
-            .group_by("name", "gb_type")
+            .group_by("query_name", "query_gb_type")
             .len()
             .iter_rows(named=True)
-            if gbt["name"] == _record_name
+            if gbt["query_name"] == _record_name
         ][0]
         if _gene_value == "locus_tag" or _gene_value == "gene":
             for _feature in _record.features:
@@ -390,9 +393,9 @@ def create_graph(
                     if _gene_value == "locus_tag":
                         _perc = (
                             _gene_color_palette.filter(
-                                (pl.col("name") == _record_name)
+                                (pl.col("query_name") == _record_name)
                                 & (
-                                    pl.col("locus_tag")
+                                    pl.col("query_locus_tag")
                                     == _feature.qualifiers["locus_tag"][0]
                                 )
                             )
@@ -424,9 +427,9 @@ def create_graph(
                     else:
                         _perc = (
                             _gene_color_palette.filter(
-                                (pl.col("name") == _record_name)
+                                (pl.col("query_name") == _record_name)
                                 & (
-                                    pl.col("locus_tag")
+                                    pl.col("query_locus_tag")
                                     == _feature.qualifiers["gene"][0]
                                 )
                             )
@@ -487,9 +490,9 @@ def create_graph(
                     if _gene_value == "cds_locus_tag":
                         _perc = (
                             _gene_color_palette.filter(
-                                (pl.col("name") == _record_name)
+                                (pl.col("query_name") == _record_name)
                                 & (
-                                    pl.col("locus_tag")
+                                    pl.col("query_locus_tag")
                                     == _feature.qualifiers["locus_tag"][0]
                                 )
                             )
@@ -521,9 +524,9 @@ def create_graph(
                     else:
                         _perc = (
                             _gene_color_palette.filter(
-                                (pl.col("name") == _record_name)
+                                (pl.col("query_name") == _record_name)
                                 & (
-                                    pl.col("locus_tag")
+                                    pl.col("query_locus_tag")
                                     == _feature.qualifiers["protein_id"][0]
                                 )
                             )
@@ -605,18 +608,22 @@ def create_graph(
     text_elements = root.xpath('.//*[local-name()="text"]')
 
     # Filter predicates
-    _has_key = lambda x: x.text and (x.text.strip() != '') and (x.text.strip() in _record_names)
+    _has_key = (
+        lambda x: x.text
+        and (x.text.strip() != "")
+        and (x.text.strip() in _record_names)
+    )
     text_labels = list(filter(_has_key, text_elements))
-    
+
     for t in text_labels:
         t.attrib["transform"] = "translate(-40,0) scale(1,-1)"
         label = t.text
-        title = etree.SubElement(t, 'title')
+        title = etree.SubElement(t, "title")
         title.text = t.text
         if len(label) > 8:
             label = label[:3] + ".." + label[-3:]
         t.text = label
-    
+
     with open(_path_output, "wb") as label_writer:
         label_writer.write(etree.tostring(root))
 

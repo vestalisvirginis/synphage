@@ -7,6 +7,7 @@ from pydantic import Field, field_validator
 
 
 TEMP_DIR = tempfile.gettempdir()
+OWNER = os.getenv("OWNER", "N/A")
 
 
 class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be ok in 1.8 version of Dagster

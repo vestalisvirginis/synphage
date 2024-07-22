@@ -7,6 +7,7 @@ import polars as pl
 from pathlib import Path
 from typing import List
 from collections import namedtuple
+from synphage.resources.local_resource import OWNER
 
 
 FastaPRecord = namedtuple("FastaPRecord", "new,history")
@@ -18,7 +19,7 @@ BlastPRecord = namedtuple("BlastPRecord", "new,history")
     description="Create fasta files for every genes in the fasta format. One fasta fila/per gb file.",
     compute_kind="Python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def create_fasta_p(context, append_processed_df) -> FastaPRecord:
 
@@ -92,7 +93,7 @@ def create_fasta_p(context, append_processed_df) -> FastaPRecord:
     description="Receive a fasta file as input and create a database for the blastp step",
     io_manager_key="io_manager",
     compute_kind="Blastp",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def create_blast_p_db(context, create_fasta_p) -> List[str]:
     # path to store db
@@ -131,7 +132,7 @@ def create_blast_p_db(context, create_fasta_p) -> List[str]:
     description="Perform blastp between available sequences and databases and return result in json format",
     io_manager_key="io_manager",
     compute_kind="blastp",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def get_blastp(context, create_fasta_p, create_blast_p_db) -> BlastPRecord:
     # blastp json file directory - create directory if not yet existing

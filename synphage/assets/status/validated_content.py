@@ -19,6 +19,7 @@ from synphage.utils.check_factory import (
     _check_severity,
     _create_check_specs,
 )
+from synphage.resources.local_resource import OWNER
 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -66,7 +67,7 @@ check, check_specs = _create_check_specs(
     check_specs=check_specs,
     compute_kind="Python",
     io_manager_key="io_manager",
-    metadata={"owner": "Virginie Grosboillot"},
+    metadata={"owner": OWNER},
 )
 def append_processed_df(context):
     """Collect all the dataframes in one unique dataframe"""
