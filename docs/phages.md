@@ -30,7 +30,7 @@ To get familiar with `synphage` capabilities, you can reproduce the step-by-step
         For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
     === "Docker Desktop"
         <iframe width="560" height="315"
-        src="http://0.0.0.0:8000/synphage/images/phages/docker_desktop_movie.mp4" 
+        src="../images/phages/docker_desktop_movie.mp4" 
         frameborder="0" 
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
         allowfullscreen></iframe>  
@@ -50,7 +50,7 @@ Go to
 ![Image title](./images/phages/dagster-reversed-mark.svg#only-dark){ width="50"} Dagster_home -> Jobs -> download.  
 
 <iframe width="560" height="315"
-src="http://0.0.0.0:8000/synphage/images/phages/job_1.webm" 
+src="../images/phages/job_1.webm" 
 frameborder="0" 
 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
 allowfullscreen></iframe>
