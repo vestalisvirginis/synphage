@@ -1,33 +1,53 @@
 # Synteny diagram of bacteriophage genomes with 'synphage'
 
-For this step-by-step example, a group of closely related *Lactococcus* phages has been selected based on name from [Bacterial and Viral Bioinformatics Resource Center (BV-BRC)](https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&filter=keyword(Lactococcus)).  
+For this step-by-step example, a group of closely related *Lactococcus* 936-type phages has been selected based on name from [Bacterial and Viral Bioinformatics Resource Center (BV-BRC)](https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&filter=keyword(Lactococcus)).  
 
 <figure markdown="span">
     ![Selected Lactococcus phages](./images/phages/lactococcus_bv_brc.png)
     <figcaption>Selected *Lactococcus* phages for this example</figcaption>
 </figure>  
 
-*Lactococcus* phage genomes can be mosaic and are relevant for the [diary industry](https://doi.org/10.1038/srep21345).  
+*Lactococcus* 936-type phages are especially relevant for the [diary industry](https://doi.org/10.1038/srep21345). Genomes of this phage species are known for its mosaic architecture i.e., they carry genes or segments from distinct evolutionary origins, likely acquired by recombination. In this example, unique and conserved genes and proteins will be highlighted within this phage group, based on analysis of 35 genomes.  
+
 
 ## Running 'synphage' pipeline  
 
-To get familiar with `synphage` capabilities, you can reproduce the step-by-step example describe below. To get started, go to [step 1](#step1-phage-example).  
+To get familiar with `synphage` capabilities, you can reproduce the step-by-step example described below. To get started, go to [step 1](#step1-phage-example).  
 
 ???+ success "*Prerequisite:*"
-    You need to have `synphage` installed in a python environment or in a docker container (see [Installation](installation.md#pip-install)) and running. Open the Dagster UI in your browser to get started.  
-    ```python
-    pip install synphage
-    dagster dev -h 0.0.0.0 -p 3000 -m synphage
-    ```
-    <figure markdown="span">
-        ![Dagster home page](./images/phages/dagster_landing_page.png)
-        <figcaption>Dagster UI - landing page</figcaption>
-    </figure>
+    You need to have `synphage` installed in a python environment or in a docker container or to have pulled synphage docker image. Start synphage and open the Dagster UI in your browser to get started.  
+    === "venv"
+        ``` bash
+        pip install synphage
+        dagster dev -h 0.0.0.0 -p 3000 -m synphage
+        ```
+        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-pip) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+    === "docker"
+        ``` bash
+        docker pull vestalisvirginis/synphage:<tag>
+        docker run --rm --name my-synphage-container -p 3000 vestalisvirginis/synphage:<tag>
+        ```
+        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+    === "Docker Desktop"
+        <iframe width="560" height="315"
+        src="http://0.0.0.0:8000/synphage/images/phages/docker_desktop_movie.mp4" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen></iframe>  
+        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+
+
+<figure markdown="span">
+    ![Dagster home page](./images/phages/dagster_landing_page.png)
+    <figcaption>Dagster UI - landing page</figcaption>
+</figure>
 
 
 ### Step 1: Download the data of interest <a id="step1-phage-example"></a>
 
-Go to Dagster_home -> Jobs -> download.  
+Go to 
+![Image title](./images/phages/dagster-primary-mark.svg#only-light){ width="50"}
+![Image title](./images/phages/dagster-reversed-mark.svg#only-dark){ width="50"} Dagster_home -> Jobs -> download.  
 
 <iframe width="560" height="315"
 src="http://0.0.0.0:8000/synphage/images/phages/job_1.webm" 
@@ -111,7 +131,7 @@ The result table for the checks is available in the metadata panel and the detai
     <figcaption>Full asset check results.</figcaption>
 </figure>
 
-The metadata attached to the second step of the validation inform the user about the logic applied to the file, more precisely what feature type the software will be using for downstream processing and what attribute will be used as unique identifier for the coding genes.
+The metadata attached to the second step of the validation inform the user about the logic applied to file processing in later steps, more precisely what feature type the software will be using for downstream processing and what attribute will be used as unique identifier for the coding genes.
 <figure markdown="span">
     ![Logic - Validation Job](./images/phages/validation_apply_logic.png)
     <figcaption>Step 2 of the validation with metadata.</figcaption>
@@ -301,7 +321,7 @@ Metadata are also available for the plot, including a preview of the graph.
 
 ## Analysing the data
 
-The output plot(s) allows to quickly visualise conserved and unique genes among our 35 *Lactococcus* sequences.
+The output plot(s) allows to quickly visualise conserved and unique genes among our 35 *Lactococcus* 936-type phage sequences.
 
 ???+ example "Synteny diagram"
     === "blastn data"
