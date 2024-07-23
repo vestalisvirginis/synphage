@@ -65,14 +65,14 @@ synphage requires to specify the following environment variables:
 
 >[!TIP]
 >These variables can be set by a `.env` file located in your working directory or can be passed directly in the terminal:  
->=== ".env"  
+>**.env**
 >``` .env
 >INPUT_DIR=path/to/my/data/
 >OUTPUT_DIR=path/to/synphage/data
 >EMAIL=user.email@email.com
 >API_KEY=UserApiKey
 >```
->=== "bash"
+>**bash**
 >``` bash
 >export INPUT_DIR=<path_to_data_folder>
 >export OUTPUT_DIR=<path_to_synphage_folder>
@@ -102,16 +102,49 @@ dagster dev -h 0.0.0.0 -p 3000 -m synphage
 
 #### Running the jobs
 
-The current software is structured in four different jobs.
- - `blast` : create the blastn of each sequences against each sequences (results -> gene_identity folder)
- - `transform` : create three tables from the blastn results and genbank files (results -> tables)
- - `plot` : create the synteny graph (results -> synteny)
+synphage pipeline is composed of `four steps` that need to be run `sequencially`.
 
-**Note:** Different synteny plots can be generated from the same set of genomes. In this case the two first jobs only need to be run once and the third job (`plot`) can be triggered separately for each graphs.
+##### Step 1: Loading the data into the pipeline
+Data is loaded into the pipeline from the `input_folder` set by the user `and/or` `downloaded` from the NCBI.  
+- `step_1a_get_user_data` : load user's data
+- `step_1b_download` : download data from the NCBI
+
+> [!IMPORTANT]
+> - Only one of the jobs is required to successfully run step 1.
+> - Configuration is require for `step_1b_download` job: `search_key`, that receives the keywords for querying the NCBI database.
+
+> [!TIP]
+> Both jobs can be run if the user needs both, local and downloaded files.
+
+##### Step 2: Data validation
+Completeness and uniqueness of the data is validated at this step.
+- `step_2_make_validation` : perform checks and transformations on the dataset that are required for downstream processing
+
+> [!IMPORTANT]
+> This step is required and cannot be skipped.
+
+##### Step 3: Blasting the data
+The blast is performed at this step of the pipeline and three different `options` are available:  
+- `step_3a_make_blastn` : run a Nucleotide BLAST on the dataset
+- `step_3b_make_blastp` : run a Protein BLAST on the dataset
+- `step_3c_make_all_blast` : run both, Nucleotide and Protein BLAST simultaneously  
+
+> [!IMPORTANT]
+> Only one of the above jobs is required to successfully run step 3.
+
+> [!TIP]
+> Both `step_3a_make_blastn` and `step_3b_make_blastp` jobs can be run sequencially, mainly in the case where the user decide to run the second job based on the results obtained for the first one.
 
 
-`[2024-01-11]`   ✨ __New feature!__   to simplify the addition of new sequences into the genbank folder
- - `download` : download genomes to be analysed from the NCBI database 
+##### Step 4: Synteny plot
+The graph is created during this last step. The step 4 can be run multiple time with different configurations and different sets of data, as long as the data have been processed once through step1, 2 and 3.
+- `step_4_make_plot` : use data generated at step 3 and the genbank files to plot the synteny diagram  
+  
+> [!IMPORTANT]
+> Configuration is require for `step_4_make_plot` job: `graph_type`, that receives either `blastn` or `blastp` as value for specifying what dataset to use for the plot. Default value is set to `blastn`. For more information about the configuration at step 4, check the [documentation](https://vestalisvirginis.github.io/synphage/configurations/).
+
+> [!TIP]
+> Different synteny plots can be generated from the same set of genomes. In this case the three first steps only need to be run once and the fourth step, `step_4_make_plot`, can be triggered separately for each graphs.
 
 
 ## Output
@@ -213,6 +246,12 @@ Field Name | Description | Default Value
 - [ ] create possibility to add ref sequence with special colour coding
 - [ ] create interactive plot 
 - [ ] Help us in a discussion?
+
+
+## Status
+
+`[2024-01-11]`   ✨ __New feature!__   to simplify the addition of new sequences into the genbank folder
+ - `download` : download genomes to be analysed from the NCBI database 
 
 
 ## Contributing 
