@@ -50,7 +50,7 @@ apt update
 apt install -y ncbi-blast+
 ```
 
-For other systems, you can download the [executables](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) check the [installation documentation](https://www.ncbi.nlm.nih.gov/books/NBK569861/).  
+For other systems, you can download the [executables](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) and check the complete [installation documentation](https://www.ncbi.nlm.nih.gov/books/NBK569861/).  
 
 
 ## Usage
