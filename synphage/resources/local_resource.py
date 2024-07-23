@@ -19,8 +19,8 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
     )
 
     @field_validator("input_dir")
-    def data_dir_exists(cls, v: str) -> str:
-        if "DATA_DIR" not in os.environ:
+    def input_dir_exists(cls, v: str) -> str:
+        if "INPUT_DIR" not in os.environ:
             return TEMP_DIR
         return v
 

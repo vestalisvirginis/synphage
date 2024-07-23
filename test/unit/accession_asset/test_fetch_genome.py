@@ -66,7 +66,7 @@ def test_fetch_genome(mock_env_ncbi_fetch):
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
             ),
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             ),
         }
     )
@@ -119,7 +119,7 @@ def test_fetch_genome_asset(mock_env_ncbi_fetch):
                 email=os.getenv("EMAIL"), api_key=os.getenv("API_KEY")
             ),
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             ),
         },
     )

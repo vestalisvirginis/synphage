@@ -108,7 +108,7 @@ class Genome(Config):
 def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
     # _path_seq = str(
-    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / config.sequence_file
+    #     Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / config.sequence_file
     # )
     _path_seq = str(
         Path(context.resources.local_resource.get_paths()["SYNPHAGE_DATA"])
@@ -205,13 +205,13 @@ def create_graph(
     context, create_genome: dict, config: Diagram
 ) -> GenomeDiagram.Diagram:
     # Define the paths
-    # _gb_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "genbank")
+    # _gb_folder = str(Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / "genbank")
 
     _gb_folder = context.resources.local_resource.get_paths()["GENBANK_DIR"]
-    # _synteny_folder = str(Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "synteny")
+    # _synteny_folder = str(Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / "synteny")
     _synteny_folder = context.resources.local_resource.get_paths()["SYNTENY_DIR"]
     # _blastn_dir = str(
-    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR))
+    #     Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR))
     #     / "tables"
     #     / "blastn_summary.parquet"
     # )
@@ -223,7 +223,7 @@ def create_graph(
         _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
 
     # _uniq_dir = str(
-    #     Path(os.getenv(EnvVar("DATA_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
+    #     Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
     # )
     _colour_dir = str(Path(_synteny_folder) / "colour_table.parquet")
 

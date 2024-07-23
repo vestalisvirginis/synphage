@@ -24,7 +24,7 @@ jobs:
         coverage run -m pytest test/unit
         coverage xml -o coverage.xml
       env:
-        DATA_DIR: ${{ env.DATA_DIR }}
+        INPUT_DIR: ${{ env.INPUT_DIR }}
         FILE_SYSTEM: ${{ env.FILE_SYSTEM }}
         EMAIL: ${{ secrets.EMAIL }}
         API_KEY: ${{ secrets.API_KEY }}

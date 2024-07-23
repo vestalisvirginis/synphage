@@ -13,15 +13,15 @@ def test_transform(mock_env_phagy_dir_transform):
     config = RunConfig(
         ops={
             "blastn": PipeConfig(
-                source=str(Path(os.getenv("DATA_DIR")) / "gene_identity" / "blastn"),
-                target=str(Path(os.getenv("DATA_DIR")) / "fs" / "blastn_parsing"),
-                table_dir=str(Path(os.getenv("DATA_DIR")) / "tables"),
+                source=str(Path(os.getenv("INPUT_DIR")) / "gene_identity" / "blastn"),
+                target=str(Path(os.getenv("INPUT_DIR")) / "fs" / "blastn_parsing"),
+                table_dir=str(Path(os.getenv("INPUT_DIR")) / "tables"),
                 file="blastn_summary.parquet",
             ),
             "locus": PipeConfig(
-                source=str(Path(os.getenv("DATA_DIR")) / "genbank"),
-                target=str(Path(os.getenv("DATA_DIR")) / "fs" / "locus_parsing"),
-                table_dir=str(Path(os.getenv("DATA_DIR")) / "tables"),
+                source=str(Path(os.getenv("INPUT_DIR")) / "genbank"),
+                target=str(Path(os.getenv("INPUT_DIR")) / "fs" / "locus_parsing"),
+                table_dir=str(Path(os.getenv("INPUT_DIR")) / "tables"),
                 file="locus_and_gene.parquet",
             ),
         }
