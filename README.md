@@ -57,14 +57,14 @@ For other systems, you can download the [executables](https://ftp.ncbi.nlm.nih.g
 
 ### Setup  
 
-synphage requires to specify the following environment variables:
-- `INPUT_DIR` : to specify the path to the folder containing the user's `GenBank files`. If not set, this path will be defaulted to the temp folder. The path can also be configured at run time.  
+synphage requires the user to specify the following environment variables:
+- `INPUT_DIR` : to specify the path to the folder containing the user's `GenBank files`. If not set, this path will be defaulted to the temp folder. This path can also be modified at run time.  
 - `OUTPUT_DIR`: to specify the path to the folder where the data generated during the run will be stored. If not set, this path will be defaulted to the temp folder.  
 - `EMAIL` (optional): to connect to the NCBI database.  
 - `API_KEY` (optional): to connect to the NCBI database and download files.  
 
 >[!TIP]
->These variables can be set by a `.env` file located in your working directory or can be passed directly in the terminal:  
+>These variables can be set with a `.env` file located in your working directory (Dagster will automatically load them when initialising the pipeline) or can be passed in the terminal before starting to run synphage:  
 >**.env**
 >``` .env
 >INPUT_DIR=path/to/my/data/
