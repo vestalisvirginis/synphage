@@ -71,7 +71,7 @@
 #     with build_resources(
 #         resources={
 #             "path_config": InputOutputConfig(
-#                 input_dir=str(os.getenv("DATA_DIR")),
+#                 input_dir=str(os.getenv("INPUT_DIR")),
 #                 output_dir=str(os.getenv("OUTPUT_DIR")),
 #             )
 #         }
@@ -91,7 +91,7 @@
 #     with build_resources(
 #         resources={
 #             "path_config": InputOutputConfig(
-#                 input_dir=str(os.getenv("DATA_DIR")),
+#                 input_dir=str(os.getenv("INPUT_DIR")),
 #                 output_dir=str(os.getenv("OUTPUT_DIR")),
 #             )
 #         }

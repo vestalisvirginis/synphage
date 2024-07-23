@@ -58,7 +58,7 @@ def test_get_blastn_asset(mock_env_phagy_dir_blasting):
         assets,
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         },
     )

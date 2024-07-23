@@ -8,7 +8,7 @@ def test_uno():
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         }
     )

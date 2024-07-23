@@ -11,7 +11,7 @@ def test_downloaded_genomes_pos(mock_env_ncbi_download_pos):
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         }
     )
@@ -22,12 +22,12 @@ def test_downloaded_genomes_pos(mock_env_ncbi_download_pos):
 
 
 def test_downloded_genomes_neg(mock_env_ncbi_download_neg):
-    _path = str(Path(os.getenv("DATA_DIR")) / "download")
+    _path = str(Path(os.getenv("INPUT_DIR")) / "download")
     os.makedirs(_path, exist_ok=True)
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         }
     )
@@ -43,7 +43,7 @@ def test_download_genomes_asset(mock_env_ncbi_download_pos):
         assets,
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         },
     )

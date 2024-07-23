@@ -30,10 +30,10 @@ This will automatically install compatible versions of all Python dependencies.
 
 1. Environment variables
 
-    1. `synphage` uses the environment variable `DATA_DIR` to allow the user to specify a data directory.
+    1. `synphage` uses the environment variable `INPUT_DIR` to allow the user to specify a data directory.
 
         ```bash
-        export DATA_DIR=/path_to_data
+        export INPUT_DIR=/path_to_data
         ```
 
         ???+ info
@@ -58,7 +58,7 @@ This will automatically install compatible versions of all Python dependencies.
             This directory contains the information linked to the run of the pipeline. In order to keep the information about previous runs when working in the same project, it is advice to connect a volume to it otherwise information will be wiped out when the container is removed.
 
 
-2. Copy genbank files in the `/genbank/` directory of you `DATA_DIR`
+2. Copy genbank files in the `/genbank/` directory of you `INPUT_DIR`
     ```bash
     cp path_to_my_gb_files/*.gb /<path_to_data>/genbank/
     ```

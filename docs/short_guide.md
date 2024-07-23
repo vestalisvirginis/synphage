@@ -64,7 +64,7 @@ The [Docker image](https://hub.docker.com/r/vestalisvirginis/synphage) comes wit
 #### Path setup
 
 ```bash
-export DATA_DIR=<path_to_data_folder>
+export INPUT_DIR=<path_to_data_folder>
 ```
 
 ???+ note

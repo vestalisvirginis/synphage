@@ -14,7 +14,7 @@ def test_users_to_genbank(mock_env_users_to_genbank):
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         }
     )
@@ -31,7 +31,7 @@ def test_users_to_genbank_with_history(mock_env_users_to_genbank_with_history):
     context = build_asset_context(
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         }
     )
@@ -88,7 +88,7 @@ def test_users_to_genbank_asset(mock_env_users_to_genbank):
         assets,
         resources={
             "local_resource": InputOutputConfig(
-                input_dir=os.getenv("DATA_DIR"), output_dir=os.getenv("OUTPUT_DIR")
+                input_dir=os.getenv("INPUT_DIR"), output_dir=os.getenv("OUTPUT_DIR")
             )
         },
     )

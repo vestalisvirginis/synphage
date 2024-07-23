@@ -3,12 +3,12 @@ import pytest
 
 @pytest.fixture
 def mock_env_input_validator(monkeypatch):
-    monkeypatch.delenv('DATA_DIR')
+    monkeypatch.delenv('INPUT_DIR')
     monkeypatch.setenv('OUTPUT_DIR', '/output_folder')
 
 @pytest.fixture
 def mock_env_output_validator(monkeypatch):
-    monkeypatch.setenv('DATA_DIR', '/input_folder')
+    monkeypatch.setenv('INPUT_DIR', '/input_folder')
     monkeypatch.delenv('OUTPUT_DIR')
 
 @pytest.fixture
@@ -38,17 +38,17 @@ def mock_env_download_to_genbank_with_history(monkeypatch):
 
 @pytest.fixture
 def mock_env_users_to_genbank(monkeypatch):
-    monkeypatch.setenv("DATA_DIR", "test/fixtures/user_data_transfer/user_data")
+    monkeypatch.setenv("INPUT_DIR", "test/fixtures/user_data_transfer/user_data")
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/user_data_transfer/data")
 
 @pytest.fixture
 def mock_env_users_to_genbank_with_history(monkeypatch):
-    monkeypatch.setenv("DATA_DIR", "test/fixtures/user_data_transfer/user_data")
+    monkeypatch.setenv("INPUT_DIR", "test/fixtures/user_data_transfer/user_data")
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/user_data_transfer/data_with_history")
 
 @pytest.fixture
 def mock_env_users_to_genbank_empty_dir(monkeypatch):
-    monkeypatch.setenv("DATA_DIR", "test/fixtures/user_data_transfer")
+    monkeypatch.setenv("INPUT_DIR", "test/fixtures/user_data_transfer")
     monkeypatch.setenv("OUTPUT_DIR", "test/fixtures/user_data_transfer/data")
 
 @pytest.fixture
