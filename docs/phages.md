@@ -1,24 +1,40 @@
 # Synteny diagram of bacteriophage genomes with 'synphage'
 
-For this step-by-step example, a group of closely related *Lactococcus* phages has been selected based on name from [Bacterial and Viral Bioinformatics Resource Center (BV-BRC)](https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&filter=keyword(Lactococcus)).  
+For this step-by-step example, a group of closely related *Lactococcus* 936-type phages has been selected based on name from [Bacterial and Viral Bioinformatics Resource Center (BV-BRC)](https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&filter=keyword(Lactococcus)).  
 
 <figure markdown="span">
     ![Selected Lactococcus phages](./images/phages/lactococcus_bv_brc.png)
     <figcaption>Selected *Lactococcus* phages for this example</figcaption>
 </figure>  
 
-*Lactococcus* phage genomes can be mosaic and are relevant for the [diary industry](https://doi.org/10.1038/srep21345).  
+*Lactococcus* 936-type phages are especially relevant for the [diary industry](https://doi.org/10.1038/srep21345). Genomes of this phage species are known for its mosaic architecture i.e., they carry genes or segments from distinct evolutionary origins, likely acquired by recombination. In this example, unique and conserved genes and proteins will be highlighted within this phage group, based on analysis of 35 genomes.  
+
 
 ## Running 'synphage' pipeline  
 
-To get familiar with `synphage` capabilities, you can reproduce the step-by-step example describe below. To get started, go to [step 1](#step1-phage-example).  
+To get familiar with `synphage` capabilities, you can reproduce the step-by-step example described below. To get started, go to [step 1](#step1-phage-example).  
 
 ???+ success "*Prerequisite:*"
     You need to have `synphage` installed in a python environment or in a docker container (see [Installation](installation.md#pip-install)) and running. Open the Dagster UI in your browser to get started.  
-    ```python
-    pip install synphage
-    dagster dev -h 0.0.0.0 -p 3000 -m synphage
-    ```
+    === "venv"
+        ``` bash
+        pip install synphage
+        dagster dev -h 0.0.0.0 -p 3000 -m synphage
+        ```
+        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-pip) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+    === "docker"
+        ``` bash
+        docker pull vestalisvirginis/synphage:<tag>
+        docker run --rm --name my-synphage-container -p 3000 vestalisvirginis/synphage:<tag>
+        ```
+        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+    === "Docker Desktop"
+        <figure markdown="span">
+            ![Docker Desktop - Run Container](./images/phages/dagster_landing_page.png)
+            <figcaption>Run the docker container with Docker Desktop.</figcaption>
+        </figure>
+
+
     <figure markdown="span">
         ![Dagster home page](./images/phages/dagster_landing_page.png)
         <figcaption>Dagster UI - landing page</figcaption>
