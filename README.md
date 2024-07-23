@@ -35,7 +35,8 @@ pip install synphage
 ```bash
 docker pull vestalisvirginis/synphage:<tag>
 ```
-**Note:** Replace <tag> with the [latest image tag](https://hub.docker.com/r/vestalisvirginis/synphage/tags).
+>[!NOTE]
+>Replace `<tag>` with the [latest image tag](https://hub.docker.com/r/vestalisvirginis/synphage/tags).
 
 
 ### Additional dependencies
@@ -62,25 +63,25 @@ synphage requires to specify the following environment variables:
 - `EMAIL` (optional): to connect to the NCBI database.  
 - `API_KEY` (optional): to connect to the NCBI database and download files.  
 
-[!TIP]
-These variables can be set by a `.env` file located in your working directory or can be passed directly in the terminal:  
-=== ".env"  
-``` .env
-INPUT_DIR=path/to/my/data/
-OUTPUT_DIR=path/to/synphage/data
-EMAIL=user.email@email.com
-API_KEY=UserApiKey
-```
-=== "bash"
-``` bash
-export INPUT_DIR=<path_to_data_folder>
-export OUTPUT_DIR=<path_to_synphage_folder>
-export EMAIL=user.email@email.com
-export API_KEY=UserApiKey
-```
+>[!TIP]
+>These variables can be set by a `.env` file located in your working directory or can be passed directly in the terminal:  
+>=== ".env"  
+>``` .env
+>INPUT_DIR=path/to/my/data/
+>OUTPUT_DIR=path/to/synphage/data
+>EMAIL=user.email@email.com
+>API_KEY=UserApiKey
+>```
+>=== "bash"
+>``` bash
+>export INPUT_DIR=<path_to_data_folder>
+>export OUTPUT_DIR=<path_to_synphage_folder>
+>export EMAIL=user.email@email.com
+>export API_KEY=UserApiKey
+>```
 
-[!NOTE]  
-For docker users, the `INPUT_DIR` is defaulted to `/user_files` and `OUTPUT_DIR` is defaulted to `/data`.  
+>[!NOTE]  
+>For docker users, the `INPUT_DIR` is defaulted to `/user_files` and `OUTPUT_DIR` is defaulted to `/data`.  
 
 
 ### Running Synphage
