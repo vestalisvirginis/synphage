@@ -64,7 +64,7 @@ synphage requires the user to specify the following environment variables:
 - `API_KEY` (optional): to connect to the NCBI database and download files.  
 
 >[!TIP]
->These variables can be set with a `.env` file located in your working directory (Dagster will automatically load them when initialising the pipeline) or can be passed in the terminal before starting to run synphage:  
+>These variables can be set with a `.env` file located in your working directory (Dagster will automatically load them from the .env file when initialising the pipeline) or can be passed in the terminal before starting to run synphage:  
 >**.env**
 >``` .env
 >INPUT_DIR=path/to/my/data/
@@ -82,6 +82,7 @@ synphage requires the user to specify the following environment variables:
 
 >[!NOTE]  
 >For docker users, the `INPUT_DIR` is defaulted to `/user_files` and `OUTPUT_DIR` is defaulted to `/data`.  
+> For more detailed explainations on using `synphage docker image`, check our [documentation](https://vestalisvirginis.github.io/synphage/installation/#run-synphage-container).
 
 
 ### Running Synphage
