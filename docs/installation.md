@@ -27,19 +27,65 @@ pip install --upgrade pip
     # Latest
     pip install synphage
     ```
+    This will automatically install compatible versions of all Python dependencies.
 
 === "Windows"
     ``` bash
     # Latest
     python -m pip install synphage
     ```
+    This will automatically install compatible versions of all Python dependencies.
 
 === "WSL"
+    Step-by-step installation of synphage in Windows Linux Subsystem:
     ``` bash
-    # Add example for WSL + video
-    ```
+    # Install all build python dependencies
+    sudo apt install build-essential zlib1g-dev libncurses5-dev libgdm-dev libnss3-dev libss1-dev libsqlite3-dev libreadline-dev libffi-dev curl libbz2-dev
 
-This will automatically install compatible versions of all Python dependencies.
+    # Get the install package for python
+    wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
+    
+    # Unpack the tarball file
+    tar -zxvf Python-3.11.9.tgz
+
+    # Build Python
+    cd Python-3.11.9/
+    ./configure --enable-optimizations  # (video: 2:39-3:22)
+    make -j 2  # (video: 3:27-7:44)
+    sudo make install   # (video: 8:05-8:25)
+    #Test Python Install
+    python3.11 -V
+    # Python installed
+    cd ..
+
+    # Install dependencies
+    sudo apt install libcairo2-dev pkg-config python3-dev
+
+    # Create project folder
+    mkdir -p ~/synphage_home
+    cd ~/synphage_home
+
+    # Create python environment
+    python3.11 -m venv .venv
+    source ./.venv/bin/activate
+
+    # Install synphage
+    pip install synphage
+
+    # Install the Blast+ dependency
+    sudo apt install ncbi-blast+
+
+    # Run synphage
+    mkdir /dagster_home
+    DAGSTER_HOME=$PWD/dagster_home dagster dev -h 0.0.0.0 -p 3000 -m synphage
+
+
+    ```
+    <iframe width="560" height="315"
+    src="../images/installation_pip/installation_WSL.webm" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen></iframe>
 
 
 ### Run `synphage`  <a id="run-synphage-pip"></a>
@@ -53,11 +99,11 @@ This will automatically install compatible versions of all Python dependencies.
         - `API_KEY` (optional): for connecting to the NCBI database and download files.  
         - `DAGSTER_HOME` (optional): for storing metadata generated during former run of the pipeline
 
-    ???+ info
+    ???+ info "Optional env"
         - `EMAIL` and `API_KEY` are only required for connecting to the NCBI database and downloading GenBank files. If the user only works with local data, these two variables can be ignored.
-        - `DAGSTER_HOME` is only necessary to keep track of the previous run and generated metadata. Does not impair data storage if not set.
+        - `DAGSTER_HOME` is only necessary to keep track of the previous runs and generated metadata. Does not impair data storage if not set.
 
-    ???+ tip
+    ???+ tip "Setting your env"
         These variables can be set with a `.env` file located in your working directory (Dagster will automatically load them from the .env file when initialising the pipeline) or can be passed in the terminal before starting to run synphage: 
         === ":material-file-document-outline: .env"
             ``` .env
@@ -85,7 +131,7 @@ This will automatically install compatible versions of all Python dependencies.
             - Only a single path can be configured per loading job run.
             - The use of special characters in file names, might causes errors downstream.
 
-        ???+ note
+        ???+ note "GenBank file extensions"
             `.gb`and `.gbk` are both valid extension for genbank files
 
 
@@ -222,16 +268,16 @@ The following dependency needs to be installed in order to run synphage Docker I
 
         1. Data Output  
             All output data are located in the `/data` directory of the container.  
-            The output data can be copied after the run from the /data folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent run if the user needs to process additional sequences or simply generate additional synteny diagrams.
+            The output data can be copied after the run from the `/data` folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent runs if the user needs to process additional sequences or simply generate additional synteny diagrams.
 
-            === "Docker Volume"
+            === ":fontawesome-solid-hard-drive: Docker Volume"
                 <figure markdown="span">
                 ![Create volumes](./images/dd_volumes.png) 
                 <figcaption>Create a Docker Volume for your data</figcaption>
                 ![Volume Output Data](./images/dd_optional_settings_2.png){width=500}
                 <figcaption>Mount your volume to the docker data volume when starting your container</figcaption>
                 </figure>
-            === "download"
+            === ":material-download: download"
                 <figure markdown="span">
                 ![Save data generated in the container](./images/dd_save_data_folder.png){align=right}
                 <figcaption>Download the data from the container to you computer</figcaption>
@@ -240,7 +286,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
         2. Dagster home  
             Metadata generated during the successive runs of the pipeline are stored in `/dagster` directory.  
-            Setting a `DAGSTER_HOME` Volume is only necessary to keep track of the previous run and generated metadata. It does not impair data storage if not set.  
+            Setting a `DAGSTER_HOME` Volume is only necessary to keep track of the previous runs and generated metadata. It does not impair data storage if not set.  
 
         ???+ danger
             All the data will be deleted when the container will be removed.
@@ -264,7 +310,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
 
     7. Import local GenBank files (optional)  
-        `/user_files` is the directory that received users GenBank files.  
+        `/user_files` is the directory that received users' GenBank files.  
         For using locally stored GenBank files, the files can be imported or dragged and dropped (depending on your system) into the `/user_files` directory.
    
         ![Drag and drop genbank files](./images/installation_docker/dd_import_gb_files.png)
@@ -318,8 +364,8 @@ The following dependency needs to be installed in order to run synphage Docker I
         docker run -d --rm --name my_phage_box -p 3000:3000 vestalisvirginis/synphage:<tag>
         ```
 
-        ???+ note
-            The <tag> corresponds to the <tag> of the downloaded image.
+        ???+ note "Image version"
+            The `<tag>` corresponds to the `<tag>` of the downloaded image.
 
         ???+ tip
             - As synphage uses dagster-webserver, -p flag is required to visualise the pipeline in your browser:   
@@ -332,7 +378,7 @@ The following dependency needs to be installed in order to run synphage Docker I
             ```
 
         ???+ tip
-            - It is good practice to name your container to find them easily: `--name`
+            - It is good practice to name your containers to find them easily: `--name`
             - It is also good practice to remove the container at the end of the run. By passing the `--rm` flag, the container will be automatically removed after being stopped.  
 
 
@@ -340,9 +386,9 @@ The following dependency needs to be installed in order to run synphage Docker I
 
         1. Data Output  
             All output data are located in the `/data` directory of the container.  
-            The output data can be copied after the run from the /data folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent run if the user needs to process additional sequences or simply generate additional synteny diagrams.
+            The output data can be copied after the run from the `/data` folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent run if the user needs to process additional sequences or simply generate additional synteny diagrams.
 
-            === "Docker Volume"
+            === ":fontawesome-solid-hard-drive: Docker Volume"
                 ```bash
                 # Create volume synphage_data
                 docker volume create synphage_data
@@ -351,14 +397,14 @@ The following dependency needs to be installed in order to run synphage Docker I
                 docker run -d --rm --name my_phage_box -v synphage_data:/data -p 3000:3000 vestalisvirginis/synphage:<tag>
                 ```
             
-            === "copy"
+            === ":material-content-copy: copy"
                 ```bash
                 docker cp container-id/data/* your/local/data_directory/
                 ```
 
         2. Dagster home  
             Metadata generated during the successive runs of the pipeline are stored in `/dagster` directory.  
-            Setting a `DAGSTER_HOME` Volume is only necessary to keep track of the previous run and generated metadata. It does not impair data storage if not set.
+            Setting a `DAGSTER_HOME` Volume is only necessary to keep track of the previous runs and generated metadata. It does not impair data storage if not set.
             ```bash
             # Create volume synphage_data
             docker volume create synphage_data
@@ -371,7 +417,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
         ???+ danger
             All the data will be deleted when the container will be removed.
-            If no Volume is mounted to the /data directory and the user do not save the data, data will be lost.
+            If no Volume is mounted to the `/data` directory and the user do not save the data, data will be lost.
 
         ???+ warning
             Volume names must be unique. You canot set two volumes wit the same name.
@@ -390,7 +436,7 @@ The following dependency needs to be installed in order to run synphage Docker I
         ???+ warning
             - The use of special characters in file names, might causes errors downstream.
 
-        ???+ note
+        ???+ note "GenBank files extensions"
             `.gb`and `.gbk` are both valid extension for genbank files
 
 
@@ -414,4 +460,3 @@ The following dependency needs to be installed in order to run synphage Docker I
         ![Stop dagster](./images/installation_docker/stop_docker_container.png)
         <figcaption>Dagster shutting down and the docker container is stopped and removed automatically</figcaption>
         </figure>
-        s
