@@ -13,7 +13,7 @@ repo_name: vestalisvirginis/synphage
 nav:
   - Home: index.md
   - Getting Started: short_guide.md
-  - User guide: 
+  - User Guide: 
     - Installation: installation.md
     - Running your jobs: jobs.md
     - Configurations: configurations.md
@@ -82,6 +82,7 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji 
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys:
 plugins:
   - search
   # - autorefs
