@@ -190,26 +190,64 @@ The following dependency needs to be installed in order to run synphage Docker I
     ```
     Replace `<tag>` with the [latest image tag](https://hub.docker.com/r/vestalisvirginis/synphage/tags).
 
-<a id="run-synphage-container"></a>
-### Run `synphage` container 
+
+### Run `synphage` container  <a id="run-synphage-container"></a>
+
+#### Start the container  
 
 === ":simple-docker: Docker Desktop"
     1. Start the container
-    ![Start container](./images/dd_start_container.png){align=right}  
+        ![Start container](./images/dd_start_container.png){align=right}  
 
     2. Open the drop-down menu `Optional settings`:  
-    ![Optional settings pop-up window](./images/dd_optional_settings_1.png){align=right}  
+        ![Optional settings pop-up window](./images/dd_optional_settings_1.png){width=500}  
 
-    3. Set the `port` to 3000 (or any other port still available on your computer).  
-    Port is the only setting required for running the program, as it uses a web-interface.   
-    ![Optional settings example](./images/dd_optional_settings_2.png){align=right}  
+    3. Set the `host port` to 3000  
+   
+        ???+ tip  
+            Setting the port is required to run synphage as it uses a web-interface.  
+            3000 is given as example, any other `available` port can be used.
+  
 
-    4. Set `EMAIL` and `API_KEY` environment variables (optional). These variables are only required if you want to use the `NCBI_download` job.
-    ![Environment variables](./images/dd_env_variable.png){align=right} 
+          ![Port](./images/dd_optional_settings_2.png){width=500}
 
-    5. Press the `Run` botton.
+        ???+ warning
+            Make sure that the port is available and not already in use (by another running container for example).
 
-    6. In `Containers -> Files` : Drag and drop your genbank files in the `/data/genbank` directory of your running container
+    4. Set the `Volumes`
+
+        1. Data Output  
+            All output data are located in the `/data` directory of the container.  
+            The output data can be copied after the run from the /data folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent run if the user needs to process additional sequences or simply generate additional synteny diagrams.
+
+            ![Volume Output Data](./images/dd_optional_settings_2.png){width=500}
+
+        2. Dagster home  
+            Metadata generated during the successive runs of the pipeline are stored in `/dagster_home` directory.  
+            Setting a `DAGSTER_HOME` Volume is only necessary to keep track of the previous run and generated metadata. It does not impair data storage if not set.  
+
+        ???+ danger
+            All the data will be deleted when the container will be removed.
+            If no Volume is mounted to the /data directory and the user do not save the data, data will be lost.
+
+
+    5. Set the environment variables (optional)  
+        `synphage` uses the following environment variables:  
+        - `EMAIL` (optional): for connecting to the NCBI database.  
+        - `API_KEY` (optional): for connecting to the NCBI database and download files.  
+        - `DAGSTER_HOME` (optional): for storing metadata generated during former run of the pipeline
+         
+        ![Environment variables](./images/dd_env_variable.png){width=500}
+
+        ???+ info
+            - `EMAIL` and `API_KEY` are only required for connecting to the NCBI database and downloading GenBank files. If the user only works with local data, these two variables can be ignored.
+
+
+    6. Press the `Run` botton  
+        Your container is now running.
+
+
+    7. In `Containers -> Files` : Drag and drop your genbank files in the `/data/genbank` directory of your running container
     ![Drag and drop genbank files](./images/dd_drag_and_drop_gb_files.png){align=right}
 
         ???+ warning
@@ -218,7 +256,7 @@ The following dependency needs to be installed in order to run synphage Docker I
         ???+ note
             `.gb`and `.gbk` are both valid extension for genbank files
 
-    7. For ploting add a `sequences.csv` file in the /data directory. Please use the file editor of the docker to check that the format of your file is according to the example below:
+    8. For ploting add a `sequences.csv` file in the /data directory. Please use the file editor of the docker to check that the format of your file is according to the example below:
     ```txt
     168_SPbeta.gb,0
     Phi3T.gb,1
@@ -236,7 +274,7 @@ The following dependency needs to be installed in order to run synphage Docker I
             0 : sequence
             1 : reverse
 
-    8. Connect to the web interface
+    9.  Connect to the web interface
     ![Open the link to the web-interface](./images/dd_web_interface.png) 
  
 === ":octicons-terminal-16:  Bash"
