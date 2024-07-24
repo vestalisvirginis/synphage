@@ -1,5 +1,8 @@
 # Navigating `synphage` pipeline
 
+
+<a id="dir-config"></a>
+
 ## Pre-requisite  
 
 In order to use the software, the user needs to provide:
@@ -137,6 +140,15 @@ Job 2 needs to be re-run after Job 1 in order to integrate the new data to the t
 
 
 ### Job 3 : synteny job
+
+
+    ???+ warning
+        Please here use **only** `.gb` as file extension.
+
+    ???+ info
+        The integer after the comma represents the orientation of the sequence in the synteny diagram.
+        0 : sequence
+        1 : reverse
 
 This job requires the genbank files to be available in the genbank folder, that job 1 and 2 have been run on the sequence of interest and that a sequences.csv is present in the /data folder.
 

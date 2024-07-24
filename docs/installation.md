@@ -1,100 +1,135 @@
 # Installation
 
-<a id="pip-install"></a>
-## Via pip 
 
-### Pre-requisite
+## Via pip  <a id="pip-install"></a>
 
-`synphage` relies on one non-python dependency, [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) >= 2.12.0, that need to be manually installed when synphage is installed with `pip`.
+### Requirements
+The following dependencies need to be installed in order to run synphage on your system.
+ 
+- `Python 3.11`
+- A Python package manager such as `Pip` or `uv`
+
+- [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) >= 2.12.0
+
+Install [Python](https://www.python.org/) and [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) using your package manager of choice, or by downloading an installer appropriate for your system from [python.org](https://www.python.org/downloads/) and from the [NCBI](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) respectively.  
+The Python package manager `pip` is installed by default with Python, however you may need to upgrade pip to the latest version:
+``` bash
+pip install --upgrade pip
+```
+
 
 ### Install `synphage`
 
 `synphage`is available as a [Python package](https://pypi.org/project/synphage/) and can be install with the Python package manager `pip` in an opened terminal window.
 
 === "Linux/MacOS"
-    ```bash
+    ``` bash
     # Latest
     pip install synphage
     ```
 
 === "Windows"
-    ```bash
+    ``` bash
     # Latest
     python -m pip install synphage
     ```
 
+=== "WSL"
+    ``` bash
+    # Add example for WSL + video
+    ```
+
 This will automatically install compatible versions of all Python dependencies.
 
-<a id="run-synphage-pip"></a>
-### Run `synphage`
+
+### Run `synphage`  <a id="run-synphage-pip"></a>
 
 1. Environment variables
 
-    1. `synphage` uses the environment variable `INPUT_DIR` to allow the user to specify a data directory.
-
-        ```bash
-        export INPUT_DIR=/path_to_data
-        ```
-
-        ???+ info
-            - If no data directory is set, the data folder will be the temporary folder by default.
-            The current data directory can be checked in the [config panel](#dir-config)<a id="dir-config"></a> of the jobs.  
-            - This directory contains all the data generated during the run as well as the genbank files and sequences.csv file added by the user.  
-
-    2. Set `EMAIL` and `API_KEY` environment variables (optional). These variables are only required if you want to use the `NCBI_download` job.
-   
-        ```bash
-        export EMAIL=john.doe@domain.com
-        export API_KEY=gdzjdfzkhlh6832HBkh
-        ```
-
-    3. Optional. Set the environment variable DAGSTER_HOME to keep track of the previous run and generated assets.
-   
-        ```bash
-        export DAGSTER_HOME=/dagster
-        ```
-
-        ???+ info
-            This directory contains the information linked to the run of the pipeline. In order to keep the information about previous runs when working in the same project, it is advice to connect a volume to it otherwise information will be wiped out when the container is removed.
-
-
-2. Copy genbank files in the `/genbank/` directory of you `INPUT_DIR`
-    ```bash
-    cp path_to_my_gb_files/*.gb /<path_to_data>/genbank/
-    ```
-
-    ???+ warning
-        The use of spaces and special characters in file names, might cause error downstream.
-
-    ???+ note
-        `.gb`and `.gbk` are both valid extension for genbank files
-
-3. For ploting add a sequences.csv file in the /data directory. Format your file according to the example below:
-    ```txt
-    168_SPbeta.gb,0
-    Phi3T.gb,1
-    ```
-    ```bash
-    # Create file
-    touch sequences.csv
-    # Edit file
-    vim sequences.csv
-    # Copy file to the /data directory
-    docker cp path_to_file/sequences.csv /data/
-    ```
-
-    ???+ warning
-        Please here use **only** `.gb` as file extension.
+    `synphage` uses the following environment variables:  
+        - `INPUT_DIR` : for specifying the path to the folder containing the user's `GenBank files`. If not set, this path will be defaulted to the temp folder. This path can also be modified at run time.  
+        - `OUTPUT_DIR`: for specifying the path to the folder where the data generated during the run will be stored. If not set, this path will be defaulted to the temp folder.  
+        - `EMAIL` (optional): for connecting to the NCBI database.  
+        - `API_KEY` (optional): for connecting to the NCBI database and download files.  
+        - `DAGSTER_HOME` (optional): for storing metadata generated during former run of the pipeline
 
     ???+ info
-        The integer after the comma represents the orientation of the sequence in the synteny diagram.
-        0 : sequence
-        1 : reverse
+        - `EMAIL` and `API_KEY` are only required for connecting to the NCBI database and downloading GenBank files. If the user only works with local data, these two variables can be ignored.
+        - `DAGSTER_HOME` is only necessary to keep track of the previous run and generated metadata. Does not impair data storage if not set.
 
-4. Start dagster and synphage
-    ```bash
+    ???+ tip
+        These variables can be set with a `.env` file located in your working directory (Dagster will automatically load them from the .env file when initialising the pipeline) or can be passed in the terminal before starting to run synphage: 
+        === ":material-file-document-outline: .env"
+            ``` .env
+            INPUT_DIR=path/to/my/data/
+            OUTPUT_DIR=path/to/synphage/data
+            EMAIL=user.email@email.com
+            API_KEY=UserApiKey
+            ```
+        === ":octicons-terminal-16: bash"
+            ``` bash
+            export INPUT_DIR=<path_to_data_folder>
+            export OUTPUT_DIR=<path_to_synphage_folder>
+            export EMAIL=user.email@email.com
+            export API_KEY=UserApiKey
+            ```
+
+
+2. Data Input and Output
+
+    1. Data Input
+
+        The input data are the GenBank files located in the `INPUT_DIR`. However paths to other data location can be passed at run time for loading data from another directory.
+
+        ???+ warning
+            - Only a single path can be configured per loading job run.
+            - The use of special characters in file names, might causes errors downstream.
+
+        ???+ note
+            `.gb`and `.gbk` are both valid extension for genbank files
+
+
+    2. Data Output
+
+        All output data are located in the `OUTPUT_DIR` set by the user.  
+        This directory can be reused in future runs if the user needs to process additional sequences or simply generate additional synteny diagrams. 
+        
+
+        ???+ warning
+            - If no output directory is set, the data folder will be the temporary folder by default.
+            Be aware that the naming convention for the temporary folder (temp/, tmp/, ...) depends on your system.
+
+
+        ???+ tip
+            The current data directory can be checked in the [config panel](jobs.md#dir-config) of the jobs.  
+
+
+3. Start synphage via dagster web-based interface
+
+    To start synphage run the following command:
+    ``` bash
     dagster dev -h 0.0.0.0 -p 3000 -m synphage
     ```
+
+    ???+ tip
+        As synphage uses dagster-webserver, -h and -p flags are required to visualise the pipeline in your browser:  
+        -h : Host to use for the Dagster webserver  
+        -p : Port to use for the Dagster webserver
+
+    To access the webserver, follow the link displayed in your browser or copy/paste it in your web-browser. In this example:
+    ``` bash
+    http://0.0.0.0:3000
+    ```
+
+    <figure markdown="span">
+    ![Start dagster](./images/installation_pip/start_dagster.png)
+    <figcaption>Dagster running form the terminal and link to the webserver</figcaption>
+    </figure>
+
+
+1. Stop synphage
+
+    After completing your work, you can close the web-browser and stop the process running in the terminal with ++ctrl+c++ .
 
 
 <a id="docker-install"></a>

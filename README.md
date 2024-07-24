@@ -44,13 +44,13 @@ docker pull vestalisvirginis/synphage:<tag>
 synphage relies on one non-python dependency that needs to be manually installed when synphage is installed with pip:
 - [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) >= 2.12.0  
 
-For LINUX ubuntu:
+Install `Blast+` using your package manager of choice, e.g. for linux ubuntu:
 ``` bash
 apt update
 apt install -y ncbi-blast+
 ```
 
-For other systems, you can download the [executables](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) and check the complete [installation documentation](https://www.ncbi.nlm.nih.gov/books/NBK569861/).  
+or by downloading an [executables](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) appropriate for your system. For help, check the complete [installation documentation](https://www.ncbi.nlm.nih.gov/books/NBK569861/).  
 
 
 ## Usage
