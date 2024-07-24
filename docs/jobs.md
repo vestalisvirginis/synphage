@@ -1,41 +1,97 @@
 # Navigating `synphage` pipeline
 
 
-<a id="dir-config"></a>
+## Requirements 
 
-## Pre-requisite  
+???+ success "*Prerequisite:*"
+    You need to have `synphage` installed in a python environment or in a docker container or to have pulled synphage docker image. Start synphage and open the Dagster UI in your browser to get started.  
+    === "venv"
+        ``` bash
+        pip install synphage
+        dagster dev -h 0.0.0.0 -p 3000 -m synphage
+        ```
+        For more details, see [installation instruction](installation.md#pip-install) or [how to run the software](installation.md/#run-synphage-pip).
+    === "docker"
+        ``` bash
+        docker pull vestalisvirginis/synphage:<tag>
+        docker run --rm --name my-synphage-container -p 3000 vestalisvirginis/synphage:<tag>
+        ```
+        For more details, see [installation instruction](installation.md/#docker-install) or [how to run the software](installation.md/#run-synphage-container).
+    === "Docker Desktop"
+        <iframe width="560" height="315"
+        src="../images/phages/docker_desktop_movie.mp4" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen></iframe>  
+        For more details, see [installation instruction](installation.md/#docker-install) or [how to run the software](installation.md/#run-synphage-container).
 
-In order to use the software, the user needs to provide:
-- `genbank files` of the genomes to analyse (.gb or .gbk)
-- a csv file called `sequences.csv` containing the name and orientation of the sequence to plot (only necessary for the plotting job)
 
-For more information, refer to section: ['Run `synphage`'](installation.md#run-synphage-pip) when using python environment or [`Run `synphage` in container](installation.md#run-synphage-container) when using a docker container.
+<figure markdown="span">
+![Dagster landing page](./images/pipeline/dag_landing_page.png)
+<figcaption>Dagster UI - landing page</figcaption>
+</figure>
 
 
-## Data architecture
+## Navigating the UI
 
-The folders and files are organised as follow inside the `data directory`:
+To navigate to the jobs, go to 
+![Image title](./images/phages/dagster-primary-mark.svg#only-light){ width="50"}
+![Image title](./images/phages/dagster-reversed-mark.svg#only-dark){ width="50"} 
+Dagster_home -> Jobs
 
-```bash
-.
-├── download/
-├── genbank/
-├── sequences.csv
-├── gene_identity/
-│   ├── fasta/
-│   ├── blastn_database/
-│   └── blastn/
-└── tables/ 
-│   ├── blastn_summary/
-│   ├── locus_and_gene/
-│   └── uniqueness/
-└── syntenys/ 
-│   ├── colour_table/
-│   └── synteny_graph.svg
-└── fs/ 
-```  
+<figure markdown="span">
+![List of jobs](./images/pipeline/dag_jobs.png) 
+<figcaption>Dagster shutting down</figcaption>
+</figure>
+
+Whenever you are lost, go back to the 
+![Image title](./images/phages/dagster-primary-mark.svg#only-light){ width="50"}
+![Image title](./images/phages/dagster-reversed-mark.svg#only-dark){ width="50"} to get back on track.
+
 
 ## Software structure
+
+synphage pipeline is composed of `four steps` that need to be run `sequencially`:  
+    - step 1: loading the data  
+    - step 2: validating the data  
+    - step 3: blasting the data  
+    - step 4: ploting the data  
+
+
+### Step 1: Loading the data into the pipeline
+
+The step 1 is composed of two sub-steps : 
+- `step_1a_get_user_data`, for loading user's data into the pipeline
+- `step_1b_download`, for downloading data from the NCBI
+
+GenBank files are loaded into the pipeline from the `input_folder` setup by the user `and/or` `downloaded` from the NCBI database.
+
+
+#### step_1a: `step_1a_get_user_data`
+    This job allows the users to upload their own data / data stored locally into the pipeline. (see [](installation.md#data_input_pip), [](installation.md#data_input_docker)).
+
+
+
+
+### Job 4 : NCBI download job  
+
+This job requires to have the `EMAIL` and `API_KEY` environnmental variable set in order to access the NCBI database.  
+
+In order to set your keywords for the NCBI database query, click the arrow on the right side of the `materialise all` botton to access the drop-down menu and select `Open launchpad`.  
+
+![Select launchpad for NCBI download job](./images/dagster/dag_job_4_launchpad.png)  
+  
+You can then set the `search_key` with your own keywords. Example: "Paenibacillus larvae"[Organism] AND complete genome[Title]  
+
+![NCBI query configuration panel](./images/dagster/dag_job_4_launchpad_menu.png)  
+
+
+
+
+### Step 2: Data validation
+### Step 3: Blasting the data
+### Step 4: Synteny plot
+
 
 ### Jobs
 
@@ -96,16 +152,6 @@ Field Name | Description | Default Value
 `database` | Database identifier | nuccore  
 
 
-## How to run the software
-
-After starting starting the container, open the dagster web-interface (https://dagster.io) into the web-browser.
-
-![Dagster landing page](./images/dagster/dag_landing_page.png) 
-
-In order to run the different jobs, hit the `Job` tab. The three job constituing the pipeline will be displayed.
-
-![List of jobs](./images/dagster/dag_jobs_011.png) 
-
 
 ### Job 1 : blasting job
 
@@ -150,6 +196,48 @@ Job 2 needs to be re-run after Job 1 in order to integrate the new data to the t
         0 : sequence
         1 : reverse
 
+
+        8. For ploting add a `sequences.csv` file in the /data directory. Please use the file editor of the docker to check that the format of your file is according to the example below:
+    ```txt
+    168_SPbeta.gb,0
+    Phi3T.gb,1
+    ```
+    Example of incorrectly formatted csv file (can happen when saved from excel):
+    ![Incorrectly formatted csv file](./images/dd_csv_file_excel.png){align=right}
+    Example of correctly formatted csv file:  
+    ![Correctly formatted csv file](./images/dd_csv_file_correctly_formatted.png){align=right}
+
+        ???+ warning
+            Please here use **only** `.gb` as file extension.
+
+        ???+ info
+            The integer after the comma represents the orientation of the sequence in the synteny diagram.
+            0 : sequence
+            1 : reverse
+
+
+             5. For ploting add a sequences.csv file in the /data directory. Format your file according to the example below:
+    ```txt
+    168_SPbeta.gb,0
+    Phi3T.gb,1
+    ```
+    ```bash
+    # Create file
+    touch sequences.csv
+    # Edit file
+    vim sequences.csv
+    # Copy file to the /data directory
+    docker cp path_to_file/sequences.csv /data/
+    ```
+
+        ???+ warning
+            Please here use **only** `.gb` as file extension.
+
+        ???+ info
+            The integer after the comma represents the orientation of the sequence in the synteny diagram.
+            0 : sequence
+            1 : reverse
+
 This job requires the genbank files to be available in the genbank folder, that job 1 and 2 have been run on the sequence of interest and that a sequences.csv is present in the /data folder.
 
 As for the first job, this job is triggered by hiting the `Materialize all` botton.
@@ -179,17 +267,7 @@ In the launchpad it is possible to replace any config values by your own configu
 ![Graphic configuration panel](./images/dagster/dag_job_3_launchpad_menu.png) 
 
 
-### Job 4 : NCBI download job  
 
-This job requires to have the `EMAIL` and `API_KEY` environnmental variable set in order to access the NCBI database.  
-
-In order to set your keywords for the NCBI database query, click the arrow on the right side of the `materialise all` botton to access the drop-down menu and select `Open launchpad`.  
-
-![Select launchpad for NCBI download job](./images/dagster/dag_job_4_launchpad.png)  
-  
-You can then set the `search_key` with your own keywords. Example: "Paenibacillus larvae"[Organism] AND complete genome[Title]  
-
-![NCBI query configuration panel](./images/dagster/dag_job_4_launchpad_menu.png)  
 
 ### Metadata and results of each run
 
@@ -202,3 +280,11 @@ The informations can be found in the `Assets` panel.
 For each asset, you can review the metadata generated during the run as for the below example regarding the creation of the synteny plot.
 
 ![Example asset: create_graph](./images/dagster/dag_graph_metadata.png)  
+
+
+
+
+local_resource:
+    config:
+      input_dir: temp/sequences_2
+      output_dir: /data

@@ -15,8 +15,9 @@ nav:
   - Getting Started: short_guide.md
   - User Guide: 
     - Installation: installation.md
-    - Running your jobs: jobs.md
+    - Navigating synphage pipeline: pipeline.md
     - Configurations: configurations.md
+    - Output data: output.md
   - Step-by-step example: 
     - Bacteriophage genomes: phages.md
     - Plasmid sequences: plasmids.md

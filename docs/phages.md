@@ -21,20 +21,20 @@ To get familiar with `synphage` capabilities, you can reproduce the step-by-step
         pip install synphage
         dagster dev -h 0.0.0.0 -p 3000 -m synphage
         ```
-        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-pip) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+        For more details, see [installation instruction](installation.md#pip-install) or [how to run the software](installation.md/#run-synphage-pip).
     === "docker"
         ``` bash
         docker pull vestalisvirginis/synphage:<tag>
         docker run --rm --name my-synphage-container -p 3000 vestalisvirginis/synphage:<tag>
         ```
-        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+        For more details, see [installation instruction](installation.md/#docker-install) or [how to run the software](installation.md/#run-synphage-container).
     === "Docker Desktop"
         <iframe width="560" height="315"
         src="../images/phages/docker_desktop_movie.mp4" 
         frameborder="0" 
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
         allowfullscreen></iframe>  
-        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+        For more details, see [installation instruction](installation.md/#docker-install) or [how to run the software](installation.md/#run-synphage-container).
 
 
 <figure markdown="span">
@@ -105,7 +105,7 @@ When the job finishes its execution, we can move to `step 2` to run the validati
 ### Step 2: Run data quality checks on the dataset
 
 ???+ note
-    For more detailed information on this step, check the [Validation](jobs.md#step2-validation-job).  
+    For more detailed information on this step, check the [Validation](pipeline.md#step2-validation-job).  
 
 Go to Dagster_home -> Jobs -> make_validations.  
 <figure markdown="span">

@@ -2,6 +2,7 @@
 
 Using Dagster to run synphage pipeline allows the user to easily configure the jobs at run-time. 
 
+<a id="dir-config"></a>
 
 ## Plotting config options  
 
