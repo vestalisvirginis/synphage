@@ -132,12 +132,14 @@ This will automatically install compatible versions of all Python dependencies.
     After completing your work, you can close the web-browser and stop the process running in the terminal with ++ctrl+c++ .
 
 
-<a id="docker-install"></a>
-## Via docker 
 
-### Pre-requisite : docker
+## Via synphage docker image  <a id="docker-install"></a>
 
-In order to use `synphage` Docker Image, you first need to have docker installed.
+### Requirements
+The following dependency needs to be installed in order to run synphage Docker Image on your system.
+
+- `Docker` or `Docker Desktop`
+
 
 === "Linux"
     - Install [docker desktop](https://www.docker.com/products/docker-desktop/) from the executable.  
@@ -151,43 +153,47 @@ In order to use `synphage` Docker Image, you first need to have docker installed
     - Install [docker desktop](https://www.docker.com/products/docker-desktop/) from the executable.  
     - Check the full documentation for [docker Windows](https://docs.docker.com/desktop/install/windows-install/).
 
-![Docker-Desktop download](./images/dd_download.png){ align=right }
 
 ???+ info
     When installing docker from the website, the right version should automatically be selected for your computer.
+    ![Docker-Desktop download](./images/dd_download.png){ align=right }
 
 
 ### Pull synphage image
 
-=== "Docker Desktop"
+=== ":simple-docker: Docker Desktop"
     1. Open the docker desktop app and go to `Images`.  
-    ![Images](./images/dd_images.png){align=right}  
+        ![Images](./images/dd_images.png){align=right}  
 
     2. Go to the search bar and search for `synphage`.  
-    ![Search synphage image in DockerHub](./images/dd_pull_image.png){align=right}  
+        ![Search synphage image in DockerHub](./images/dd_pull_image.png){align=right}
+        
+        ???+ note
+            The latest image will automatically be selected - advised
 
-    3. Pull the image (it will automatically select for the latest image (advised)).   
+    3. Pull the image.  
+        Select `Pull` and wait for the download to complete.
 
-    4. The synphage image is installed
-    ![Installed image](./images/dd_pulled_image.png){align=right} 
+    4. synphage docker image is installed
+        ![Installed image](./images/dd_pulled_image.png){align=right} 
 
     ???+ note
         Your Dashboard might look a bit different depending on the Docker Desktop version and your OS.
  
-=== "Bash"
+=== ":octicons-terminal-16: Bash"
     ```bash
     # Pull the image from docker hub
-    docker pull vestalisvirginis/synphage:latest
+    docker pull vestalisvirginis/synphage:<tag>
 
-    # List installed Docker Images
+    # Check the list of installed Docker Images
     docker image ls
     ```
-    It will download the latest image. If a former version is desired, reeplace latest by version tag (e.g. `0.0.6`).
+    Replace `<tag>` with the [latest image tag](https://hub.docker.com/r/vestalisvirginis/synphage/tags).
 
 <a id="run-synphage-container"></a>
 ### Run `synphage` container 
 
-=== "Docker Desktop"
+=== ":simple-docker: Docker Desktop"
     1. Start the container
     ![Start container](./images/dd_start_container.png){align=right}  
 
@@ -233,7 +239,7 @@ In order to use `synphage` Docker Image, you first need to have docker installed
     8. Connect to the web interface
     ![Open the link to the web-interface](./images/dd_web_interface.png) 
  
-=== "Bash"
+=== ":octicons-terminal-16:  Bash"
 
     1. Environnment variable 
     Only required if you want to use the `NCBI_download` job.
