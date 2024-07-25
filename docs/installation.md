@@ -292,7 +292,7 @@ The following dependency needs to be installed in order to run synphage Docker I
             If no Volume is mounted to the /data directory and the user do not save the data, data will be lost.
 
 
-    5. Set the environment variables (optional)  
+    5. Set the environment variables (optional)   <a id="env_dockerdesktop"></a>
         `synphage` uses the following environment variables:  
         - `EMAIL` (optional): for connecting to the NCBI database.  
         - `API_KEY` (optional): for connecting to the NCBI database and download files.  
@@ -308,7 +308,7 @@ The following dependency needs to be installed in order to run synphage Docker I
         Your container is now running.
 
 
-    7. Import local GenBank files (optional)  <a id="data_input_docker"></a>
+    7. Import local GenBank files (optional)  <a id="data_input_dockerdesktop"></a>
         `/user_files` is the directory that received users' GenBank files.  
         For using locally stored GenBank files, the files can be imported or dragged and dropped (depending on your system) into the `/user_files` directory.
    
@@ -339,7 +339,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
 === ":octicons-terminal-16:  Bash"
 
-    1. Environment variables
+    1. Environment variables  <a id="env_docker"></a>
 
         `synphage` uses the following environment variables:  
             - `EMAIL` (optional): for connecting to the NCBI database.  
@@ -422,7 +422,7 @@ The following dependency needs to be installed in order to run synphage Docker I
             Volume names must be unique. You canot set two volumes wit the same name.
 
 
-    1. Import local GenBank files (optional)  
+    1. Import local GenBank files (optional)  <a id="data_input_docker"></a>
         `/user_files` is the directory that received users GenBank files.  
         For using locally stored GenBank files, the files can be copied into the `/user_files` directory.  
         ```bash
