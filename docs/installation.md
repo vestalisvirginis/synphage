@@ -3,7 +3,7 @@
 
 ## Via pip  <a id="pip-install"></a>
 
-### Requirements
+### Requirements  <a id="pip-dependencies"></a>
 The following dependencies need to be installed in order to run synphage on your system.
  
 - `Python 3.11`
@@ -90,7 +90,7 @@ pip install --upgrade pip
 
 ### Run `synphage`  <a id="run-synphage-pip"></a>
 
-1. Environment variables
+1. Environment variables  <a id="env_pip"></a>
 
     `synphage` uses the following environment variables:  
         - `INPUT_DIR` : for specifying the path to the folder containing the user's `GenBank files`. If not set, this path will be defaulted to the temp folder. This path can also be modified at run time.  
