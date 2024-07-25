@@ -123,7 +123,7 @@ pip install --upgrade pip
 
 2. Data Input and Output
 
-    1. Data Input
+    1. Data Input  <a id="data_input_pip"></a>
 
         The input data are the GenBank files located in the `INPUT_DIR`. However paths to other data location can be passed at run time for loading data from another directory.
 
@@ -135,7 +135,7 @@ pip install --upgrade pip
             `.gb`and `.gbk` are both valid extension for genbank files
 
 
-    2. Data Output
+    2. Data Output  <a id="data_output_pip"></a>
 
         All output data are located in the `OUTPUT_DIR` set by the user.  
         This directory can be reused in future runs if the user needs to process additional sequences or simply generate additional synteny diagrams. 
@@ -147,7 +147,7 @@ pip install --upgrade pip
 
 
         ???+ tip
-            The current data directory can be checked in the [config panel](jobs.md#dir-config) of the jobs.  
+            The current data directory can be checked in the [config panel](pipeline.md#dir-config) of the jobs.  
 
 
 3. Start synphage via dagster web-based interface
@@ -243,7 +243,6 @@ The following dependency needs to be installed in order to run synphage Docker I
 
 ### Run `synphage` container  <a id="run-synphage-container"></a>
 
-#### Start the container  
 
 === ":simple-docker: Docker Desktop"
     1. Start the container
@@ -266,7 +265,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
     4. Set the `Volumes`
 
-        1. Data Output  
+        1. Data Output  <a id="data_output_dd"></a>
             All output data are located in the `/data` directory of the container.  
             The output data can be copied after the run from the `/data` folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent runs if the user needs to process additional sequences or simply generate additional synteny diagrams.
 
@@ -293,7 +292,7 @@ The following dependency needs to be installed in order to run synphage Docker I
             If no Volume is mounted to the /data directory and the user do not save the data, data will be lost.
 
 
-    5. Set the environment variables (optional)  
+    5. Set the environment variables (optional)   <a id="env_dockerdesktop"></a>
         `synphage` uses the following environment variables:  
         - `EMAIL` (optional): for connecting to the NCBI database.  
         - `API_KEY` (optional): for connecting to the NCBI database and download files.  
@@ -309,7 +308,7 @@ The following dependency needs to be installed in order to run synphage Docker I
         Your container is now running.
 
 
-    7. Import local GenBank files (optional)  
+    7. Import local GenBank files (optional)  <a id="data_input_dockerdesktop"></a>
         `/user_files` is the directory that received users' GenBank files.  
         For using locally stored GenBank files, the files can be imported or dragged and dropped (depending on your system) into the `/user_files` directory.
    
@@ -340,7 +339,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
 === ":octicons-terminal-16:  Bash"
 
-    1. Environment variables
+    1. Environment variables  <a id="env_docker"></a>
 
         `synphage` uses the following environment variables:  
             - `EMAIL` (optional): for connecting to the NCBI database.  
@@ -384,7 +383,7 @@ The following dependency needs to be installed in order to run synphage Docker I
 
     3. Set the `Volumes`
 
-        1. Data Output  
+        1. Data Output  <a id="data_output_docker"></a>
             All output data are located in the `/data` directory of the container.  
             The output data can be copied after the run from the `/data` folder or they can be stored in a `Docker Volume` that can be mounted to a new Docker Container and reused in subsequent run if the user needs to process additional sequences or simply generate additional synteny diagrams.
 
@@ -423,7 +422,7 @@ The following dependency needs to be installed in order to run synphage Docker I
             Volume names must be unique. You canot set two volumes wit the same name.
 
 
-    1. Import local GenBank files (optional)  
+    1. Import local GenBank files (optional)  <a id="data_input_docker"></a>
         `/user_files` is the directory that received users GenBank files.  
         For using locally stored GenBank files, the files can be copied into the `/user_files` directory.  
         ```bash

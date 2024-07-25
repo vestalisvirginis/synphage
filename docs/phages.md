@@ -21,20 +21,20 @@ To get familiar with `synphage` capabilities, you can reproduce the step-by-step
         pip install synphage
         dagster dev -h 0.0.0.0 -p 3000 -m synphage
         ```
-        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-pip) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+        For more details, see [installation instruction](installation.md#pip-install) or [how to run the software](installation.md/#run-synphage-pip).
     === "docker"
         ``` bash
         docker pull vestalisvirginis/synphage:<tag>
         docker run --rm --name my-synphage-container -p 3000 vestalisvirginis/synphage:<tag>
         ```
-        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+        For more details, see [installation instruction](installation.md/#docker-install) or [how to run the software](installation.md/#run-synphage-container).
     === "Docker Desktop"
         <iframe width="560" height="315"
         src="../images/phages/docker_desktop_movie.mp4" 
         frameborder="0" 
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
         allowfullscreen></iframe>  
-        For more details, see [installation instruction](https://vestalisvirginis.github.io/synphage/installation/#via-docker) or [how to run the software](https://vestalisvirginis.github.io/synphage/installation/#pull-synphage-image).
+        For more details, see [installation instruction](installation.md/#docker-install) or [how to run the software](installation.md/#run-synphage-container).
 
 
 <figure markdown="span">
@@ -102,10 +102,10 @@ When the job finishes its execution, we can move to `step 2` to run the validati
 </figure>
 
 
-### Step 2: Run data quality checks on the dataset
+### Step 2: Run data quality checks on the dataset  <a id="step2-phage-example"></a>  
 
 ???+ note
-    For more detailed information on this step, check the [Validation](jobs.md#step2-validation-job).  
+    For more detailed information on this step, check the [Validation](pipeline.md#step2-validation-job).  
 
 Go to Dagster_home -> Jobs -> make_validations.  
 <figure markdown="span">
@@ -144,7 +144,7 @@ The metadata attached to the last step of the validation, render an overview of 
 </figure>  
 
 
-### Step 3: Run the blast
+### Step 3: Run the blast  <a id="step3-phage-example"></a>  
 
 For this example, blastn was run on the dataset.  
 
@@ -224,7 +224,7 @@ This file can be read and manipulated with any DataFrame API the user choose, su
     The unified dataset generated through the blastp pipeline is saved under `protein_uniqueness.parquet`.
 
 
-### Step 4: Generate the plot
+### Step 4: Generate the plot  <a id="step4-phage-example"></a>  
 
 Go to Dagster_home -> Jobs -> make_plot
 <figure markdown="span">
