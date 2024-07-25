@@ -102,7 +102,7 @@ When the job finishes its execution, we can move to `step 2` to run the validati
 </figure>
 
 
-### Step 2: Run data quality checks on the dataset
+### Step 2: Run data quality checks on the dataset  <a id="step2-phage-example"></a>  
 
 ???+ note
     For more detailed information on this step, check the [Validation](pipeline.md#step2-validation-job).  
@@ -144,7 +144,7 @@ The metadata attached to the last step of the validation, render an overview of 
 </figure>  
 
 
-### Step 3: Run the blast
+### Step 3: Run the blast  <a id="step3-phage-example"></a>  
 
 For this example, blastn was run on the dataset.  
 
@@ -224,7 +224,7 @@ This file can be read and manipulated with any DataFrame API the user choose, su
     The unified dataset generated through the blastp pipeline is saved under `protein_uniqueness.parquet`.
 
 
-### Step 4: Generate the plot
+### Step 4: Generate the plot  <a id="step4-phage-example"></a>  
 
 Go to Dagster_home -> Jobs -> make_plot
 <figure markdown="span">
