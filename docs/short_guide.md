@@ -1,10 +1,14 @@
 # Getting started with synphage
 
 `synphage` is a pipeline to create genome synteny graphics from genbank files.
-If you are familiar with Python, you can install `synphage` via `pip`. If not, we recommend using the `docker image` instead.
+`synphage` is available via [pip install](https://pypi.org/project/synphage/) or as [docker image](https://hub.docker.com/r/vestalisvirginis/synphage).  
+For more detailed instruction, consult [synphage installation guide](https://vestalisvirginis.github.io/synphage/installation/).  
 
 
 ## Installation 
+
+If you are familiar with Python, you can install `synphage` via [`pip`](installation.md#/pip-install). If not, we recommend using the [`docker image`](installation.md#docker-install) instead.
+
 
 ### Requirements 
 
@@ -14,11 +18,11 @@ If you are familiar with Python, you can install `synphage` via `pip`. If not, w
 - `MacOS` :material-apple:
 - `Windows` :material-microsoft-windows:
 
-The binaries in the python `wheel` are built universally so as far as you have a python interpreter with the minimum version `>=3.9` you are all set.
+The binaries in the python `wheel` are built universally so as far as you have `Python 3.11` you are all set.
 
 ### Via pip
 
-Users installing synphage with pip, need to have Blast+ installed as well (see [Additional dependencies](#additional-dependencies)). 
+Users installing synphage with pip, need to have Blast+ installed as well (see [requirement installation](installation.md#/pip-dependencies)). 
 
 ```bash
 # Latest
@@ -30,63 +34,72 @@ For more details, see the [Installation guide](installation.md#pip-install).
 ### Via docker
 
 ```bash
-docker pull vestalisvirginis/synphage
+docker pull vestalisvirginis/synphage:<tag>
 ```
+
+???+ note 
+    Replace `<tag>` with the [latest image tag](https://hub.docker.com/r/vestalisvirginis/synphage/tags).  
+    [See complete documention](https://vestalisvirginis.github.io/synphage/installation#/docker-install)
 
 The [Docker image](https://hub.docker.com/r/vestalisvirginis/synphage) comes with all the dependencies pre-installed. For more details, see the [Installation guide](installation.md#docker-install).
 
-<a id="additional-dependencies"></a>
-### Additional dependencies 
 
-`synphage` relies on one non-python dependency that need to be manually installed when synphage is installed with pip:  
+### Additional dependencies
+
+synphage relies on one non-python dependency that needs to be manually installed when synphage is installed with pip:
 - [Blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) >= 2.12.0  
 
-=== "Linux"
-    Command line or install ...
+Install `Blast+` using your package manager of choice, e.g. for linux ubuntu:
+``` bash
+apt update
+apt install -y ncbi-blast+
+```
 
-=== "MacOS/Windows"
-    Install from ...
+or by downloading an [executables](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/) appropriate for your system. For help, check the complete [installation documentation](https://www.ncbi.nlm.nih.gov/books/NBK569861/).  
 
 
 ## Usage
 
 ### Setup 
 
-`synphage` requires:  
-- to specify a folder path where the `genbank` folder will be present and where generated data will be stored;  
-- a `genbank` folder populated with genbank files (`.gb` and  `.gbk` extension are accepted);  
-- a `sequences.csv` file containing the file name and orientation of the sequences to plot.  
-
-???+ warning
-    Genbank file names should not contain spaces.
+synphage requires the user to specify the following environment variables:
+- `INPUT_DIR` : to specify the path to the folder containing the user's `GenBank files`. If not set, this path will be defaulted to the temp folder. This path can also be modified at run time.  
+- `OUTPUT_DIR`: to specify the path to the folder where the data generated during the run will be stored. If not set, this path will be defaulted to the temp folder.  
+- `EMAIL` (optional): to connect to the NCBI database.  
+- `API_KEY` (optional): to connect to the NCBI database and download files.  
 
 
-#### Path setup
-
-```bash
-export INPUT_DIR=<path_to_data_folder>
-```
+???+ tip
+    These variables can be set with a `.env` file located in your working directory (Dagster will automatically load them from the .env file when initialising the pipeline) or can be passed in the terminal before starting to run synphage:  
+    === ":material-file-document-outline: .env"
+        ``` .env
+        INPUT_DIR=path/to/my/data/
+        OUTPUT_DIR=path/to/synphage/data
+        EMAIL=user.email@email.com
+        API_KEY=UserApiKey
+        ```
+    === ":octicons-terminal-16: Bash"
+        ``` bash
+        export INPUT_DIR=<path_to_data_folder>
+        export OUTPUT_DIR=<path_to_synphage_folder>
+        export EMAIL=user.email@email.com
+        export API_KEY=UserApiKey
+        ```
 
 ???+ note
-    For docker users, this path is defaulted to `/data`.
-
-#### CSV file
-
-```txt
-genome_1.gb,0
-genome_2.gb,1
-genome_3.gb,0
-```
+    For docker users, the `INPUT_DIR` is defaulted to `/user_files` and `OUTPUT_DIR` is defaulted to `/data`.  
+    For more detailed explainations on using `synphage docker image`, check our [documentation](installation.md#/run-synphage-container).
 
 
 ### Running Synphage
 
-`synphage` uses [Dagster](https://dagster.io). In order to run synphage jobs, you need to start dagster first.
-
+A step-by-step example, performed on a group of closely related *Lactococcus* phages is available in the [documentation](https://vestalisvirginis.github.io/synphage/phages/).
 
 #### Starting Dagster
 
-Set up the environment variable DAGSTER_HOME in order to keep a trace of your previous run. For more information, see [Dagster documentation](https://docs.dagster.io/deployment/dagster-instance). 
+`synphage` uses [Dagster](https://dagster.io). In order to run synphage jobs, you need to start dagster first.
+
+Set up the environment variable DAGSTER_HOME in order to keep a trace of your previous run (optional). For more information, see [Dagster documentation](https://docs.dagster.io/deployment/dagster-instance). 
 
 ```bash
 export DAGSTER_HOME=<dagster_home_directory>
@@ -97,39 +110,113 @@ dagster dev -h 0.0.0.0 -p 3000 -m synphage
 
 #### Running the jobs
 
-The current software is structured in four different jobs.  
- - `blast` : create the blastn of each sequences against each sequences (results -> gene_identity folder)  
- - `transform` : create three tables from the blastn results and genbank files (results -> tables)  
- - `plot` : create the synteny graph (results -> synteny)  
- - `download` : download genomes to be analysed from the NCBI database 
+synphage pipeline is composed of `four steps` that need to be run `sequencially`.
+[See complete documention](pipeline.md)
 
-???+ note
-    Different synteny plots can be generated from the same set of genomes. In this case the two first jobs only need to be run once and the third job (`plot`) can be triggered separately for each graphs.
+##### Step 1: Loading the data into the pipeline
+Data is loaded into the pipeline from the `input_folder` set by the user `and/or` `downloaded` from the NCBI.  
+- `step_1a_get_user_data` : load user's data
+- `step_1b_download` : download data from the NCBI
 
+???+ tip
+   - Only one of the jobs is required to successfully run step 1.
+   - Configuration is required for `step_1b_download` job: `search_key`, that receives the keywords for querying the NCBI database.  
+
+###### Query config options :
+Field Name | Description | Default Value
+ ------- | ----------- | ----
+`search_key` | Keyword(s) for NCBI query | Myoalterovirus
+
+
+???+ tip
+    Both jobs can be run if the user needs both, local and downloaded files.
+
+##### Step 2: Data validation
+Completeness of the data is validated at this step.
+- `step_2_make_validation` : perform checks and transformations on the dataset that are required for downstream processing
+
+???+ warning
+    This step is required and cannot be skipped.
+
+##### Step 3: Blasting the data
+The blast is performed at this step of the pipeline and three different `options` are available:  
+- `step_3a_make_blastn` : run a Nucleotide BLAST on the dataset
+- `step_3b_make_blastp` : run a Protein BLAST on the dataset
+- `step_3c_make_all_blast` : run both, Nucleotide and Protein BLAST simultaneously  
+
+???+ tip
+    - Only one of the above jobs is required to successfully run step 3.
+    - Both `step_3a_make_blastn` and `step_3b_make_blastp` jobs can be run sequencially, mainly in the case where the user decide to run the second job based on the results obtained for the first one.
+
+
+##### Step 4: Synteny plot
+The graph is created during this last step. The step 4 can be run multiple times with different configurations and different sets of data, as long as the data have been processed once through steps 1, 2 and 3.
+- `step_4_make_plot` : use data generated at step 3 and the genbank files to plot the synteny diagram  
+  
+???+ warning
+    Configuration is require for `step_4_make_plot` job: `graph_type`, that receives either `blastn` or `blastp` as value for specifying what dataset to use for the plot. Default value is set to `blastn`. For more information about the configuration at step 4, check the [documentation](configurations.md).
+
+???+ tip
+    - Different synteny plots can be generated from the same set of genomes. In this case the three first steps only need to be run once and the fourth step, `step_4_make_plot`, can be triggered separately for each graphs.
+    - For modifying the sequences to be plotted (selected sequences, order, orientation), the sequences.csv file generated at step3 can be modify and saved under a different name. This new `.csv` can be passed in the job configuration `sequence_file`.
+
+    === ":fontawesome-solid-file-csv: sequences.csv"
+        ``` txt 
+        genome_1.gb,0
+        genome_2.gb,1
+        genome_3.gb,0
+        ```
+
+
+###### Plotting config options
+
+The appearance of the plot can be modified through the configuration. 
+
+Field Name | Description | Default Value
+ ------- | ----------- | ----
+`title` | Generated plot file title | synteny_plot
+`graph_type` | Type of dataset to use for the plot | blastn
+`colours` | Gene identity colour bar | ["#fde725", "#90d743", "#35b779", "#21918c", "#31688e", "#443983", "#440154"] 
+`gradient` | Nucleotide identity colour bar | #B22222
+`graph_shape` | Linear or circular representation | linear
+`graph_pagesize` | Output document format | A4
+`graph_fragments` | Number of fragments | 1
+`graph_start` | Sequence start | 1
+`graph_end` | Sequence end | length of the longest genome
 
 
 ## Output
 
-synphage's output consists of three main parquet files and the synteny graph. However all the data generated by the synphage pipeline are made available in your workng directory.
+synphage's output consists of four to six main parquet files (depending if blastn and blastp were both executed) and the synteny graphic. However all the data generated by the synphage pipeline are made available in your data directory.  
+(see [Documentation](output.md))
 
 ### Generated data architecture
 
 ```
 .
-├── <path_to_data_folder>/
+├── <path_to_synphage_folder>/
 │   ├── download/
-│   ├── genbank/
 │   ├── fs/
+│   ├── genbank/
 │   ├── gene_identity/
-│   │   ├── fasta/
+│   │   ├── fasta_n/
 │   │   ├── blastn_database/
 │   │   └── blastn/
+│   ├── protein_identity/
+│   │   ├── fasta_p/
+│   │   ├── blastp_database/
+│   │   └── blastp/
 │   ├── tables/
-│   │   ├── blastn.parquet
-│   │   ├── locus_and_gene.parquet
-│   │   └── uniqueness.parquet
+│   │   ├── genbank_db.parquet
+│   │   ├── processed_genbank_df.parquet
+│   │   ├── blastn_summary.parquet
+│   │   ├── blastp_summary.parquet
+│   │   ├── gene_uniqueness.parquet
+│   │   └── protein_uniqueness.parquet
+│   ├── sequences.csv
 │   └── synteny/
 │      ├── colour_table.parquet
+│      ├── synteny_graph.png
 │      └── synteny_graph.svg
 └── ...
 ```
@@ -137,47 +224,17 @@ synphage's output consists of three main parquet files and the synteny graph. Ho
 
 ### Tables
 
-The `tables` folder contains the three main parquet files generated by the `transform` job of synphage.    
-1. `blastn.parquet` contains the collection of the best match for each locus tag/gene against each genomes. The percentage of identity between two genes/loci are then used for calculating the plot cross-links between the sequences.  
-2. `locus_and_gene.parquet` contains the full list of `locus tag` and corresponding `gene` names when available for all the genomes in the genbank folder. If the genbank file only contains `CDS`, the locus tag and gene value are replaced by the protein identifyer `protein_id`.  
-3. `uniqueness.parquet` combined both previous data tables in one, allowing the user to quickly know how many matches their gene(s) of interest has/have retrieved. These data are then used to compute the colour code used for the synteny plot. The result of the computation is recorded in the `colour_table.parquet`. This file is over-written between each `plot` run.  
+The `tables` folder contains the four to six main parquet files generated by the pipeline.
+1. `genbank_db.parquet` : original data parsed from the GenBank files. 
+2. `processed_genbank_df.parquet` : data processed during the validation step. It contains two additional columns:
+   - `gb_type` : specifying what type of data is used as unique identifier of the coding elements
+   - `key`: unique identifier based on the columns: `filename`, `id` and `locus_tag`.
+3. `blastn_summary.parquet` : data parsed from the `blastn` output json files. It contains the collection of the best match for each sequence against each genomes. The percentage of identity between two sequences are then used for calculating the plot cross-links between the sequences.  
+4. `blastp_summary.parquet` : data parsed from the `blastp` output json files. It contains the collection of the best match for each sequence against each genomes. The percentage of identity between two sequences are then used for calculating the plot cross-links between the sequences.  
+5. `gene_uniqueness.parquet` : combines both `processed_genbank_df.parquet` and `blastn_summary.parquet` in a single parquet file, allowing the user to quickly know how many matches their sequence(s) of interest has/have retrieved. These data are then used to compute the colour code used for the synteny plot. The result of the computation is recorded in the `colour_table.parquet`. This file is over-written between each `plot` run. 
+6. `protein_uniqueness.parquet` : combines both `processed_genbank_df.parquet` and `blastp_summary.parquet` in a single parquet file, allowing the user to quickly know how many matches their sequence(s) of interest has/have retrieved. These data are then used to compute the colour code used for the synteny plot. The result of the computation is recorded in the `colour_table.parquet`. This file is over-written between each `plot` run. 
 
 
 ### Synteny plot
 
-The `synteny plot` is generated as `.svg file` and `.png file`, and contains the sequences indicated in the sequences.csv file. The genes are colour-coded according to their abundance (percentage) among the plotted sequences. The cross-links between each consecutive sequence indicates the percentage or similarities between those two sequences.
-
-
-#### Plotting config options
-
-Field Name | Description | Default Value
- ------- | ----------- | ----
-`title` | Generated plot file title | synteny_plot
-`colours` | Gene identity colour bar | ["#fde725", "#90d743", "#35b779", "#21918c", "#31688e", "#443983", "#440154"] 
-`gradient` | Nucleotide identity colour bar | #B22222
-`graph_shape` | Linear or circular representation | linear
-`graph_pagesize` | Output document format | A4
-`graph_fragments` | Number of fragments | 1
-`graph_start` | Sequence start | 1
-`graph_end` | Sequence end | length of the longest genome
-
-
-### Genbank file download
-
-The `download` allow to download sequences of interest into the genbank folder to be subsequently processed by the software.
-
-
-#### Requirement
-
-Connection to the NCBI databases requires user's `email` and `api_key`.
-```bash
-export EMAIL=user.email@email.com
-export API_KEY=UserApiKey
-```
-
-#### Query config options
-
-Field Name | Description | Default Value
- ------- | ----------- | ----
-`search_key` | Keyword(s) for NCBI query | Myoalterovirus
-`database` | Database identifier | nuccore
+The `synteny plot` is generated as `.svg file` and `.png file`, and contains the sequences indicated in the `sequences.csv` file. The genes are colour-coded according to their abundance (percentage) among the plotted sequences. The cross-links between each consecutive sequence indicates the percentage of similarities between those two sequences.
