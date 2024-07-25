@@ -11,6 +11,14 @@ As a result `synphage` was born.
 
 In addition to show conserved genes across multiple sequences, the originality of this library stands in the fact that when working on the same set of genomes the initial blast and computation need to be run only once. Multiple graphics can then be generated from these data, comparing all the genomes or only a set of genomes from the analysed dataset. Moreover, the generated data is also available to the user as a table, where individual genes or groups of genes can easily be checked by name for conservation or uniqueness.
 
+
+## Support
+
+**Where to ask for help?**
+
+Open a [discussion](https://github.com/vestalisvirginis/synphage/discussions).
+
+
 ## Roadmap
 
 - [x] create config options for the plot at run time
@@ -19,17 +27,25 @@ In addition to show conserved genes across multiple sequences, the originality o
 - [ ] create possibility to add ref sequence with special colour coding
 - [ ] create interactive plot 
 - [ ] Help us in a discussion?
+ 
 
-## Contributing
-We accept different types of contributions, including some that don't require you to write a single line of code. For detailed instructions on how to get started with our project, see [CONTRIBUTING](https://github.com/vestalisvirginis/synphage/blob/main/CONTRIBUTING.md) file.
+## Status
 
-## License
-[Apache License 2.0](https://github.com/vestalisvirginis/synphage/blob/main/LICENSE)  
-Free for commercial use, modification, distribution, patent use, private use.
-Just preserve the copyright and license.
+`[2024-07-20]`   ✨ __New features!__  
+- `Checks` : to validate the quality of the data
+- `Blastp` is finally implemented
+
+  
+`[2024-01-11]`   ✨ __New feature!__   to simplify the addition of new sequences into the genbank folder
+ - `download` : download genomes to be analysed from the NCBI database 
+
+
+## Contributing 
+
+We accept different types of contributions, including some that don't require you to write a single line of code. For detailed instructions on how to get started with our project, see [CONTRIBUTING](CONTRIBUTING.md) file.
+
 
 ## Authors
 - [vestalisvirginis](https://github.com/vestalisvirginis) / Virginie Grosboillot
-
 
 > Made with ❤️ in Ljubljana 🇸🇮
