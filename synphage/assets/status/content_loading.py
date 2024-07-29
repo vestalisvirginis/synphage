@@ -13,7 +13,6 @@ from dagster import (
     Output,
     ExperimentalWarning,
     MetadataValue,
-    AssetObservation,
 )
 
 import os
