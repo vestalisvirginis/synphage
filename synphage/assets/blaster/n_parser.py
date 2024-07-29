@@ -8,6 +8,8 @@ from dagster import (
     Nothing,
     OpExecutionContext,
     AssetKey,
+    Output,
+    MetadataValue,
 )
 
 import os
@@ -50,7 +52,7 @@ def nload(context: OpExecutionContext, get_blastn):
 def parse_blastn(
     context: OpExecutionContext, setup_nconfig: NPipeConfig, file: str
 ):  # setup_nconfig: NPipeConfig, file: str):
-    """Retrieve sequence and metadata"""
+    """Retrieve blastn results and store it in a DataFrame"""
     _path_parse_blastn_sql = os.path.join(
         os.path.dirname(__file__), "sql/parse_blastn.sql"
     )
@@ -113,11 +115,21 @@ def gene_presence(
     conn.query(query.format(blastn_all, path_to_df)).pl().write_parquet(
         str(Path(tables) / "gene_uniqueness.parquet")
     )
-    return "OK"
+
+    df = pl.read_parquet(str(Path(tables) / "gene_uniqueness.parquet"))
+
+    return Output(
+        value="ok",
+        metadata={
+            "table_location": str(Path(tables) / "gene_uniqueness.parquet"),
+            "num_rows": len(df),
+            "preview": MetadataValue.md(df.to_pandas().head().to_markdown()),
+        },
+    )
 
 
 @graph_asset(
-    description="Create a genbank DataFrame",
+    description="Create a new DataFrame, joining information from the blastn results with the dataset information",
     metadata={"owner": OWNER},
 )
 def transform_blastn(get_blastn):
@@ -125,9 +137,5 @@ def transform_blastn(get_blastn):
     files = nload.alias("nload_blastn")(get_blastn)
     results = files.map(partial(parse_blastn, config_blastn))
     blastn_all = append_blastn.alias("append_blastn")(config_blastn, results.collect())
-
-    # locus_all = pl.read_parquet('temp/development/data/tables/processed_genbank_db')
-
-    # gene_presence(config_blastn, blastn_all=blastn_all)
 
     return gene_presence(config_blastn, blastn_all=blastn_all)

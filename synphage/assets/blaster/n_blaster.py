@@ -19,7 +19,7 @@ BlastNRecord = namedtuple("BlastNRecord", "new,history")
 
 @asset(
     required_resource_keys={"local_resource"},
-    description="Create fasta files for every genes in the fasta format. Ona fasta fila/per gb file.",
+    description="Create a fasta file of nucleotide sequences for each dataset",
     compute_kind="Python",
     io_manager_key="io_manager",
     metadata={"owner": OWNER},
@@ -93,7 +93,7 @@ def create_fasta_n(context, append_processed_df) -> FastaNRecord:
 
 @asset(
     required_resource_keys={"local_resource"},
-    description="Receive a fasta file as input and create a database for the blastn step",
+    description="Uses makeblastdb to produce nucleotide BLAST databases from the fasta files",
     io_manager_key="io_manager",
     compute_kind="Blastn",
     metadata={"owner": OWNER},

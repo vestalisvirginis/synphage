@@ -23,7 +23,7 @@ class QueryConfig(Config):  # type: ignore[misc] # should be ok in 1.8 version o
 
 
 @asset(
-    description="Setup unique config for asset group",
+    description="Set up the configuration for the NCBI search.",
     compute_kind="Config",
     metadata={"owner": OWNER},
 )
@@ -58,10 +58,10 @@ def accession_count(context, setup_query_config: QueryConfig) -> int:
     # Asset user metadata
     context.add_output_metadata(
         metadata={
+            "num_hits": _num_rows,
             "search_word(s)": keyword,
             "database": db,
             "NCBI_query": _ncbi_query,
-            "num_hits": _num_rows,
         }
     )
 
@@ -101,10 +101,10 @@ def accession_ids(context, accession_count, setup_query_config: QueryConfig) -> 
     # Asset user metadata
     context.add_output_metadata(
         metadata={
-            "search_word(s)": keyword,
-            "database": db,
             "num_retrived_ids": len(_result["IdList"]),
             "id_preview": _result["IdList"],
+            "database": db,
+            "search_word(s)": keyword,
         }
     )
 

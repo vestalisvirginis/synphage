@@ -8,6 +8,8 @@ from dagster import (
     Nothing,
     OpExecutionContext,
     AssetKey,
+    Output,
+    MetadataValue,
 )
 
 import os
@@ -50,7 +52,7 @@ def pload(context: OpExecutionContext, get_blastp):
 def parse_blastp(
     context: OpExecutionContext, setup_pconfig: PPipeConfig, file: str
 ):  # setup_pconfig: PPipeConfig, file: str):
-    """Retrieve sequence and metadata"""
+    """Retrieve blastp results and store it in a DataFrame"""
     _path_parse_blastp_sql = os.path.join(
         os.path.dirname(__file__), "sql/parse_blastn.sql"
     )
@@ -113,11 +115,21 @@ def protein_presence(
     conn.query(query.format(blastp_all, path_to_df)).pl().write_parquet(
         str(Path(tables) / "protein_uniqueness.parquet")
     )
-    return "OK"
+
+    df = pl.read_parquet(str(Path(tables) / "protein_uniqueness.parquet"))
+
+    return Output(
+        value="ok",
+        metadata={
+            "table_location": str(Path(tables) / "protein_uniqueness.parquet"),
+            "num_rows": len(df),
+            "preview": MetadataValue.md(df.to_pandas().head().to_markdown()),
+        },
+    )
 
 
 @graph_asset(
-    description="Create a genbank DataFrame",
+    description="Create a new DataFrame, joining information from the blastp results with the dataset information",
     metadata={"owner": OWNER},
 )
 def transform_blastp(get_blastp):

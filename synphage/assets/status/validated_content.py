@@ -70,7 +70,7 @@ check, check_specs = _create_check_specs(
     metadata={"owner": OWNER},
 )
 def append_processed_df(context):
-    """Collect all the dataframes in one unique dataframe"""
+    """Collect all the validated dataframes in one unique dataframe"""
     target = str(
         Path(context.resources.local_resource.get_paths()["FILESYSTEM_DIR"])
         / "transformed_dfs"

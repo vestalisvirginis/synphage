@@ -102,6 +102,11 @@ export DAGSTER_HOME=<dagster_home_directory>
 dagster dev -h 0.0.0.0 -p 3000 -m synphage
 ```
 
+For docker users:
+```bash
+docker run -p 3000 vestalisvirginis/synphage:<tag>
+```
+For more information and options, check [running synphage container](https://vestalisvirginis.github.io/synphage/installation/#run-synphage-container).
 
 #### Running the jobs
 

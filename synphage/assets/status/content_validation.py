@@ -816,7 +816,7 @@ def load_dynamic():
             df_transformation(
                 key=asset_name.lower() + "_transformation",
                 input_name=asset_name.lower(),
-                description=f"Apply transformation for {asset_name} dataframe for downstream computation",
+                description=f"Apply transformation onto {asset_name} dataframe for downstream computation",
             )
         )
 

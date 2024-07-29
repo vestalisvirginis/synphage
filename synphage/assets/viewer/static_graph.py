@@ -64,21 +64,6 @@ def gene_uniqueness(
     return _gene_uniqueness_df
 
 
-def _assess_file_content(genome: SeqRecord.SeqRecord) -> bool:  # Duplicated function
-    """Assess wether the genbank file contains gene or only CDS"""
-
-    _gene_count = 0
-    _gene_value = False
-    for _feature in genome.features:
-        if _feature.type == "gene":
-            _gene_count = _gene_count + 1
-            if _gene_count > 1:
-                _gene_value = True
-                break
-    # [gb['gb_type'] for gb in pl.read_parquet('temp/development/data/tables/gene_uniqueness.parquet').group_by('name', 'gb_type').count().iter_rows(named=True) if gb['name']=='NC_000964']
-    return _gene_value
-
-
 def _get_sqc_identity_from_csv(file_path: str) -> dict:
     _df = pl.read_csv(file_path, has_header=False).select(
         "column_1", pl.col("column_2").cast(pl.Int16)
@@ -100,16 +85,13 @@ class Genome(Config):
         AssetSpec("transform_blastn", skippable=True),
         AssetSpec("transform_blastp", skippable=True),
     ],
-    description="Return a dict from the sequence paths and their orientation.",
+    description="Load file names and orientations for the sequences to be plotted",
     required_resource_keys={"local_resource"},
     compute_kind="Python",
     metadata={"owner": OWNER},
 )
 def create_genome(context, config: Genome) -> dict:
     # Path to sequence file
-    # _path_seq = str(
-    #     Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / config.sequence_file
-    # )
     _path_seq = str(
         Path(context.resources.local_resource.get_paths()["SYNPHAGE_DATA"])
         / config.sequence_file
@@ -194,7 +176,7 @@ class Diagram(Config):
 
 
 @asset(
-    description="Transform a list of genomes into a genome diagram",
+    description="Create a synteny diagram from the sequences to be plotted",
     required_resource_keys={"local_resource"},
     compute_kind="Biopython",
     metadata={
@@ -205,16 +187,8 @@ def create_graph(
     context, create_genome: dict, config: Diagram
 ) -> GenomeDiagram.Diagram:
     # Define the paths
-    # _gb_folder = str(Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / "genbank")
-
     _gb_folder = context.resources.local_resource.get_paths()["GENBANK_DIR"]
-    # _synteny_folder = str(Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / "synteny")
     _synteny_folder = context.resources.local_resource.get_paths()["SYNTENY_DIR"]
-    # _blastn_dir = str(
-    #     Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR))
-    #     / "tables"
-    #     / "blastn_summary.parquet"
-    # )
     # Which blast summary table ?
     _tables_path = context.resources.local_resource.get_paths()["TABLES_DIR"]
     if config.graph_type == "blastp":
@@ -222,9 +196,6 @@ def create_graph(
     else:
         _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
 
-    # _uniq_dir = str(
-    #     Path(os.getenv(EnvVar("INPUT_DIR"), TEMP_DIR)) / "tables" / "uniqueness.parquet"
-    # )
     _colour_dir = str(Path(_synteny_folder) / "colour_table.parquet")
 
     # Set name for the diagram
@@ -686,10 +657,10 @@ def create_graph(
     # Asset metadata
     context.add_output_metadata(
         metadata={
-            "text_metadata": "A synteny diagram had been created.",
+            "text_metadata": "A new synteny diagram has been created.",
             "graph_type": config.graph_type,
             "num_sqcs": len(_records),
-            "path": _path_output,
+            "folder": _path_output,
             "sequences": MetadataValue.json(_record_names),
             "synteny_overview": MetadataValue.md(
                 f"![img](data:image/png;base64,{image_data.decode()})"
