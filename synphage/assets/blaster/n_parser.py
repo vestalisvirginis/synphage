@@ -121,6 +121,7 @@ def gene_presence(
     return Output(
         value="ok",
         metadata={
+            "table_location": str(Path(tables) / "gene_uniqueness.parquet"),
             "num_rows": len(df),
             "preview": MetadataValue.md(df.to_pandas().head().to_markdown()),
         },
