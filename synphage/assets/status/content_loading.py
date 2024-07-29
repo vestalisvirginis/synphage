@@ -12,6 +12,8 @@ from dagster import (
     file_relative_path,
     Output,
     ExperimentalWarning,
+    MetadataValue,
+    AssetObservation,
 )
 
 import os
@@ -19,6 +21,7 @@ import pickle
 import duckdb
 import shutil
 import warnings
+import polars as pl
 
 from pathlib import Path
 from collections import namedtuple
@@ -167,11 +170,14 @@ def append_gb(context, setup_config: ValidationConfig):
         .pl()
         .write_parquet(parquet_destination)
     )
-    return "ok"
+
+    df = pl.read_parquet(parquet_destination)
+
+    return Output(value="ok", metadata={"num_rows": len(df), "preview": MetadataValue.md(df.to_pandas().head().to_markdown())})
 
 
 @graph_asset(
-    description="Create a genbank DataFrame",
+    description="Extract information from the GenBank files and store it in a DataFrame",
     metadata={"owner": OWNER},
 )
 def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
@@ -183,6 +189,7 @@ def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
 
 
 @asset(
+    description= "Reload the UI to materialise dynamically created subsequent assets",
     required_resource_keys={"pipes_subprocess_client"},
 )
 def reload_ui_asset(context: AssetExecutionContext, create_genbank_df) -> Output:
@@ -192,4 +199,4 @@ def reload_ui_asset(context: AssetExecutionContext, create_genbank_df) -> Output
     #     command=cmd, context=context
     # ).get_materialize_result()
     context.resources.pipes_subprocess_client.run(command=cmd, context=context)
-    return Output(value="Definitions have been reloaded")
+    return Output(value="Definitions have been reloaded", metadata={"text": "Definitions have been reloaded"})
