@@ -115,11 +115,16 @@ def protein_presence(
     conn.query(query.format(blastp_all, path_to_df)).pl().write_parquet(
         str(Path(tables) / "protein_uniqueness.parquet")
     )
-    
+
     df = pl.read_parquet(str(Path(tables) / "protein_uniqueness.parquet"))
 
-    return Output(value="ok", metadata={"num_rows": len(df), "preview": MetadataValue.md(df.to_pandas().head().to_markdown())})
-
+    return Output(
+        value="ok",
+        metadata={
+            "num_rows": len(df),
+            "preview": MetadataValue.md(df.to_pandas().head().to_markdown()),
+        },
+    )
 
 
 @graph_asset(

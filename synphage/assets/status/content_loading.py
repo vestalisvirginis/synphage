@@ -173,7 +173,13 @@ def append_gb(context, setup_config: ValidationConfig):
 
     df = pl.read_parquet(parquet_destination)
 
-    return Output(value="ok", metadata={"num_rows": len(df), "preview": MetadataValue.md(df.to_pandas().head().to_markdown())})
+    return Output(
+        value="ok",
+        metadata={
+            "num_rows": len(df),
+            "preview": MetadataValue.md(df.to_pandas().head().to_markdown()),
+        },
+    )
 
 
 @graph_asset(
@@ -189,7 +195,7 @@ def create_genbank_df(genbank_history):  # download_to_genbank, users_to_genbank
 
 
 @asset(
-    description= "Reload the UI to materialise dynamically created subsequent assets",
+    description="Reload the UI to materialise dynamically created subsequent assets",
     required_resource_keys={"pipes_subprocess_client"},
 )
 def reload_ui_asset(context: AssetExecutionContext, create_genbank_df) -> Output:
@@ -199,4 +205,7 @@ def reload_ui_asset(context: AssetExecutionContext, create_genbank_df) -> Output
     #     command=cmd, context=context
     # ).get_materialize_result()
     context.resources.pipes_subprocess_client.run(command=cmd, context=context)
-    return Output(value="Definitions have been reloaded", metadata={"text": "Definitions have been reloaded"})
+    return Output(
+        value="Definitions have been reloaded",
+        metadata={"text": "Definitions have been reloaded"},
+    )

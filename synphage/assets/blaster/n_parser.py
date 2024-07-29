@@ -115,11 +115,16 @@ def gene_presence(
     conn.query(query.format(blastn_all, path_to_df)).pl().write_parquet(
         str(Path(tables) / "gene_uniqueness.parquet")
     )
-    
+
     df = pl.read_parquet(str(Path(tables) / "gene_uniqueness.parquet"))
 
-    return Output(value="ok", metadata={"num_rows": len(df), "preview": MetadataValue.md(df.to_pandas().head().to_markdown())})
-
+    return Output(
+        value="ok",
+        metadata={
+            "num_rows": len(df),
+            "preview": MetadataValue.md(df.to_pandas().head().to_markdown()),
+        },
+    )
 
 
 @graph_asset(

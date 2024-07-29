@@ -195,7 +195,7 @@ def create_graph(
         _uniq_dir = str(Path(_tables_path) / "protein_uniqueness.parquet")
     else:
         _uniq_dir = str(Path(_tables_path) / "gene_uniqueness.parquet")
-    
+
     _colour_dir = str(Path(_synteny_folder) / "colour_table.parquet")
 
     # Set name for the diagram
