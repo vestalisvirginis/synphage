@@ -1,0 +1,1435 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation of synphage, a pipeline to create phage genome synteny graphics from genbank files">
+      
+      
+        <meta name="author" content="Virginie Grosboillot">
+      
+      
+        <link rel="canonical" href="https://vestalisvirginis.github.io/synphage/pipeline/">
+      
+      
+        <link rel="prev" href="../installation/">
+      
+      
+        <link rel="next" href="../configurations/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+    
+    
+      
+        <title>Navigating synphage pipeline - synphage</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#navigating-synphage-pipeline" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="synphage" class="md-header__button md-logo" aria-label="synphage" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            synphage
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Navigating synphage pipeline
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 2c-1.82 0-3.53.5-5 1.35C8 5.08 10 8.3 10 12s-2 6.92-5 8.65C6.47 21.5 8.18 22 10 22a10 10 0 0 0 10-10A10 10 0 0 0 10 2Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/vestalisvirginis/synphage" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vestalisvirginis/synphage
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../short_guide/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../installation/" class="md-tabs__link">
+          
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../phages/" class="md-tabs__link">
+          
+  
+    
+  
+  Step-by-step example
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="synphage" class="md-nav__button md-logo" aria-label="synphage" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    synphage
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/vestalisvirginis/synphage" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vestalisvirginis/synphage
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../short_guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Navigating synphage pipeline
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Navigating synphage pipeline
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigating-the-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      Navigating the UI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#software-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Software structure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Software structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-loading-the-data-into-the-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Loading the data into the pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Loading the data into the pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step_1a-step_1a_get_user_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_1a: step_1a_get_user_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step_1b-step_1b_download" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_1b: step_1b_download
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-data-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Data validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-blasting-the-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Blasting the data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Blasting the data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step_3a-step_3a_make_blastn" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_3a: step_3a_make_blastn
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step_3b-step_3b_make_blastp" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_3b: step_3b_make_blastp
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step_3c-step_3c_make_all_blast" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_3c: step_3c_make_all_blast
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-synteny-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Synteny plot
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#to-go-further" class="md-nav__link">
+    <span class="md-ellipsis">
+      To go further
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configurations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configurations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../output/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Step-by-step example
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Step-by-step example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phages/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bacteriophage genomes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plasmids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plasmid sequences
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#navigating-the-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      Navigating the UI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#software-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Software structure
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Software structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-loading-the-data-into-the-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Loading the data into the pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Loading the data into the pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step_1a-step_1a_get_user_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_1a: step_1a_get_user_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step_1b-step_1b_download" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_1b: step_1b_download
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-data-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Data validation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-blasting-the-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Blasting the data
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Blasting the data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step_3a-step_3a_make_blastn" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_3a: step_3a_make_blastn
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step_3b-step_3b_make_blastp" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_3b: step_3b_make_blastp
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step_3c-step_3c_make_all_blast" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_3c: step_3c_make_all_blast
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-synteny-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Synteny plot
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#to-go-further" class="md-nav__link">
+    <span class="md-ellipsis">
+      To go further
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="navigating-synphage-pipeline">Navigating <code>synphage</code> pipeline</h1>
+<h2 id="requirements">Requirements</h2>
+<details class="success" open="open">
+<summary><em>Prerequisite:</em></summary>
+<p>You need to have <code>synphage</code> installed in a python environment or in a docker container or to have pulled synphage docker image. Start synphage and open the Dagster UI in your browser to get started.  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">venv</label><label for="__tabbed_1_2">docker</label><label for="__tabbed_1_3">Docker Desktop</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>synphage
+dagster<span class="w"> </span>dev<span class="w"> </span>-h<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span>-m<span class="w"> </span>synphage
+</code></pre></div>
+For more details, see <a href="../installation/#pip-install">installation instruction</a> or <a href="../installation/#run-synphage-pip">how to run the software</a>.</p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code>docker<span class="w"> </span>pull<span class="w"> </span>vestalisvirginis/synphage:&lt;tag&gt;
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--name<span class="w"> </span>my-synphage-container<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span>vestalisvirginis/synphage:&lt;tag&gt;
+</code></pre></div>
+For more details, see <a href="../installation/#docker-install">installation instruction</a> or <a href="../installation/#run-synphage-container">how to run the software</a>.</p>
+</div>
+<div class="tabbed-block">
+<p><iframe width="560" height="315"
+src="../images/phages/docker_desktop_movie.mp4" 
+frameborder="0" 
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+allowfullscreen></iframe><br />
+For more details, see <a href="../installation/#docker-install">installation instruction</a> or <a href="../installation/#run-synphage-container">how to run the software</a>.</p>
+</div>
+</div>
+</div>
+</details>
+<figure>
+<img alt="Dagster landing page" src="../images/pipeline/dag_landing_page.png" />
+<figcaption>Dagster UI - landing page</figcaption>
+</figure>
+<h2 id="navigating-the-ui">Navigating the UI</h2>
+<p>To navigate to the jobs, go to 
+<img alt="Image title" src="../images/phages/dagster-primary-mark.svg#only-light" width="50" />
+<img alt="Image title" src="../images/phages/dagster-reversed-mark.svg#only-dark" width="50" /> 
+Dagster_home -&gt; Jobs</p>
+<figure>
+<img alt="List of jobs" src="../images/pipeline/dag_jobs.png" /> 
+<figcaption>Dagster shutting down</figcaption>
+</figure>
+<p>Whenever you are lost, go back to the 
+<img alt="Image title" src="../images/phages/dagster-primary-mark.svg#only-light" width="50" />
+<img alt="Image title" src="../images/phages/dagster-reversed-mark.svg#only-dark" width="50" /> to get back on track.</p>
+<p>For the steps that requires to open th <code>Launchpad</code>, after selecting <code>Materialize</code> you will automatically brought to the page where the job is running. To go back to the previous page you can either select <code>View jobs</code> on the top right of the page or select the job you are running on the left panel.</p>
+<figure>
+<img alt="View jobs button" src="../images/pipeline/navigating_job_logs.png" /> 
+<figcaption>View after selecting `Materialize`. Select `View jobs`to go back.</figcaption>
+<img alt="Left panel" src="../images/pipeline/navigating_left_panel.png" /> 
+<figcaption>The left panel displays the list of jobs. To go back select the job you are currently running.</figcaption>
+</figure>
+<h2 id="software-structure">Software structure</h2>
+<p>synphage pipeline is composed of <code>four steps</code> that need to be run <code>sequencially</code>:<br />
+    - step 1: loading the data<br />
+    - step 2: validating the data<br />
+    - step 3: blasting the data<br />
+    - step 4: ploting the data  </p>
+<h3 id="step-1-loading-the-data-into-the-pipeline">Step 1: Loading the data into the pipeline</h3>
+<p>The step 1 is composed of two sub-steps :<br />
+- <code>step_1a_get_user_data</code>, for loading user's data into the pipeline<br />
+- <code>step_1b_download</code>, for downloading data from the NCBI  </p>
+<p>GenBank files are loaded into the pipeline from the <code>input_folder</code> setup by the user <code>and/or</code> <code>downloaded</code> from the NCBI database. </p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>Only one of the following jobs, <code>step_1a</code> or <code>step_1b</code> is required to successfully run step 1.</p>
+</details>
+<h4 id="step_1a-step_1a_get_user_data">step_1a: <code>step_1a_get_user_data</code></h4>
+<ol>
+<li>
+<p>Description
+    This job allows the users to upload their own data / data stored locally into the pipeline.  </p>
+<details class="success" open="open">
+<summary>Success</summary>
+<p>This job requires the provision of a path to users' data folder or the data to be copied in the docker container.
+For more details on how to load your data, check the <a href="../installation/#data_input_pip">documentation for <code>pip</code> users</a>, <a href="../installation/#data_input_dockerdesktop">Docker Desktop users</a> and <a href="../installation/#data_input_docker">for docker CLI users</a>.  </p>
+</details>
+<p>During this step, the GenBank files are loaded into the pipeline and filenames are harmonised (remove spaces, dots) to avoid failure during the downstream processing. The information contained in each file is processed and the raw data is stored in a parquet file (<em><a href="../output/#data_architecture">./tables/genbank_db</a></em>). This information will be further processed at step 2.</p>
+<p><figure markdown="span">
+<img alt="step_1a_get_user_data schema" src="../images/pipeline/Job_step_1a_get_user_data.svg" /><br />
+<figcaption>Step 1a schematic representation</figcaption>
+</figure></p>
+</li>
+<li>
+<p>In practice<br />
+<em>Requires:</em> GenBank files
+    To run the job, no configuration is required at this stage. Select <code>Materialize all</code> on the top right corner of the main panel to run the job. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset. 
+    Once the job is completed, you can:</p>
+<ul>
+<li>add more files and re-run <code>step 1a</code></li>
+<li>download additional file, running <code>step 1b</code></li>
+<li>run <code>step 2</code></li>
+</ul>
+</li>
+</ol>
+<h4 id="step_1b-step_1b_download">step_1b: <code>step_1b_download</code></h4>
+<ol>
+<li>
+<p>Description<br />
+    Run this job to download genomes to be analysed from the NCBI database (same combinaison of keywords can be used as in the ncbi website). The keyword(s) are passed to the <code>job configuration</code>.  </p>
+<details class="success" open="open">
+<summary>Success</summary>
+<p>This job requires to have the <code>EMAIL</code> and <code>API_KEY</code> environnmental variables set in order to access the NCBI database.
+(For more information, check the documention <a href="../installation/#env_pip">via pip</a>, <a href="../installation/#env_dockerdesktop">with Docker Desktop</a> and <a href="../installation/#docker">via docker CLI</a>).</p>
+</details>
+<p>During this step, the GenBank files are downloaded from the NCBI database into the pipeline and filenames are harmonised (remove spaces, dots) to avoid failure during the downstream processing. The information contained in each file is processed and the raw data is stored in a parquet file (<em>path: ./tables/genbank_db</em>). This information will be further processed at step 2.</p>
+<p><figure markdown="span">
+<img alt="step_1b_download" src="../images/pipeline/Job_step_1b_download.svg" /><br />
+<figcaption>Step 1b schematic representation</figcaption>
+</figure></p>
+</li>
+<li>
+<p>In practice<br />
+    To run this job, you first need to set your keywords for the NCBI database query. Click the arrow on the right side of the <code>materialise all</code> botton to access the drop-down menu and select <code>Open launchpad</code>.  </p>
+<p><figure markdown="span">
+<img alt="Open launchpad for NCBI download job" src="../images/pipeline/step1b_open_launchpad.png" /><br />
+<figcaption>How to open the launchpad</figcaption>
+<img alt="NCBI query configuration panel" src="../images/pipeline/step1b_launchpad.png" /><br />
+<figcaption>Configuration panel for the download</figcaption>
+</figure></p>
+<p>Select <code>Materialize</code> on the bottom left corner of the launchpad. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset.  (<em>Check our <a href="../phages/#step1-phage-example">step-by-step</a> example.</em>)<br />
+Once the job is completed, you can:<br />
+- start another query, re-running <code>step 1b</code><br />
+- add locally stored files and run <code>step 1a</code><br />
+- run <code>step 2</code>  </p>
+</li>
+</ol>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>If both step 1a and 1b are run, the data is combined in the parquet file.</p>
+</details>
+<h3 id="step-2-data-validation">Step 2: Data validation</h3>
+<p>Completeness of the data is validated at this step.<br />
+This step is composed of 1 job and the job visualisation (graph) will be updated after each step 1 run showing all the sequences present in the pipeline:
+- <code>step_2_make_validation</code>, for performing checks and transformations on the dataset that are required for downstream processing </p>
+<details class="failure" open="open">
+<summary>Failure</summary>
+<p>This step is required and cannot be skipped.</p>
+</details>
+<ol>
+<li>
+<p>Description<br />
+    Run a validation on the dataset. </p>
+<p><figure markdown="span">
+<img alt="step_2_validation" src="../images/pipeline/Job_step_2_make_validation.svg" /><br />
+<figcaption>Step 2 schematic representation before loading any sequences in the pipeline</figcaption>
+<img alt="step_2_validation_after_ui_reload" src="../images/pipeline/Job_step_2_make_validation_reloads.svg" /><br />
+<figcaption>Step 2 schematic representation after loading sequences in the pipeline and reloading the UI</figcaption>
+</figure></p>
+<p>This step checks what features are present in the GenBank files (gene and CDS, only gene, only CDS) and select an attribute to be used as unique identifier for each coding region.  </p>
+<details class="warning" open="open">
+<summary>Warning</summary>
+<p>Dataset which does not complete this step are excluded from the downstream processing. This step aims to prevent failure at step 3 and 4 due to a low quality dataset.</p>
+</details>
+</li>
+<li>
+<p>In practice<br />
+<em>Requires:</em> step 1
+   To run the job, no configuration is required at this stage. Select <code>Materialize all</code> on the top right corner of the main panel to run the job. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset. (<em>Check our <a href="../phages/#step2-phage-example">step-by-step</a> example.</em>)<br />
+    Once the job is completed, you can:</p>
+<ul>
+<li>run <code>step 3</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="step-3-blasting-the-data">Step 3: Blasting the data</h3>
+<p>The step 3 is composed of two sub-steps and three different <code>options</code> are available:<br />
+- <code>step_3a_make_blastn</code>, for running a Nucleotide BLAST on the dataset<br />
+- <code>step_3b_make_blastp</code>, for running a Protein BLAST on the dataset<br />
+- <code>step_3c_make_all_blast</code>, for running both, Nucleotide and Protein BLAST simultaneously  </p>
+<p>A blast is performed at this step of the pipeline using the <a href="https://doi.org/10.1186/1471-2105-10-421">blast+ tool</a> from the ncbi and the users can choose to perform either a blastn, or a blastp, or both simultaneously or sequentially (running for example, 3a and then 3b).</p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<ul>
+<li>Only one of the above jobs is required to successfully run step 3.</li>
+<li>Both <code>step_3a_make_blastn</code> and <code>step_3b_make_blastp</code> jobs can be run sequencially, mainly in the case where the user decide to run the second job based on the results obtained for the first one.</li>
+</ul>
+</details>
+<h4 id="step_3a-step_3a_make_blastn">step_3a: <code>step_3a_make_blastn</code></h4>
+<ol>
+<li>
+<p>Description  </p>
+<p>A blastn against each other sequences is performed at this step. The resulting fasta files, blast database and blastn output files are saved in <em><a href="../output/#data_architecture">./gene_identity/</a></em>.</p>
+<p><figure markdown="span">
+<img alt="step_3a_blastn" src="../images/pipeline/Job_step_3a_make_blastn.svg" /><br />
+<figcaption>Step 3a schematic representation</figcaption>
+</figure></p>
+<p>After performing the blast, the output json files are processed and the blast information is used to join information about queried sequences and hit sequences. The resulting parquet file is stored as <em><a href="../output/#data_architecture">./tables/gene_uniqueness.parquet</a></em>. 
+This file is used to build the synteny diagram and can also be queried by the user to retrieve further information about unique and conserved genes (<em>For more details, read our <a href="../phages/">step-by-step</a> example.</em>)</p>
+</li>
+<li>
+<p>In practice  </p>
+<p><em>Requires</em>: step 2
+To run the job, no configuration is required at this stage. Select <code>Materialize all</code> on the top right corner of the main panel to run the job. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset.  (<em>Check our <a href="../phages/#step3-phage-example">step-by-step</a> example.</em>)<br />
+Once the job is completed, you can:<br />
+- run <code>step 3b</code><br />
+- run <code>step 4</code>  </p>
+</li>
+</ol>
+<h4 id="step_3b-step_3b_make_blastp">step_3b: <code>step_3b_make_blastp</code></h4>
+<ol>
+<li>
+<p>Description  </p>
+<p>A blastp against each other sequences is performed at this step. The resulting fasta files, blast database and blastp output files are saved in <em><a href="../output/#data_architecture">./protein_identity/</a></em>. </p>
+<p><figure markdown="span">
+<img alt="step_3b_blastp" src="../images/pipeline/Job_step_3b_make_blastp.svg" /><br />
+<figcaption>Step 3b schematic representation</figcaption>
+</figure></p>
+<p>After performing the blast, the output json files are processed and the blast information is used to join information about queried sequences and hit sequences. The resulting parquet file is stored as <em><a href="../output/#data_architecture">./tables/protein_uniqueness.parquet</a></em>. 
+This file is used to build the synteny diagram and can also be queried by the user to retrieve further information about unique and conserved genes (<em>For more details, read our <a href="../phages/">step-by-step</a> example.</em>)</p>
+</li>
+<li>
+<p>In practice<br />
+<em>Requires</em>: step 2
+    To run the job, no configuration is required at this stage. Select <code>Materialize all</code> on the top right corner of the main panel to run the job. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset. <br />
+    Once the job is completed, you can:  </p>
+<ul>
+<li>run <code>step 3a</code>  </li>
+<li>run <code>step 4</code>  </li>
+</ul>
+</li>
+</ol>
+<h4 id="step_3c-step_3c_make_all_blast">step_3c: <code>step_3c_make_all_blast</code></h4>
+<ol>
+<li>
+<p>Description  </p>
+<p>A blastn and a blastp against each other sequences is performed at this step. The resulting fasta files, blast database and, blastn nad blastp output files are saved in <em><a href="../output/#data_architecture">./gene_identity/ and ./protein_identity/</a></em> respectively. </p>
+<p><figure markdown="span">
+<img alt="step_3c_blast_all" src="../images/pipeline/Job_step_3c_make_all_blast.svg" /><br />
+<figcaption>Step 3c schematic representation</figcaption>
+</figure></p>
+<p>After performing the blast, the output json files are processed and the blast information is used to join information about queried sequences and hit sequences. For this step, there are two resulting parquet files stored as <em><a href="../output/#data_architecture">./tables/gene_uniqueness.parquet and ./tables/protein_uniqueness.parquet</a></em>, respectively for blastn and for blastp results. 
+This file is used to build the synteny diagram and can also be queried by the user to retrieve further information about unique and conserved genes (<em>For more details, read our <a href="../phages/">step-by-step</a> example.</em>)</p>
+</li>
+<li>
+<p>In practice<br />
+<em>Requires</em>: step 2
+    To run the job, no configuration is required at this stage. Select <code>Materialize all</code> on the top right corner of the main panel to run the job. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset.<br />
+    Once the job is completed, you can:  </p>
+<ul>
+<li>run <code>step 4</code> </li>
+</ul>
+</li>
+</ol>
+<h3 id="step-4-synteny-plot">Step 4: Synteny plot</h3>
+<p>The synteny graph is created during this last step. The step 4 can be run multiple times with different configurations and different sets of data, as long as the data have been processed once through steps 1, 2 and 3.<br />
+- <code>step_4_make_plot</code>, for plotting synteny diagram(s) from data generated at step 3 and the genbank files  </p>
+<ol>
+<li>
+<p>Description  </p>
+<p>At this step, a synteny plot is generated as <code>.svg</code> file and <code>.png</code> file.<br />
+The <em><a href="../output/#/data_architecture">sequences.csv</a></em> file contains the sequences to be plotted, as well as their orientation and the order (from bottom to top). By default, all the sequences processed throughthe pipeline are plotted.<br />
+The genes are colour-coded according to their abundance (percentage) among the plotted sequences. The cross-links between each consecutive sequence indicates the percentage or similarities between those two sequences.<br />
+The <code>.svg</code> can simply be opened in your web-browser for visualisation or be opened with a software such as <a href="https://inkscape.org">Inkscape</a> and be further annotated if needed.  </p>
+<p><figure markdown="span">
+<img alt="step_4_plot" src="../images/pipeline/Job_step_4_make_plot.svg" /><br />
+<figcaption>Step 4 schematic representation</figcaption>
+</figure></p>
+</li>
+<li>
+<p>In practice<br />
+<em>Requirement:</em> step3<br />
+    To run this job, you first need to:</p>
+<ul>
+<li>select the sequences to be plotted. You can use the default <code>sequences.csv</code> file, modify it or use your own <code>.csv</code> file. In the later case, the file name needs to be modified in the <code>Configuration</code>.<br />
+The structure of the file is the following:
+<div class="highlight"><pre><span></span><code>genome_1.gb,0
+genome_2.gb,1
+genome_3.gb,0
+</code></pre></div></li>
+<li>set the type of dataset you want to use for the plot. This is configure through the <code>graph_type</code> parameter that receives either <code>blastn</code> or <code>blastp</code> as value. Click the arrow on the right side of the <code>materialise all</code> botton to access the drop-down menu and select <code>Open launchpad</code>.<br />
+Other graphic parameters, such as the title or the colours, can be modified at this stage (optional), and the complete list is available in the <a href="../configurations/#/plot-config">Configuration Documentation</a>.<br />
+Select <code>Materialize</code> on the bottom left corner of the launchpad. Once the job is complete, all the assets will turn green. You can then select invidual assets to check the metadata generated by the asset.  (<em>Check our <a href="phages.md/step4-phage-example">step-by-step</a> example.</em>)<br />
+Once the job is completed, you can:  </li>
+<li>generate more diagrams by re-running <code>step 4</code> </li>
+</ul>
+</li>
+</ol>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<ul>
+<li>Different synteny plots can be generated from the same set of genomes. In this case the three first steps only need to be run once and the fourth step, <code>step_4_make_plot</code>, can be triggered separately for each graphs.</li>
+<li>For modifying the sequences to be plotted (selected sequences, order, orientation), the sequences.csv file generated at step3 can be modify and saved under a different name. This new <code>.csv</code> can be passed in the job configuration <code>sequence_file</code>.</li>
+</ul>
+</details>
+<details class="success" open="open">
+<summary>Successfully modifying or writing your <code>sequences.csv</code> file</summary>
+<ul>
+<li>Use <strong>only</strong> <code>.gb</code> as file extension</li>
+<li>The integer after the comma represents the orientation of the sequence in the synteny diagram.
+    0 : sequence
+    1 : reverse</li>
+<li>No space is allowed between the comma and the integer (see above example)</li>
+</ul>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM7.25 8a.749.749 0 0 1-.22.53l-2.25 2.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L5.44 8 3.72 6.28a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l2.25 2.25c.141.14.22.331.22.53Zm1.5 1.5h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5Z"/></svg></span> Bash</label><label for="__tabbed_2_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.185-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 0 0-.75.748 11.376 11.376 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137a15.74 15.74 0 0 0 2.93-.266 12.248 12.248 0 0 0 3.823-1.389 10.51 10.51 0 0 0 2.61-2.136c1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288Z"/></svg></span> Docker Desktop</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Create file</span>
+touch<span class="w"> </span>new_sequences.csv
+<span class="c1"># Edit file</span>
+vim<span class="w"> </span>sequences.csv
+<span class="c1"># Only when running in synphage Docker Container: Copy file to the /data directory</span>
+docker<span class="w"> </span>cp<span class="w"> </span>path_to_file/new_sequences.csv<span class="w"> </span>/data/
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Please use the file editor of the docker to modify or to check that the format of your file is according to the example above.</p>
+<p><figure markdown="span">
+<img align="right" alt="Incorrectly formatted csv file" src="../images/dd_csv_file_excel.png" />
+<figcaption>Incorrectly formatted csv file (can happen when saved from excel)</figcaption>
+<img align="right" alt="Correctly formatted csv file" src="../images/dd_csv_file_correctly_formatted.png" />
+<figcaption> Correctly formatted csv file</figcaption>
+</figure></p>
+</div>
+</div>
+</div>
+</details>
+<h2 id="to-go-further">To go further</h2>
+<p>Dagster keeps track of the job that have been run and of the metadata generated during the run.</p>
+<p>The informations can be found in the <code>Assets</code> panel.</p>
+<p><img alt="Assets" src="../images/dagster/dag_assets_summary.png" /> </p>
+<p>For each asset, you can review the metadata generated during the run as for the below example regarding the creation of the synteny plot.</p>
+<p><img alt="Example asset: create_graph" src="../images/dagster/dag_graph_metadata.png" />  </p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../installation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Installation
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../configurations/" class="md-footer__link md-footer__link--next" aria-label="Next: Configurations">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Configurations
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/vestalisvirginis/synphage" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://hub.docker.com/r/vestalisvirginis/synphage" target="_blank" rel="noopener" title="hub.docker.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1v59.4zm0-204.3h-66.1v60.7h66.1V32zm78.2 144.8H362v59.4h66.1v-59.4zm-156.3-72.1h-66.1v60.1h66.1v-60.1zm78.1 0h-66.1v60.1h66.1v-60.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1l-13.3-8.9zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm-78.1-72.1h-66.1v60.1h66.1v-60.1z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.indexes", "navigation.footer", "navigation.tracking", "toc.follow", "navigation.top", "search.suggest", "search.highlight", "search.share", "content.code.annotate", "content.code.copy", "content.tooltips", "content.tabs.link"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+    
+  </body>
+</html>

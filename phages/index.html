@@ -1,0 +1,2398 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation of synphage, a pipeline to create phage genome synteny graphics from genbank files">
+      
+      
+        <meta name="author" content="Virginie Grosboillot">
+      
+      
+        <link rel="canonical" href="https://vestalisvirginis.github.io/synphage/phages/">
+      
+      
+        <link rel="prev" href="../output/">
+      
+      
+        <link rel="next" href="../plasmids/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+    
+    
+      
+        <title>Bacteriophage genomes - synphage</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#synteny-diagram-of-bacteriophage-genomes-with-synphage" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="synphage" class="md-header__button md-logo" aria-label="synphage" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            synphage
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Bacteriophage genomes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 2c-1.82 0-3.53.5-5 1.35C8 5.08 10 8.3 10 12s-2 6.92-5 8.65C6.47 21.5 8.18 22 10 22a10 10 0 0 0 10-10A10 10 0 0 0 10 2Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/vestalisvirginis/synphage" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vestalisvirginis/synphage
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../short_guide/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../installation/" class="md-tabs__link">
+          
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+    
+  
+  Step-by-step example
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="synphage" class="md-nav__button md-logo" aria-label="synphage" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    synphage
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/vestalisvirginis/synphage" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vestalisvirginis/synphage
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../short_guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Navigating synphage pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configurations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configurations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../output/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Output data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Step-by-step example
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Step-by-step example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Bacteriophage genomes
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Bacteriophage genomes
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-synphage-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running 'synphage' pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running 'synphage' pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-download-the-data-of-interest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Download the data of interest
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-run-data-quality-checks-on-the-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Run data quality checks on the dataset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-run-the-blast" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Run the blast
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-generate-the-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Generate the plot
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analysing-the-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analysing the data
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plasmids/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plasmid sequences
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-synphage-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running 'synphage' pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running 'synphage' pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-download-the-data-of-interest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Download the data of interest
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-run-data-quality-checks-on-the-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Run data quality checks on the dataset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-run-the-blast" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Run the blast
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-generate-the-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Generate the plot
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analysing-the-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Analysing the data
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="synteny-diagram-of-bacteriophage-genomes-with-synphage">Synteny diagram of bacteriophage genomes with 'synphage'</h1>
+<p>For this step-by-step example, a group of closely related <em>Lactococcus</em> 936-type phages has been selected based on name from <a href="https://www.bv-brc.org/view/GenomeList/?eq(genome_name,phage)#view_tab=genomes&amp;filter=keyword(Lactococcus)">Bacterial and Viral Bioinformatics Resource Center (BV-BRC)</a>.  </p>
+<figure>
+    <img alt="Selected Lactococcus phages" src="../images/phages/lactococcus_bv_brc.png" />
+    <figcaption>Selected <em>Lactococcus</em> phages for this example</figcaption>
+</figure>
+<p><em>Lactococcus</em> 936-type phages are especially relevant for the <a href="https://doi.org/10.1038/srep21345">diary industry</a>. Genomes of this phage species are known for its mosaic architecture i.e., they carry genes or segments from distinct evolutionary origins, likely acquired by recombination. In this example, unique and conserved genes and proteins will be highlighted within this phage group, based on analysis of 35 genomes.  </p>
+<h2 id="running-synphage-pipeline">Running 'synphage' pipeline</h2>
+<p>To get familiar with <code>synphage</code> capabilities, you can reproduce the step-by-step example described below. To get started, go to <a href="#step1-phage-example">step 1</a>.  </p>
+<details class="success" open="open">
+<summary><em>Prerequisite:</em></summary>
+<p>You need to have <code>synphage</code> installed in a python environment or in a docker container or to have pulled synphage docker image. Start synphage and open the Dagster UI in your browser to get started.  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">venv</label><label for="__tabbed_1_2">docker</label><label for="__tabbed_1_3">Docker Desktop</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>synphage
+dagster<span class="w"> </span>dev<span class="w"> </span>-h<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span>-m<span class="w"> </span>synphage
+</code></pre></div>
+For more details, see <a href="../installation/#pip-install">installation instruction</a> or <a href="../installation/#run-synphage-pip">how to run the software</a>.</p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code>docker<span class="w"> </span>pull<span class="w"> </span>vestalisvirginis/synphage:&lt;tag&gt;
+docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--name<span class="w"> </span>my-synphage-container<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span><span class="w"> </span>vestalisvirginis/synphage:&lt;tag&gt;
+</code></pre></div>
+For more details, see <a href="../installation/#docker-install">installation instruction</a> or <a href="../installation/#run-synphage-container">how to run the software</a>.</p>
+</div>
+<div class="tabbed-block">
+<p><iframe width="560" height="315"
+src="../images/phages/docker_desktop_movie.mp4" 
+frameborder="0" 
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+allowfullscreen></iframe><br />
+For more details, see <a href="../installation/#docker-install">installation instruction</a> or <a href="../installation/#run-synphage-container">how to run the software</a>.</p>
+</div>
+</div>
+</div>
+</details>
+<figure>
+    <img alt="Dagster home page" src="../images/phages/dagster_landing_page.png" />
+    <figcaption>Dagster UI - landing page</figcaption>
+</figure>
+<h3 id="step-1-download-the-data-of-interest">Step 1: Download the data of interest <a id="step1-phage-example"></a></h3>
+<p>Go to 
+<img alt="Image title" src="../images/phages/dagster-primary-mark.svg#only-light" width="50" />
+<img alt="Image title" src="../images/phages/dagster-reversed-mark.svg#only-dark" width="50" /> Dagster_home -&gt; Jobs -&gt; download.  </p>
+<iframe width="560" height="315"
+src="../images/phages/job_1.webm" 
+frameborder="0" 
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+allowfullscreen></iframe>
+
+<figure>
+    <img alt="Download job - overview" src="../images/phages/download_job_overview.png" />
+    <figcaption>Overview of the download job</figcaption>
+</figure>
+<details class="info" open="open">
+<summary>Info</summary>
+<p>A warning message will pop-up. Select <code>Confirm</code>. This will not impact the smooth run of the download job.
+<figure markdown="span">
+    <img alt="Warning message - Download Job" src="../images/phages/download_warning_message.png" width="200" />
+    <figcaption>Warning message - Download job</figcaption>
+</figure> </p>
+</details>
+<p>In order to query our genomes of interest, we need to pass a query to the <code>search-key</code> in the configuration panel.<br />
+To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled <code>Materialize all</code>) and select <code>Open launchpad</code>.  </p>
+<figure>
+    <img alt="Lauchpad" src="../images/phages/launchpad_button.png" width="200" />
+    <figcaption>Access the lauchpad to the job configuration</figcaption>
+</figure>
+<p>Configure the <code>search_key</code> parameter, changing the default value with the following keywords (Accession names for the genomes previously selected in this case) to query the NCBI database:  </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">search_key</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>KP793101<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793102<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793103<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793105<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793104<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793107<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793106<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793108<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793109<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793112<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793114<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793113<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793110<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793115<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793117<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793118<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793122<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793116<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793120<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793121<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793123<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793126<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793127<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793125<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793124<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793128<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793130<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793129<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793132<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793131<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793133<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793135<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793134<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793111<span class="o">[</span>Accession<span class="o">]</span><span class="w"> </span>OR<span class="w"> </span>KP793119<span class="o">[</span>Accession<span class="o">]</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<figure>
+    <img alt="Config panel - Download Job" src="../images/phages/download_config_windows.png" />
+    <figcaption>Configuration panel - Download job</figcaption>
+</figure>
+<p>Select <code>Materialize</code>, in the right bottom corner.  </p>
+<p>Most of the assets provides metadata after successful complition of the run. These metadata allow the user to easily follow the smooth execution of the job.</p>
+<figure>
+    <img alt="Metadata fetch genome - Download Job" src="../images/phages/download_metadata_example.png" />
+    <figcaption>Example of metadata provided for the <code>fetch_genome</code> asset. After complition the user can see the number and the name of GenBank files that have been downloaded.</figcaption>
+</figure>
+<p>When the job finishes its execution, we can move to <code>step 2</code> to run the validation on the data.</p>
+<figure>
+    <img alt="Executed - Download Job" src="../images/phages/download_after_execution.png" />
+    <figcaption>Job is terminated</figcaption>
+</figure>
+<h3 id="step-2-run-data-quality-checks-on-the-dataset">Step 2: Run data quality checks on the dataset  <a id="step2-phage-example"></a></h3>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>For more detailed information on this step, check the <a href="../pipeline/#step2-validation-job">Validation</a>.  </p>
+</details>
+<p>Go to Dagster_home -&gt; Jobs -&gt; make_validations.  </p>
+<figure>
+    <img alt="Job overview - Validation Job" src="../images/phages/validation_job_overview.png" />
+    <img alt="ZoomIn- Validation Job" src="../images/phages/validation_zoom_in.png" />
+    <figcaption>Zoom In </figcaption>
+    <figcaption>Overview of the validation job</figcaption>
+</figure>
+<p>Select <code>Materialize all</code> (black box located on the up right corner).</p>
+<p>This job runs checks on each of the files that have been downloaded. The number of checks that pass or fail is directly visible on the assets and reflects how complete each dataset is.
+The result table for the checks is available in the metadata panel and the detailed results for the checks can be accessed either from the right panel under <code>Checks -&gt; View all check details</code> or by selecting the asset and then the <code>Checks</code> tab.  </p>
+<figure>
+    <img alt="Assets with checks - Validation Job" src="../images/phages/validation_assets_with_checks.png" />
+    <figcaption>The assets display the number of failed and passed checks.</figcaption>
+    <img alt="Check table - Validation Job" src="../images/phages/validation_check_table.png" />
+    <figcaption>Result table for the check, accessible from the metadata panel.</figcaption>
+    <img alt="Check result overview - Validation Job" src="../images/phages/validation_checks_rightpanel.png" />
+    <figcaption>Check results are accessible via the right panel.</figcaption>
+    <img alt="Asset check results - Validation Job" src="../images/phages/validation_check_results.png" />
+    <figcaption>Full asset check results.</figcaption>
+</figure>
+<p>The metadata attached to the second step of the validation inform the user about the logic applied to file processing in later steps, more precisely what feature type the software will be using for downstream processing and what attribute will be used as unique identifier for the coding genes.</p>
+<figure>
+    <img alt="Logic - Validation Job" src="../images/phages/validation_apply_logic.png" />
+    <figcaption>Step 2 of the validation with metadata.</figcaption>
+</figure>
+<p>The metadata attached to the last step of the validation, render an overview of the transformed data.</p>
+<figure>
+    <img alt="Transformation - Validation Job" src="../images/phages/validation_transformation.png" />
+    <figcaption>Step 3 of the validation with metadata.</figcaption>
+</figure>
+<h3 id="step-3-run-the-blast">Step 3: Run the blast  <a id="step3-phage-example"></a></h3>
+<p>For this example, blastn was run on the dataset.  </p>
+<p>Go to Dagster_home -&gt; Jobs -&gt; make_blastn  </p>
+<figure>
+    <img alt="Overview - Blastn Job" src="../images/phages/blastn_job_overview.png" />
+    <figcaption>Overview of the blastn job</figcaption>
+</figure>
+<p>Select <code>Materialize all</code> (black box located on the up right corner). </p>
+<figure>
+    <img alt="Completed - Blastn Job" src="../images/phages/blastn_after_completion.png" />
+    <figcaption>Completed job</figcaption>
+</figure>
+<p>Checks are run at the beginning of the job to verify that the keys and identifiers used for each of the coding element are unique over all the sequences.</p>
+<figure>
+    <img alt="Checks - Blastn Job" src="../images/phages/blastn_checks_df.png" />
+    <figcaption>The checks confirm the uniqueness of the chosen identifier for each of the coding elements.</figcaption>
+</figure>
+<p>Several file types are generated during this step. An sample is presented below.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:5"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><input id="__tabbed_3_4" name="__tabbed_3" type="radio" /><input id="__tabbed_3_5" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">create_fasta_n</label><label for="__tabbed_3_2">create_blast_n_db</label><label for="__tabbed_3_3">get_blastn</label><label for="__tabbed_3_4">transform_blastn</label><label for="__tabbed_3_5">unified_dataframe</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">KP793103_1.fna</span><pre><span></span><code>&gt;9338265281086248732 
+ATGCAAAAACAAAACGGTGGCAGGCCCACAATTTTACCTAAGATGTATGAAGAACCGCTTTTTAGTCAAATCATTGATAAAATTGAATCAGGCTGTAATGACAGAGAAATCTACACCAGTTTGCATTGTTCTGCTAAAACTTTTAGAAAGTGGCGAGATGACAATATAAAGGCGTATAACGAAGCTAAAAGCATTGCTAGGGGAAATCTATTAGAACTAGCTGAAAGTGCCTTAGCGAGCAAACTGACAGTCAGAACGCTAAAAGAAACAGAAACAATATATGACGCTGACGGAAACGTTGAAAAAGTAAAGGTTAAAGAAAAAGAACTGGATAAAGATAGCTTAGTAGCAATGATGGTTGCTAAGGCTGGAAACCCTGAACTTTATAACCCTACTGAATGGCGGAGATTACAACAGGAAGAAGCAAGCTCTAATGACCTTAAAGCTAAAATCGAAGAACTTGACGACTATAAACTAAGTAAGTATAAAACGCCAGAAGTTGAAGCACCGAAAGGGTTTGAATAA
+&gt;16784793607745071823 
+ATGTATTATTTAAATAAAATGTTGGAATACAACAAAGAAAATGGCATTATTATTAATAAATACATTCGTAAGACTATTCAGAAGCAAATACGTATTCATAATAAGTATATTTATCGCTATGACCGTGTTACACAAGCTATTGAGTGGATACAAGACAACTTCTATTTGACTACTGGTAACCTGACGAAAATCGAGCTACTACCGCCACAAATTTGGTGGTACGAGTTAATGCTTGGTTATGATATGATTGATGAAAAAGGCGTTCAGGTCAACCTAGTTAATGAGATTTTCCTTAATTTAGGTCGTGGATCAGGTAAGTCAAGTTTAATGGCTACAAGAGTGCTTAACTGGATGATTTTAGGCGGACAATATGGTGGAGAGAGCTTAGTTATTGCGTACGATAACACACAGGCTAGACACGTATTTGACCAGGTTCGGAATCAAACGGAAGCAAGCGATACATTAAGAGTATACAATGAAAACAAGATTTTCAAGAGTACGAAACAAGGGCTAGAGTTTACTTCTTTTAAAACCACTTTCAAAAAGCAAACAAATGATACTTTGAGGGCGCAAGGTGGTAACAGTTCCCTTAATATATTTGATGAAGTTCATACCTATGGCGAAGATATAACAGAATCAGTCAATAAAGGTTCACGTCAAAAACAAGATAACTGGCAAAGTATTTACATTACTTCTGGTGGACTTAAACGAGACGGTTTATATGATAAACTTGTTGAACGCTTCAAATCAGAAGAAGAATTTTACAATGATAGGTCGTTCGGCTTACTTTACATGCTAGAAAGTCATGAGCAGGTTAAAGATAAGAAGAATTGGACTATGGCATTGCCTCTTATTGGTAATGTCCCTAAGTGGTCAGGAGTTATTGAGGAGTATGAGCTCGCGCAAGGAGACCCAGCGTTACAGAATAAGTTCTTAGCGTTTAATATGGGCTTGCCTATGCAGGACACAGCTTACTACTTCACTCCGCAAGATACTAAACTAACAGACTTCAATTTATCTGTATTTAATAAAAATAGAACTTATGTAGGAATTGACCTATCCTTAATTGGCGATTTAACCGCTGTGTCGTTCGTTTGCGAGTTAGAGGGTAAAACTTACAGTCATACGCTAACTTTCTCTGTACGGTCGCAATATGAGCAACTGGACACAGAACAACAAGAGTTATGGACTGAATTCGTTGACAGAGGTGAACTAATCTTACTTGATACGGAATACATTAATGTAAATGACTTAATACCATATATCAACGACTTTAGAACCAAGACAGGGTGCAGACTTAGAAAAATCGGTTATGACCCAGCACGATATGAGATTTTAAAAGGGTTGATCGAGCGTTATTTCTTCGATAAAGACGGAGATAACCAAAGAGCGATTCGACAAGGTTTCTCGATGAATGACTATATTAAGTTATTAAAATCTAAATTAGTGGAAAATAAACTTATCCATAATCAAAAAGTCATGCAATGGGCTTTAAATAATACTGCTGTTAAAATCGGACAAAGTGGGGATTACATGTATACTAAAAAACTTGAAAAAGATAAAATTGACCCTACTGTGGCTTTAACAATGGCATTAGAAATGGCGGTGTCAGATGAAGTATAA
+&gt;10311725312318426547 
+ATGAAGTATAACGTTGACACAGTCAGAGAGAGTGGCTGGTACAATAAAAAAGAATGGTTGGCTGTTCGTGATTATGTCAGACAACGTGATAAGATGACTTGCGTAAGATGTGGTGCATTCGGTGCCAAAAAGTACGAAGTTGACCATATTGTAGAACTAACTTGGGAAAATCTTGATGATTGGAAAATAGCGCTAAACCCTGATAACCTACAACTCCTTTGTAAGTCTTGCCATAACAAGAAAACAGGCGAGTATAAACGAGGGAAAGGCGTAAGTTTATGGTAG
+&gt;16833909307678177342 
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">KP793103_1</span><pre><span></span><code>KP793103_1.ndb
+KP793103_1.nhr
+KP793103_1.nim
+KP793103_1.not
+KP793103_1.nsq
+KP793103_1.ntf
+KP793103_1.nto
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">KP793103_1_vs_KP793107_1</span><pre><span></span><code>      &quot;results&quot;: {
+        &quot;search&quot;: {
+          &quot;query_id&quot;: &quot;Query_1&quot;,
+          &quot;query_title&quot;: &quot;9338265281086248732&quot;,
+          &quot;query_len&quot;: 525,
+          &quot;hits&quot;: [
+            {
+              &quot;num&quot;: 1,
+              &quot;description&quot;: [
+                {
+                  &quot;id&quot;: &quot;gnl|BL_ORD_ID|0&quot;,
+                  &quot;accession&quot;: &quot;0&quot;,
+                  &quot;title&quot;: &quot;7763576513298070802 &quot;
+                }
+              ],
+              &quot;len&quot;: 525,
+              &quot;hsps&quot;: [
+                {
+                  &quot;num&quot;: 1,
+                  &quot;bit_score&quot;: 821.033,
+                  &quot;score&quot;: 444,
+                  &quot;evalue&quot;: 0,
+                  &quot;identity&quot;: 498,
+                  &quot;query_from&quot;: 1,
+                  &quot;query_to&quot;: 525,
+                  &quot;query_strand&quot;: &quot;Plus&quot;,
+                  &quot;hit_from&quot;: 1,
+                  &quot;hit_to&quot;: 525,
+                  &quot;hit_strand&quot;: &quot;Plus&quot;,
+                  &quot;align_len&quot;: 525,
+                  &quot;gaps&quot;: 0,
+                  &quot;qseq&quot;: &quot;ATGCAAAAACAAAACGGTGGCAGGCCCACAATTTTACCTAAGATGTATGAAGAACCGCTTTTTAGTCAAATCATTGATAAAATTGAATCAGGCTGTAATGACAGAGAAATCTACACCAGTTTGCATTGTTCTGCTAAAACTTTTAGAAAGTGGCGAGATGACAATATAAAGGCGTATAACGAAGCTAAAAGCATTGCTAGGGGAAATCTATTAGAACTAGCTGAAAGTGCCTTAGCGAGCAAACTGACAGTCAGAACGCTAAAAGAAACAGAAACAATATATGACGCTGACGGAAACGTTGAAAAAGTAAAGGTTAAAGAAAAAGAACTGGATAAAGATAGCTTAGTAGCAATGATGGTTGCTAAGGCTGGAAACCCTGAACTTTATAACCCTACTGAATGGCGGAGATTACAACAGGAAGAAGCAAGCTCTAATGACCTTAAAGCTAAAATCGAAGAACTTGACGACTATAAACTAAGTAAGTATAAAACGCCAGAAGTTGAAGCACCGAAAGGGTTTGAATAA&quot;,
+                  &quot;hseq&quot;: &quot;ATGCAAACACAAAACGGTGGAAGACCCACAATTTTACCTAAGATGTACGAAGAACCGCTTTTTAGTCAAATCATTGATAAAATGGAATCAGGCTGCAATGACAGAGAAATCTACACCAGTTTGCATTGTTCAGCTAAAACTTTTAGAAAGTGGCGAGATGACAATATAAAGGCGTATGACGAAGCTAAAAGTATCGCTAGGGGAAATCTATTAGAACTAGCTGAAAGTGCCTTAGCGAGCAAACTGACGGTCAGAACGCTAAAGGAAACAGAGACAATCTATGACGCTGACGGAAACGTTGAAAAAGTAAAGGTTAAAGAAAAAGAACTGGATAAAGACAGCTTGGTAGCGATGATGGTTGCTAAGGCTGGTAACCCTGAACTTTATAACCCTACTGAATGGCGGAGATTACAACAGGAAGAAGCAAGCTCTAATGACCTTAAAGCTAAGATCGAAGAACTTGATGACTATAAACTAAGTAAGTATAAAACGCCAGAAATCGAAGTCCCAGAGGGGTTTGAATAA&quot;,
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><strong><code>KP793103_1_vs_KP793107_1.parquet</code></strong>  </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">search_target</th>
+<th style="text-align: left;">query_id</th>
+<th style="text-align: right;">query_key</th>
+<th style="text-align: right;">query_len</th>
+<th style="text-align: right;">number_of_hits</th>
+<th style="text-align: right;">source_key</th>
+<th style="text-align: right;">num</th>
+<th style="text-align: right;">bit_score</th>
+<th style="text-align: right;">score</th>
+<th style="text-align: right;">evalue</th>
+<th style="text-align: right;">identity</th>
+<th style="text-align: right;">query_from</th>
+<th style="text-align: right;">query_to</th>
+<th style="text-align: left;">query_strand</th>
+<th style="text-align: right;">hit_from</th>
+<th style="text-align: right;">hit_to</th>
+<th style="text-align: left;">hit_strand</th>
+<th style="text-align: right;">align_len</th>
+<th style="text-align: right;">gaps</th>
+<th style="text-align: right;">percentage_of_identity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">{"db":"/data/gene_identity/blastn_database/KP793107_1"}</td>
+<td style="text-align: left;">Query_1</td>
+<td style="text-align: right;">9338265281086248732</td>
+<td style="text-align: right;">525</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7763576513298070802</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">821.033</td>
+<td style="text-align: right;">444</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">498</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">525</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">525</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">525</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">94.857</td>
+</tr>
+<tr>
+<td style="text-align: left;">{"db":"/data/gene_identity/blastn_database/KP793107_1"}</td>
+<td style="text-align: left;">Query_2</td>
+<td style="text-align: right;">16784793607745071823</td>
+<td style="text-align: right;">1623</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5312076624733181123</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2366.68</td>
+<td style="text-align: right;">1281</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1509</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1623</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1623</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1623</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">92.976</td>
+</tr>
+<tr>
+<td style="text-align: left;">{"db":"/data/gene_identity/blastn_database/KP793107_1"}</td>
+<td style="text-align: left;">Query_3</td>
+<td style="text-align: right;">10311725312318426547</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">17285202555729306767</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">433.236</td>
+<td style="text-align: right;">234</td>
+<td style="text-align: right;">2.63096e-124</td>
+<td style="text-align: right;">268</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">94.035</td>
+</tr>
+<tr>
+<td style="text-align: left;">{"db":"/data/gene_identity/blastn_database/KP793107_1"}</td>
+<td style="text-align: left;">Query_4</td>
+<td style="text-align: right;">16833909307678177342</td>
+<td style="text-align: right;">1137</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">12431818248849801861</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1945.64</td>
+<td style="text-align: right;">1053</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1109</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1137</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1137</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1137</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">97.537</td>
+</tr>
+<tr>
+<td style="text-align: left;">{"db":"/data/gene_identity/blastn_database/KP793107_1"}</td>
+<td style="text-align: left;">Query_5</td>
+<td style="text-align: right;">7716253111867132591</td>
+<td style="text-align: right;">537</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6258967671276254993</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">931.832</td>
+<td style="text-align: right;">504</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">526</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">537</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">537</td>
+<td style="text-align: left;">Plus</td>
+<td style="text-align: right;">537</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">97.952</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p><strong><code>gene_uniqueness.parquet</code></strong> </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;"></th>
+<th style="text-align: left;">query_cds_gene</th>
+<th style="text-align: left;">query_cds_locus_tag</th>
+<th style="text-align: left;">query_protein_id</th>
+<th style="text-align: left;">query_function</th>
+<th style="text-align: left;">query_product</th>
+<th style="text-align: left;">query_translation</th>
+<th style="text-align: right;">query_transl_table</th>
+<th style="text-align: right;">query_codon_start</th>
+<th style="text-align: right;">query_start_sequence</th>
+<th style="text-align: right;">query_end_sequence</th>
+<th style="text-align: right;">query_strand</th>
+<th style="text-align: left;">query_cds_extract</th>
+<th style="text-align: left;">query_gene</th>
+<th style="text-align: left;">query_locus_tag</th>
+<th style="text-align: left;">query_extract</th>
+<th style="text-align: left;">query_translation_fn</th>
+<th style="text-align: left;">query_id</th>
+<th style="text-align: left;">query_name</th>
+<th style="text-align: left;">query_description</th>
+<th style="text-align: left;">query_topology</th>
+<th style="text-align: left;">query_organism</th>
+<th style="text-align: left;">query_taxonomy</th>
+<th style="text-align: left;">query_filename</th>
+<th style="text-align: left;">query_gb_type</th>
+<th style="text-align: right;">query_key</th>
+<th style="text-align: right;">query_len</th>
+<th style="text-align: right;">source_key</th>
+<th style="text-align: right;">query_from</th>
+<th style="text-align: right;">query_to</th>
+<th style="text-align: right;">percentage_of_identity</th>
+<th style="text-align: left;">source_cds_gene</th>
+<th style="text-align: left;">source_cds_locus_tag</th>
+<th style="text-align: left;">source_protein_id</th>
+<th style="text-align: left;">source_function</th>
+<th style="text-align: left;">source_product</th>
+<th style="text-align: left;">source_translation</th>
+<th style="text-align: right;">source_transl_table</th>
+<th style="text-align: right;">source_codon_start</th>
+<th style="text-align: right;">source_start_sequence</th>
+<th style="text-align: right;">source_end_sequence</th>
+<th style="text-align: right;">source_strand</th>
+<th style="text-align: left;">source_cds_extract</th>
+<th style="text-align: left;">source_gene</th>
+<th style="text-align: left;">source_locus_tag</th>
+<th style="text-align: left;">source_extract</th>
+<th style="text-align: left;">source_translation_fn</th>
+<th style="text-align: left;">source_id</th>
+<th style="text-align: left;">source_name</th>
+<th style="text-align: left;">source_description</th>
+<th style="text-align: left;">source_topology</th>
+<th style="text-align: left;">source_organism</th>
+<th style="text-align: left;">source_taxonomy</th>
+<th style="text-align: left;">source_filename</th>
+<th style="text-align: left;">source_gb_type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_05</td>
+<td style="text-align: left;">ALM63044.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">protease</td>
+<td style="text-align: left;">MKLITNSAEIKVTENEDGSKSFQGIGSEVGVENLNGIILTPNCIEFARERYPLLYEHGTGSSEVIGDAKVYYDLASNKYLTDFTLYENAPNINKAVENGAFDSLSIAYYITDYEFNENDSLVVNKALFKEISLVSVPADPNAKFIQNALGEELTEERNKIIESRNALKEIEDIKKKYE</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3821</td>
+<td style="text-align: right;">4358</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAAACTAATAACCAATAGTGCTGAAATTAAAGTGACTGAAAACGAGGACGGCTCTAAGTCGTTCCAAGGTATCGGGTCAGAAGTTGGTGTAGAGAACCTTAATGGTATTATCTTGACTCCTAACTGTATTGAGTTTGCTAGAGAACGATATCCATTGCTATATGAACATGGTACTGGATCTAGCGAAGTCATCGGGGACGCAAAAGTTTACTATGATTTGGCTTCTAATAAATACCTGACTGACTTTACGCTTTACGAAAATGCACCAAACATTAATAAGGCTGTTGAAAATGGCGCTTTTGACTCACTATCAATTGCCTATTACATTACGGATTATGAGTTTAATGAAAATGATTCTCTAGTCGTAAATAAAGCACTGTTTAAAGAGATTTCTCTCGTTTCAGTACCAGCAGACCCTAACGCAAAATTTATTCAAAACGCGCTAGGCGAAGAACTCACAGAAGAACGTAACAAAATTATTGAAAGCCGAAACGCTTTGAAAGAAATTGAGGATATTAAAAAGAAATATGAATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_05</td>
+<td style="text-align: left;">ATGAAACTAATAACCAATAGTGCTGAAATTAAAGTGACTGAAAACGAGGACGGCTCTAAGTCGTTCCAAGGTATCGGGTCAGAAGTTGGTGTAGAGAACCTTAATGGTATTATCTTGACTCCTAACTGTATTGAGTTTGCTAGAGAACGATATCCATTGCTATATGAACATGGTACTGGATCTAGCGAAGTCATCGGGGACGCAAAAGTTTACTATGATTTGGCTTCTAATAAATACCTGACTGACTTTACGCTTTACGAAAATGCACCAAACATTAATAAGGCTGTTGAAAATGGCGCTTTTGACTCACTATCAATTGCCTATTACATTACGGATTATGAGTTTAATGAAAATGATTCTCTAGTCGTAAATAAAGCACTGTTTAAAGAGATTTCTCTCGTTTCAGTACCAGCAGACCCTAACGCAAAATTTATTCAAAACGCGCTAGGCGAAGAACTCACAGAAGAACGTAACAAAATTATTGAAAGCCGAAACGCTTTGAAAGAAATTGAGGATATTAAAAAGAAATATGAATAA</td>
+<td style="text-align: left;">MKLITNSAEIKVTENEDGSKSFQGIGSEVGVENLNGIILTPNCIEFARERYPLLYEHGTGSSEVIGDAKVYYDLASNKYLTDFTLYENAPNINKAVENGAFDSLSIAYYITDYEFNENDSLVVNKALFKEISLVSVPADPNAKFIQNALGEELTEERNKIIESRNALKEIEDIKKKYE</td>
+<td style="text-align: left;">KP793101.1</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793101_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+<td style="text-align: right;">12466092645417556140</td>
+<td style="text-align: right;">537</td>
+<td style="text-align: right;">10806178786950748368</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">537</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_05</td>
+<td style="text-align: left;">ALM63095.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">protease</td>
+<td style="text-align: left;">MKLITNSAEIKVTENEDGSKSFQGIGSEVGVENLNGIILTPNCIEFARERYPLLYEHGTGSSEVIGDAKVYYDLASNKYLTDFTLYENAPNINKAVENGAFDSLSIAYYITDYEFNENDSLVVNKALFKEISLVSVPADPNAKFIQNALGEELTEERNKIIESRNALKEIEDIKKKYE</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3810</td>
+<td style="text-align: right;">4347</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAAACTAATAACCAATAGTGCTGAAATTAAAGTGACTGAAAACGAGGACGGCTCTAAGTCGTTCCAAGGTATCGGGTCAGAAGTTGGTGTAGAGAACCTTAATGGTATTATCTTGACTCCTAACTGTATTGAGTTTGCTAGAGAACGATATCCATTGCTATATGAACATGGTACTGGATCTAGCGAAGTCATCGGGGACGCAAAAGTTTACTATGATTTGGCTTCTAATAAATACCTGACTGACTTTACGCTTTACGAAAATGCACCAAACATTAATAAGGCTGTTGAAAATGGCGCTTTTGACTCACTATCAATTGCCTATTACATTACGGATTATGAGTTTAATGAAAATGATTCTCTAGTCGTAAATAAAGCACTGTTTAAAGAGATTTCTCTCGTTTCAGTACCAGCAGACCCTAACGCAAAATTTATTCAAAACGCGCTAGGCGAAGAACTCACAGAAGAACGTAACAAAATTATTGAAAGCCGAAACGCTTTGAAAGAAATTGAGGATATTAAAAAGAAATATGAATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_05</td>
+<td style="text-align: left;">ATGAAACTAATAACCAATAGTGCTGAAATTAAAGTGACTGAAAACGAGGACGGCTCTAAGTCGTTCCAAGGTATCGGGTCAGAAGTTGGTGTAGAGAACCTTAATGGTATTATCTTGACTCCTAACTGTATTGAGTTTGCTAGAGAACGATATCCATTGCTATATGAACATGGTACTGGATCTAGCGAAGTCATCGGGGACGCAAAAGTTTACTATGATTTGGCTTCTAATAAATACCTGACTGACTTTACGCTTTACGAAAATGCACCAAACATTAATAAGGCTGTTGAAAATGGCGCTTTTGACTCACTATCAATTGCCTATTACATTACGGATTATGAGTTTAATGAAAATGATTCTCTAGTCGTAAATAAAGCACTGTTTAAAGAGATTTCTCTCGTTTCAGTACCAGCAGACCCTAACGCAAAATTTATTCAAAACGCGCTAGGCGAAGAACTCACAGAAGAACGTAACAAAATTATTGAAAGCCGAAACGCTTTGAAAGAAATTGAGGATATTAAAAAGAAATATGAATAA</td>
+<td style="text-align: left;">MKLITNSAEIKVTENEDGSKSFQGIGSEVGVENLNGIILTPNCIEFARERYPLLYEHGTGSSEVIGDAKVYYDLASNKYLTDFTLYENAPNINKAVENGAFDSLSIAYYITDYEFNENDSLVVNKALFKEISLVSVPADPNAKFIQNALGEELTEERNKIIESRNALKEIEDIKKKYE</td>
+<td style="text-align: left;">KP793102.1</td>
+<td style="text-align: left;">KP793102</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793102_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_06</td>
+<td style="text-align: left;">ALM63045.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">major capsid protein</td>
+<td style="text-align: left;">MNKPDLIEKQNRLAELKENNVSLKSQISGFEVKNAIEDLPKVQELEKTLSENSIEIIKIENELNAQEEKPKGKAKMTNFIESQNAVTEFFDVLKKNSGKSEIKNAWNAKLAENGVTVTDKTFELPRKLVDSINTTLLNANPVFQVFRVTNVGALLVSRSFDSANEAQVHKDGQQKTEQAATLTIDTLEPVMVYKLQSLAERVKRLQMSYSELYNLIVAELTQAIVNKIVDLALVEGDGTNGFKSIDKEADAKKIKKITTKAKSAGKTPFADAIEEAVDFVRPTAGRRYLIVKAEDRKALLDELRQATANANVRIKNDDAEIASEVGVDEIIVYTGTKAVKPTVLVDQKYHIDMQDITKVDAFEWKTNSNMILVETLTSGHVETL</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4350</td>
+<td style="text-align: right;">5505</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAATAAACCTGATTTAATCGAAAAACAAAATCGCTTGGCAGAACTTAAAGAAAATAACGTATCTTTAAAATCTCAAATTAGTGGCTTTGAAGTAAAAAACGCAATTGAAGACTTGCCTAAAGTACAAGAATTAGAAAAAACACTTTCAGAAAATTCAATTGAAATTATCAAAATTGAGAACGAACTTAACGCACAGGAAGAAAAACCAAAAGGAAAAGCTAAAATGACAAACTTTATTGAATCACAAAACGCTGTAACAGAATTTTTCGATGTATTGAAAAAGAACTCTGGAAAATCAGAAATTAAAAACGCTTGGAATGCAAAACTTGCTGAAAATGGTGTAACTGTAACAGACAAAACTTTTGAGCTTCCACGTAAATTGGTTGACTCAATCAACACAACTTTGTTAAATGCTAACCCAGTATTCCAAGTCTTCCGTGTTACAAATGTTGGTGCTTTGCTTGTATCACGCTCATTTGATTCAGCTAATGAAGCACAAGTTCACAAAGACGGACAACAAAAAACAGAGCAGGCGGCTACACTCACTATTGACACTCTTGAACCTGTAATGGTTTATAAATTGCAATCACTTGCTGAACGTGTTAAACGACTTCAAATGTCATACTCTGAACTTTACAACTTGATTGTAGCAGAACTTACACAAGCTATCGTTAACAAAATTGTCGACCTTGCTCTTGTTGAGGGTGACGGAACGAACGGTTTTAAATCAATCGACAAAGAAGCAGACGCCAAAAAAATCAAAAAGATTACTACAAAGGCTAAATCAGCTGGAAAAACTCCATTTGCTGACGCTATCGAAGAAGCGGTTGACTTTGTTCGTCCTACTGCTGGTCGTCGTTATTTGATTGTTAAAGCGGAAGACCGCAAAGCATTGTTAGATGAGTTACGTCAAGCGACTGCAAATGCTAACGTTCGTATTAAAAATGATGACGCTGAAATTGCTTCAGAAGTTGGAGTAGATGAAATCATTGTCTATACAGGTACAAAGGCTGTTAAACCTACTGTATTAGTAGACCAAAAATATCATATCGATATGCAAGACATTACAAAAGTTGACGCATTTGAATGGAAAACTAATAGCAACATGATTTTGGTTGAAACACTAACAAGCGGACACGTTGAAACGTTATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_06</td>
+<td style="text-align: left;">ATGAATAAACCTGATTTAATCGAAAAACAAAATCGCTTGGCAGAACTTAAAGAAAATAACGTATCTTTAAAATCTCAAATTAGTGGCTTTGAAGTAAAAAACGCAATTGAAGACTTGCCTAAAGTACAAGAATTAGAAAAAACACTTTCAGAAAATTCAATTGAAATTATCAAAATTGAGAACGAACTTAACGCACAGGAAGAAAAACCAAAAGGAAAAGCTAAAATGACAAACTTTATTGAATCACAAAACGCTGTAACAGAATTTTTCGATGTATTGAAAAAGAACTCTGGAAAATCAGAAATTAAAAACGCTTGGAATGCAAAACTTGCTGAAAATGGTGTAACTGTAACAGACAAAACTTTTGAGCTTCCACGTAAATTGGTTGACTCAATCAACACAACTTTGTTAAATGCTAACCCAGTATTCCAAGTCTTCCGTGTTACAAATGTTGGTGCTTTGCTTGTATCACGCTCATTTGATTCAGCTAATGAAGCACAAGTTCACAAAGACGGACAACAAAAAACAGAGCAGGCGGCTACACTCACTATTGACACTCTTGAACCTGTAATGGTTTATAAATTGCAATCACTTGCTGAACGTGTTAAACGACTTCAAATGTCATACTCTGAACTTTACAACTTGATTGTAGCAGAACTTACACAAGCTATCGTTAACAAAATTGTCGACCTTGCTCTTGTTGAGGGTGACGGAACGAACGGTTTTAAATCAATCGACAAAGAAGCAGACGCCAAAAAAATCAAAAAGATTACTACAAAGGCTAAATCAGCTGGAAAAACTCCATTTGCTGACGCTATCGAAGAAGCGGTTGACTTTGTTCGTCCTACTGCTGGTCGTCGTTATTTGATTGTTAAAGCGGAAGACCGCAAAGCATTGTTAGATGAGTTACGTCAAGCGACTGCAAATGCTAACGTTCGTATTAAAAATGATGACGCTGAAATTGCTTCAGAAGTTGGAGTAGATGAAATCATTGTCTATACAGGTACAAAGGCTGTTAAACCTACTGTATTAGTAGACCAAAAATATCATATCGATATGCAAGACATTACAAAAGTTGACGCATTTGAATGGAAAACTAATAGCAACATGATTTTGGTTGAAACACTAACAAGCGGACACGTTGAAACGTTATAA</td>
+<td style="text-align: left;">MNKPDLIEKQNRLAELKENNVSLKSQISGFEVKNAIEDLPKVQELEKTLSENSIEIIKIENELNAQEEKPKGKAKMTNFIESQNAVTEFFDVLKKNSGKSEIKNAWNAKLAENGVTVTDKTFELPRKLVDSINTTLLNANPVFQVFRVTNVGALLVSRSFDSANEAQVHKDGQQKTEQAATLTIDTLEPVMVYKLQSLAERVKRLQMSYSELYNLIVAELTQAIVNKIVDLALVEGDGTNGFKSIDKEADAKKIKKITTKAKSAGKTPFADAIEEAVDFVRPTAGRRYLIVKAEDRKALLDELRQATANANVRIKNDDAEIASEVGVDEIIVYTGTKAVKPTVLVDQKYHIDMQDITKVDAFEWKTNSNMILVETLTSGHVETL</td>
+<td style="text-align: left;">KP793101.1</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793101_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+<td style="text-align: right;">14120938943619292890</td>
+<td style="text-align: right;">1155</td>
+<td style="text-align: right;">6959416468477847864</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1155</td>
+<td style="text-align: right;">99.481</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_06</td>
+<td style="text-align: left;">ALM63096.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">major capsid protein</td>
+<td style="text-align: left;">MNKPDLIEKQNRLAELKENNVSLKSQISGFEVKNAIEDLPKVQELEKTLSENSIEIIKIENELNAQEEKPKGKAKMTNFIESQNAVTEFFDVLKKNSGKSEIKNAWNAKLAENGVTVTDKTFELPRKLVDSINTTLLNANPVFQVFRVTNVGALLVSRSFDSVDEAQVHKDGQQKTEQAATLTIDTLEPVMVYKLQSLAERVKRLQMSYSELYNLIVAELTQAIVNKIVDLALVEGDGTNGFKSIDKEADAKKIKKITTKAKSAGKTPFADAIEEAVDFVRPTAGRRYLILKAEDRKALLDELRQATANANVRIKNDDAEIASEVGVDEIIVYTGTKAVKPTVLVDQKYHIDMQDITKVDAFEWKTNSNMILVETLTSGHVETYNAGAVITVA</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4339</td>
+<td style="text-align: right;">5521</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAATAAACCTGATTTAATCGAAAAACAAAATCGCTTGGCAGAACTTAAAGAAAATAACGTATCTTTAAAATCTCAAATTAGTGGCTTTGAAGTAAAAAACGCAATTGAAGACTTGCCTAAAGTACAAGAATTAGAAAAAACACTTTCAGAAAATTCAATTGAAATTATCAAAATTGAGAACGAACTTAACGCACAGGAAGAAAAACCAAAAGGAAAAGCTAAAATGACAAACTTTATTGAATCACAAAACGCTGTAACAGAATTTTTCGATGTATTGAAAAAGAACTCTGGAAAATCAGAAATTAAAAACGCTTGGAATGCAAAACTTGCTGAAAATGGTGTAACTGTAACAGACAAAACTTTTGAGCTTCCACGTAAATTGGTTGACTCAATCAACACAACTTTGTTAAATGCTAACCCAGTATTCCAAGTCTTCCGTGTTACAAATGTTGGTGCTTTGCTTGTATCACGCTCATTTGATTCAGTTGATGAAGCACAAGTTCACAAAGACGGACAACAAAAAACAGAGCAGGCGGCTACACTCACTATTGACACTCTTGAACCTGTAATGGTTTATAAATTGCAATCACTTGCTGAACGTGTTAAACGACTTCAAATGTCATACTCTGAACTTTACAACTTGATTGTAGCAGAACTTACACAAGCTATCGTTAACAAAATTGTCGACCTTGCTCTTGTTGAGGGTGACGGAACGAACGGTTTTAAATCAATCGACAAAGAAGCAGACGCCAAAAAAATCAAAAAGATTACTACAAAGGCTAAATCAGCTGGAAAAACTCCATTTGCTGACGCTATCGAAGAAGCGGTTGACTTTGTTCGTCCTACTGCTGGTCGTCGTTATTTGATTCTTAAAGCGGAAGATCGCAAAGCATTGTTAGATGAGTTACGTCAAGCGACTGCAAATGCTAACGTTCGTATTAAAAATGATGACGCTGAAATTGCTTCAGAAGTTGGAGTAGATGAAATTATTGTCTATACAGGTACAAAGGCTGTTAAACCTACTGTATTAGTAGACCAAAAATATCATATCGATATGCAAGACATTACAAAAGTTGACGCATTTGAATGGAAAACTAATAGCAACATGATTTTGGTTGAAACACTAACAAGCGGACACGTTGAAACTTATAACGCTGGTGCAGTAATTACAGTAGCATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_06</td>
+<td style="text-align: left;">ATGAATAAACCTGATTTAATCGAAAAACAAAATCGCTTGGCAGAACTTAAAGAAAATAACGTATCTTTAAAATCTCAAATTAGTGGCTTTGAAGTAAAAAACGCAATTGAAGACTTGCCTAAAGTACAAGAATTAGAAAAAACACTTTCAGAAAATTCAATTGAAATTATCAAAATTGAGAACGAACTTAACGCACAGGAAGAAAAACCAAAAGGAAAAGCTAAAATGACAAACTTTATTGAATCACAAAACGCTGTAACAGAATTTTTCGATGTATTGAAAAAGAACTCTGGAAAATCAGAAATTAAAAACGCTTGGAATGCAAAACTTGCTGAAAATGGTGTAACTGTAACAGACAAAACTTTTGAGCTTCCACGTAAATTGGTTGACTCAATCAACACAACTTTGTTAAATGCTAACCCAGTATTCCAAGTCTTCCGTGTTACAAATGTTGGTGCTTTGCTTGTATCACGCTCATTTGATTCAGTTGATGAAGCACAAGTTCACAAAGACGGACAACAAAAAACAGAGCAGGCGGCTACACTCACTATTGACACTCTTGAACCTGTAATGGTTTATAAATTGCAATCACTTGCTGAACGTGTTAAACGACTTCAAATGTCATACTCTGAACTTTACAACTTGATTGTAGCAGAACTTACACAAGCTATCGTTAACAAAATTGTCGACCTTGCTCTTGTTGAGGGTGACGGAACGAACGGTTTTAAATCAATCGACAAAGAAGCAGACGCCAAAAAAATCAAAAAGATTACTACAAAGGCTAAATCAGCTGGAAAAACTCCATTTGCTGACGCTATCGAAGAAGCGGTTGACTTTGTTCGTCCTACTGCTGGTCGTCGTTATTTGATTCTTAAAGCGGAAGATCGCAAAGCATTGTTAGATGAGTTACGTCAAGCGACTGCAAATGCTAACGTTCGTATTAAAAATGATGACGCTGAAATTGCTTCAGAAGTTGGAGTAGATGAAATTATTGTCTATACAGGTACAAAGGCTGTTAAACCTACTGTATTAGTAGACCAAAAATATCATATCGATATGCAAGACATTACAAAAGTTGACGCATTTGAATGGAAAACTAATAGCAACATGATTTTGGTTGAAACACTAACAAGCGGACACGTTGAAACTTATAACGCTGGTGCAGTAATTACAGTAGCATAA</td>
+<td style="text-align: left;">MNKPDLIEKQNRLAELKENNVSLKSQISGFEVKNAIEDLPKVQELEKTLSENSIEIIKIENELNAQEEKPKGKAKMTNFIESQNAVTEFFDVLKKNSGKSEIKNAWNAKLAENGVTVTDKTFELPRKLVDSINTTLLNANPVFQVFRVTNVGALLVSRSFDSVDEAQVHKDGQQKTEQAATLTIDTLEPVMVYKLQSLAERVKRLQMSYSELYNLIVAELTQAIVNKIVDLALVEGDGTNGFKSIDKEADAKKIKKITTKAKSAGKTPFADAIEEAVDFVRPTAGRRYLILKAEDRKALLDELRQATANANVRIKNDDAEIASEVGVDEIIVYTGTKAVKPTVLVDQKYHIDMQDITKVDAFEWKTNSNMILVETLTSGHVETYNAGAVITVA</td>
+<td style="text-align: left;">KP793102.1</td>
+<td style="text-align: left;">KP793102</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793102_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_07</td>
+<td style="text-align: left;">ALM63046.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">putative strucural protein 1</td>
+<td style="text-align: left;">MIDYIKVYCGIPILVTAYDSKLILFRSIAIKLLEKNGIKADETSVLVKEFISCYCRLNIVDEPAEQWRNAEMKRLASLQELMYYGGI</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5553</td>
+<td style="text-align: right;">5817</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGATAGATTATATCAAGGTCTATTGTGGTATTCCGATTTTAGTAACAGCTTATGATAGTAAACTTATCTTATTCCGTTCAATAGCTATTAAATTGCTAGAAAAAAATGGTATTAAAGCTGACGAAACAAGTGTATTAGTGAAAGAATTTATCTCTTGTTATTGTCGGCTTAATATTGTTGATGAACCAGCAGAACAATGGCGAAATGCTGAAATGAAACGTTTGGCTTCTTTGCAAGAGTTAATGTATTATGGAGGTATTTAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_07</td>
+<td style="text-align: left;">ATGATAGATTATATCAAGGTCTATTGTGGTATTCCGATTTTAGTAACAGCTTATGATAGTAAACTTATCTTATTCCGTTCAATAGCTATTAAATTGCTAGAAAAAAATGGTATTAAAGCTGACGAAACAAGTGTATTAGTGAAAGAATTTATCTCTTGTTATTGTCGGCTTAATATTGTTGATGAACCAGCAGAACAATGGCGAAATGCTGAAATGAAACGTTTGGCTTCTTTGCAAGAGTTAATGTATTATGGAGGTATTTAA</td>
+<td style="text-align: left;">MIDYIKVYCGIPILVTAYDSKLILFRSIAIKLLEKNGIKADETSVLVKEFISCYCRLNIVDEPAEQWRNAEMKRLASLQELMYYGGI</td>
+<td style="text-align: left;">KP793101.1</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793101_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+<td style="text-align: right;">2759541733603255338</td>
+<td style="text-align: right;">264</td>
+<td style="text-align: right;">7364650362854213369</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">264</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_07</td>
+<td style="text-align: left;">ALM63097.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+<td style="text-align: left;">MIDYIKVYCGIPILVTAYDSKLILFRSIAIKLLEKNGIKADETSVLVKEFISCYCRLNIVDEPAEQWRNAEMKRLASLQELMYYGGI</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5541</td>
+<td style="text-align: right;">5805</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGATAGATTATATCAAGGTCTATTGTGGTATTCCGATTTTAGTAACAGCTTATGATAGTAAACTTATCTTATTCCGTTCAATAGCTATTAAATTGCTAGAAAAAAATGGTATTAAAGCTGACGAAACAAGTGTATTAGTGAAAGAATTTATCTCTTGTTATTGTCGGCTTAATATTGTTGATGAACCAGCAGAACAATGGCGAAATGCTGAAATGAAACGTTTGGCTTCTTTGCAAGAGTTAATGTATTATGGAGGTATTTAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_07</td>
+<td style="text-align: left;">ATGATAGATTATATCAAGGTCTATTGTGGTATTCCGATTTTAGTAACAGCTTATGATAGTAAACTTATCTTATTCCGTTCAATAGCTATTAAATTGCTAGAAAAAAATGGTATTAAAGCTGACGAAACAAGTGTATTAGTGAAAGAATTTATCTCTTGTTATTGTCGGCTTAATATTGTTGATGAACCAGCAGAACAATGGCGAAATGCTGAAATGAAACGTTTGGCTTCTTTGCAAGAGTTAATGTATTATGGAGGTATTTAA</td>
+<td style="text-align: left;">MIDYIKVYCGIPILVTAYDSKLILFRSIAIKLLEKNGIKADETSVLVKEFISCYCRLNIVDEPAEQWRNAEMKRLASLQELMYYGGI</td>
+<td style="text-align: left;">KP793102.1</td>
+<td style="text-align: left;">KP793102</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793102_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_08</td>
+<td style="text-align: left;">ALM63047.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">putative strucural protein 2</td>
+<td style="text-align: left;">MIFSQVTLQVETTVKKKNGAEANVIKPIVLPAVKQRISQLRLDEFSMIGLGKNVRYELNGIGEMEDLIFNYFLDEKGDTFKRTTWERNPKNNKMILEGVVSNGL</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5816</td>
+<td style="text-align: right;">6131</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGATATTTTCACAAGTAACATTGCAAGTTGAAACGACTGTTAAGAAGAAGAACGGTGCAGAAGCTAATGTTATAAAGCCTATCGTTTTACCAGCAGTTAAACAGAGAATTAGTCAGTTAAGACTTGATGAGTTTTCTATGATTGGACTAGGTAAAAATGTAAGATACGAGCTTAACGGAATCGGAGAAATGGAAGACTTAATTTTCAACTATTTCTTAGACGAAAAAGGCGATACTTTCAAGCGTACAACATGGGAAAGAAACCCTAAAAATAACAAGATGATTTTAGAGGGGGTCGTGAGCAACGGACTATGA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_08</td>
+<td style="text-align: left;">ATGATATTTTCACAAGTAACATTGCAAGTTGAAACGACTGTTAAGAAGAAGAACGGTGCAGAAGCTAATGTTATAAAGCCTATCGTTTTACCAGCAGTTAAACAGAGAATTAGTCAGTTAAGACTTGATGAGTTTTCTATGATTGGACTAGGTAAAAATGTAAGATACGAGCTTAACGGAATCGGAGAAATGGAAGACTTAATTTTCAACTATTTCTTAGACGAAAAAGGCGATACTTTCAAGCGTACAACATGGGAAAGAAACCCTAAAAATAACAAGATGATTTTAGAGGGGGTCGTGAGCAACGGACTATGA</td>
+<td style="text-align: left;">MIFSQVTLQVETTVKKKNGAEANVIKPIVLPAVKQRISQLRLDEFSMIGLGKNVRYELNGIGEMEDLIFNYFLDEKGDTFKRTTWERNPKNNKMILEGVVSNGL</td>
+<td style="text-align: left;">KP793101.1</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793101_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+<td style="text-align: right;">8749918410610294761</td>
+<td style="text-align: right;">315</td>
+<td style="text-align: right;">16664177951761433604</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">315</td>
+<td style="text-align: right;">98.73</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_08</td>
+<td style="text-align: left;">ALM63098.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+<td style="text-align: left;">MIFSQVTLQVETTVKKKNGAEANVIKPIVLPAVKQRISQLRLDEFSMIGLGKNVRYELNGIGEMEDLIFNYFLDEKGDTFKRTTWERNPKNNKMILEGVVSNGL</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5804</td>
+<td style="text-align: right;">6119</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGATATTTTCACAAGTAACATTGCAAGTTGAAACGACTGTTAAGAAGAAGAACGGTGCAGAAGCTAATGTTATAAAGCCTATCGTTTTACCAGCAGTTAAACAGAGAATTAGTCAGTTAAGACTTGATGAGTTTTCTATGATTGGACTAGGTAAAAATGTAAGATACGAGCTTAACGGAATCGGAGAAATGGAAGACTTAATTTTCAACTATTTCTTAGACGAAAAAGGCGATACTTTCAAGCGTACAACATGGGAAAGAAACCCTAAAAATAACAAAATGATTTTAGAAGGAGTCGTGAGTAACGGACTATGA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_08</td>
+<td style="text-align: left;">ATGATATTTTCACAAGTAACATTGCAAGTTGAAACGACTGTTAAGAAGAAGAACGGTGCAGAAGCTAATGTTATAAAGCCTATCGTTTTACCAGCAGTTAAACAGAGAATTAGTCAGTTAAGACTTGATGAGTTTTCTATGATTGGACTAGGTAAAAATGTAAGATACGAGCTTAACGGAATCGGAGAAATGGAAGACTTAATTTTCAACTATTTCTTAGACGAAAAAGGCGATACTTTCAAGCGTACAACATGGGAAAGAAACCCTAAAAATAACAAAATGATTTTAGAAGGAGTCGTGAGTAACGGACTATGA</td>
+<td style="text-align: left;">MIFSQVTLQVETTVKKKNGAEANVIKPIVLPAVKQRISQLRLDEFSMIGLGKNVRYELNGIGEMEDLIFNYFLDEKGDTFKRTTWERNPKNNKMILEGVVSNGL</td>
+<td style="text-align: left;">KP793102.1</td>
+<td style="text-align: left;">KP793102</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793102_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_12</td>
+<td style="text-align: left;">ALM63051.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">neck passage structure</td>
+<td style="text-align: left;">MSLDNFRNRTILWDTVNKDFPQPIQIMQGDVNARTLLIKIVDNGAQIDLTGYSLKLTYQYTNSSNSGLVMIPPKDLAKGEFILVIPIEMTATGVIEANLILLNKDKEQVIVSKSLTFISDDSTVTNLAQKVNNKIDDFTKLLLENMPQVLRSELNDLHAQTESNKSNVELKANLADMTSLQSAMTELKNEVEAFGISPENLVTIKSLLDAIASNASESEVAELINSVKALTSNVSLMSNGDYSPKANQTDLESLQYAVNDHSATISAKANQTDLNNLQATVDKQGISISEKAEQSELSITNKNVATAQETAKQAESEAKNAMAKATEAQANSLPLNGTAVSALKLATPRKLRVNLQSSSFQYFDGTADATDIGVTGVLQIANGGTSTDDGVVNTIAYANSADGTDGFTTVYPNLNLLNNTRDYAGWTFYRTEILEADGTPTKILKINYDPNAWAGGSSPNIIQSVRPKPGDTVTLSFYAKGHGRIYSTIDGVNGAISADATDDWKLYKLTGVATKEVHSVAIYLHNVDKTSTSIYIHSVKIEKGSTATPWMPSASEVTINDYPKYVGFSNSIKPNKKNSDYKWLPMGLVSIDRVTGSLKPAVIGIDCAEAHPVGSVVTNTSSSSSGYSTGKWENIGSAVIGSTTIYYWKRTA</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7365</td>
+<td style="text-align: right;">9324</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAGTTTAGATAATTTTAGAAATAGAACGATTTTGTGGGATACAGTTAATAAAGATTTCCCCCAACCAATACAAATAATGCAAGGCGATGTCAATGCTAGAACATTATTAATTAAAATAGTTGATAATGGAGCTCAAATTGACTTAACTGGTTATTCGTTAAAACTTACATATCAATACACTAATAGTAGTAATTCTGGTCTTGTTATGATCCCTCCTAAGGACTTAGCTAAGGGAGAATTTATTTTGGTAATTCCTATCGAAATGACAGCGACAGGAGTTATTGAAGCGAACTTAATACTTCTCAATAAAGACAAAGAGCAAGTTATTGTCAGTAAAAGTCTTACATTTATATCAGATGATTCCACAGTTACAAATTTAGCTCAAAAAGTAAATAATAAGATTGATGATTTTACAAAATTATTATTGGAAAATATGCCACAAGTGTTGCGCAGTGAGTTGAATGACTTACATGCTCAAACTGAATCAAACAAGAGCAATGTTGAGCTTAAAGCAAATTTAGCTGATATGACGAGCTTACAAAGCGCAATGACAGAGCTAAAAAATGAAGTAGAAGCATTTGGTATTAGTCCTGAAAATTTAGTTACTATAAAATCGCTATTAGACGCAATCGCAAGTAACGCCAGTGAATCAGAAGTAGCCGAACTAATAAATTCAGTAAAGGCTTTAACAAGTAACGTTTCTCTGATGAGTAATGGAGATTATTCCCCTAAGGCTAATCAAACTGATTTAGAAAGTTTACAGTATGCTGTAAATGACCATTCGGCAACCATTTCAGCAAAGGCTAATCAAACAGACTTAAATAACTTACAAGCTACTGTTGATAAACAAGGTATCTCTATTTCAGAAAAAGCTGAACAATCAGAGTTATCAATCACAAATAAAAATGTCGCAACTGCTCAAGAAACAGCAAAACAAGCTGAAAGTGAAGCCAAAAATGCAATGGCGAAGGCTACCGAAGCACAAGCGAACAGTTTACCACTTAATGGCACCGCGGTAAGTGCACTCAAACTGGCAACACCTAGAAAACTCAGAGTAAATCTTCAATCTTCATCATTTCAATACTTTGACGGGACTGCTGATGCAACTGATATTGGAGTTACGGGTGTACTTCAAATTGCAAATGGAGGCACTTCAACAGATGACGGAGTTGTAAATACCATTGCCTATGCCAACAGCGCAGACGGTACTGACGGTTTCACGACTGTTTATCCTAATTTGAATCTGTTGAATAATACACGTGATTATGCTGGATGGACATTTTATCGCACAGAAATATTAGAAGCGGATGGAACGCCTACTAAGATTCTTAAAATTAATTACGATCCTAACGCTTGGGCAGGTGGATCTTCACCCAATATCATTCAGTCAGTAAGACCTAAACCTGGCGATACAGTTACTCTTAGTTTCTATGCAAAAGGACATGGTAGGATTTATTCTACTATTGACGGTGTTAATGGAGCAATTAGCGCCGATGCTACTGATGATTGGAAGCTTTACAAGTTGACTGGGGTGGCTACGAAAGAAGTTCATAGTGTCGCTATCTATCTACACAACGTTGACAAGACATCAACAAGCATTTATATTCATTCCGTTAAAATAGAAAAAGGCTCAACCGCCACCCCTTGGATGCCATCAGCTAGCGAAGTAACAATAAATGACTATCCGAAGTATGTGGGGTTTAGTAATAGCATTAAACCAAATAAGAAAAATTCTGATTACAAATGGCTACCAATGGGGTTAGTGTCAATTGATAGGGTTACAGGCTCACTCAAGCCTGCGGTTATAGGTATAGATTGCGCTGAAGCACACCCAGTTGGCTCAGTAGTCACAAATACTTCAAGTTCATCATCAGGATATTCCACAGGCAAATGGGAAAATATCGGTTCAGCAGTAATCGGTTCAACAACAATATATTATTGGAAACGTACTGCATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_12</td>
+<td style="text-align: left;">ATGAGTTTAGATAATTTTAGAAATAGAACGATTTTGTGGGATACAGTTAATAAAGATTTCCCCCAACCAATACAAATAATGCAAGGCGATGTCAATGCTAGAACATTATTAATTAAAATAGTTGATAATGGAGCTCAAATTGACTTAACTGGTTATTCGTTAAAACTTACATATCAATACACTAATAGTAGTAATTCTGGTCTTGTTATGATCCCTCCTAAGGACTTAGCTAAGGGAGAATTTATTTTGGTAATTCCTATCGAAATGACAGCGACAGGAGTTATTGAAGCGAACTTAATACTTCTCAATAAAGACAAAGAGCAAGTTATTGTCAGTAAAAGTCTTACATTTATATCAGATGATTCCACAGTTACAAATTTAGCTCAAAAAGTAAATAATAAGATTGATGATTTTACAAAATTATTATTGGAAAATATGCCACAAGTGTTGCGCAGTGAGTTGAATGACTTACATGCTCAAACTGAATCAAACAAGAGCAATGTTGAGCTTAAAGCAAATTTAGCTGATATGACGAGCTTACAAAGCGCAATGACAGAGCTAAAAAATGAAGTAGAAGCATTTGGTATTAGTCCTGAAAATTTAGTTACTATAAAATCGCTATTAGACGCAATCGCAAGTAACGCCAGTGAATCAGAAGTAGCCGAACTAATAAATTCAGTAAAGGCTTTAACAAGTAACGTTTCTCTGATGAGTAATGGAGATTATTCCCCTAAGGCTAATCAAACTGATTTAGAAAGTTTACAGTATGCTGTAAATGACCATTCGGCAACCATTTCAGCAAAGGCTAATCAAACAGACTTAAATAACTTACAAGCTACTGTTGATAAACAAGGTATCTCTATTTCAGAAAAAGCTGAACAATCAGAGTTATCAATCACAAATAAAAATGTCGCAACTGCTCAAGAAACAGCAAAACAAGCTGAAAGTGAAGCCAAAAATGCAATGGCGAAGGCTACCGAAGCACAAGCGAACAGTTTACCACTTAATGGCACCGCGGTAAGTGCACTCAAACTGGCAACACCTAGAAAACTCAGAGTAAATCTTCAATCTTCATCATTTCAATACTTTGACGGGACTGCTGATGCAACTGATATTGGAGTTACGGGTGTACTTCAAATTGCAAATGGAGGCACTTCAACAGATGACGGAGTTGTAAATACCATTGCCTATGCCAACAGCGCAGACGGTACTGACGGTTTCACGACTGTTTATCCTAATTTGAATCTGTTGAATAATACACGTGATTATGCTGGATGGACATTTTATCGCACAGAAATATTAGAAGCGGATGGAACGCCTACTAAGATTCTTAAAATTAATTACGATCCTAACGCTTGGGCAGGTGGATCTTCACCCAATATCATTCAGTCAGTAAGACCTAAACCTGGCGATACAGTTACTCTTAGTTTCTATGCAAAAGGACATGGTAGGATTTATTCTACTATTGACGGTGTTAATGGAGCAATTAGCGCCGATGCTACTGATGATTGGAAGCTTTACAAGTTGACTGGGGTGGCTACGAAAGAAGTTCATAGTGTCGCTATCTATCTACACAACGTTGACAAGACATCAACAAGCATTTATATTCATTCCGTTAAAATAGAAAAAGGCTCAACCGCCACCCCTTGGATGCCATCAGCTAGCGAAGTAACAATAAATGACTATCCGAAGTATGTGGGGTTTAGTAATAGCATTAAACCAAATAAGAAAAATTCTGATTACAAATGGCTACCAATGGGGTTAGTGTCAATTGATAGGGTTACAGGCTCACTCAAGCCTGCGGTTATAGGTATAGATTGCGCTGAAGCACACCCAGTTGGCTCAGTAGTCACAAATACTTCAAGTTCATCATCAGGATATTCCACAGGCAAATGGGAAAATATCGGTTCAGCAGTAATCGGTTCAACAACAATATATTATTGGAAACGTACTGCATAA</td>
+<td style="text-align: left;">MSLDNFRNRTILWDTVNKDFPQPIQIMQGDVNARTLLIKIVDNGAQIDLTGYSLKLTYQYTNSSNSGLVMIPPKDLAKGEFILVIPIEMTATGVIEANLILLNKDKEQVIVSKSLTFISDDSTVTNLAQKVNNKIDDFTKLLLENMPQVLRSELNDLHAQTESNKSNVELKANLADMTSLQSAMTELKNEVEAFGISPENLVTIKSLLDAIASNASESEVAELINSVKALTSNVSLMSNGDYSPKANQTDLESLQYAVNDHSATISAKANQTDLNNLQATVDKQGISISEKAEQSELSITNKNVATAQETAKQAESEAKNAMAKATEAQANSLPLNGTAVSALKLATPRKLRVNLQSSSFQYFDGTADATDIGVTGVLQIANGGTSTDDGVVNTIAYANSADGTDGFTTVYPNLNLLNNTRDYAGWTFYRTEILEADGTPTKILKINYDPNAWAGGSSPNIIQSVRPKPGDTVTLSFYAKGHGRIYSTIDGVNGAISADATDDWKLYKLTGVATKEVHSVAIYLHNVDKTSTSIYIHSVKIEKGSTATPWMPSASEVTINDYPKYVGFSNSIKPNKKNSDYKWLPMGLVSIDRVTGSLKPAVIGIDCAEAHPVGSVVTNTSSSSSGYSTGKWENIGSAVIGSTTIYYWKRTA</td>
+<td style="text-align: left;">KP793101.1</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793101_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+<td style="text-align: right;">10926695262399362751</td>
+<td style="text-align: right;">1959</td>
+<td style="text-align: right;">11448547458600305838</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1959</td>
+<td style="text-align: right;">99.49</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_11</td>
+<td style="text-align: left;">ALM63101.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">neck passage structure</td>
+<td style="text-align: left;">MSLDNFRNRTILWDTVNKDFPQPIQIMQGDVNARTLLIKIVDNGAQIDLTGYSLKLTYQYTNSSNSGLVMIPPKDLAKGEFILVIPTEMTATGVIEANLILLNKDKEQVIVSKSLTFISDNSTVTNLAQKVNNKIDDFTKLLLENMPQVLRSELNDLHAQTESNKSNVELKANLADMTSLQNAMTELKNEVEAFGISPENLVTIKSLLDAIASNASESEVAELINSVKALTSNVSLMSNGDYSPKANQTDLESLQHTVNDHSATISAKANQTDLNNLQATVDKQGISISEKAEQSELSITNKNVATAQETAKQAESEAKNAMAKATEAQANSLPLNGTAVSALKLATPRKLRVNLQSSSFQYFDGTADATDIGVTGVLQIANGGTSTDDGVVNTIAYANSADGTDGFTTVYPNLNLLNNTRDYAGWTFYRTEILEADGTPTKILKINYDPNAWAGGSSPNIIQSVRPKPGDTVTLSFYAKGHGRVYSTIDGVNGAISADATDDWKLYKLTGVATKEVHSVAIYLHNVDKTSTSIYVHSVKIEKGSTATPWMPSASEVTINDYPKYVGFSNSIKPNKKNSDYKWLPMGLVSIDRVTGSLKPAVIGIDCAEAHPVGSVVTNTSSSSSGYSTGKWENIGSAVIGSTTIYYWKRTA</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6869</td>
+<td style="text-align: right;">8828</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAGTTTAGATAATTTTAGAAATAGAACGATTTTGTGGGATACAGTTAATAAAGATTTCCCCCAACCAATACAAATAATGCAAGGCGATGTCAATGCTAGAACATTATTAATTAAAATAGTTGATAATGGAGCTCAAATTGACTTAACTGGTTATTCGTTAAAACTTACATATCAATACACTAATAGTAGTAATTCTGGTCTTGTTATGATCCCTCCTAAGGACTTAGCTAAGGGAGAATTTATTTTGGTAATTCCTACCGAGATGACAGCGACAGGAGTTATTGAAGCGAACTTAATACTTCTCAATAAAGACAAAGAGCAAGTTATTGTCAGTAAAAGTCTTACATTTATATCAGATAATTCCACAGTTACAAATTTAGCTCAAAAAGTAAATAATAAGATTGATGATTTTACAAAATTATTATTGGAAAATATGCCACAAGTGTTGCGCAGTGAGTTGAATGACTTACATGCTCAAACTGAATCAAACAAGAGCAATGTTGAGCTTAAAGCAAATTTAGCTGATATGACGAGCTTACAAAACGCAATGACAGAGCTAAAAAATGAAGTAGAAGCATTTGGTATTAGTCCTGAAAATTTAGTTACTATAAAATCGCTATTAGACGCAATCGCAAGTAACGCCAGTGAATCAGAAGTAGCCGAACTAATAAATTCAGTAAAGGCTTTAACAAGTAACGTTTCTCTGATGAGTAATGGAGATTATTCCCCTAAGGCTAATCAAACAGATTTAGAAAGTTTACAGCATACTGTAAATGACCATTCGGCAACCATTTCAGCAAAGGCTAATCAAACAGACTTAAATAACTTACAAGCTACTGTTGATAAACAAGGTATCTCTATTTCAGAAAAAGCTGAACAATCAGAGTTATCAATCACAAATAAAAATGTCGCAACTGCTCAAGAAACAGCAAAACAAGCTGAAAGTGAAGCCAAAAATGCAATGGCGAAGGCTACCGAAGCACAAGCGAACAGTTTACCACTTAATGGCACCGCGGTAAGTGCACTCAAACTGGCAACACCTAGAAAACTCAGAGTAAATCTTCAATCTTCATCATTTCAATACTTTGACGGGACTGCTGATGCAACTGATATTGGAGTTACGGGTGTACTTCAAATTGCAAATGGAGGCACTTCAACAGATGACGGAGTTGTAAATACCATTGCCTATGCCAATAGCGCAGACGGTACTGACGGTTTCACGACTGTTTATCCTAATTTGAATCTGTTGAATAATACACGTGATTATGCTGGATGGACATTTTATCGCACAGAAATATTAGAAGCGGATGGAACGCCTACTAAGATTCTTAAAATTAATTACGATCCTAACGCTTGGGCAGGTGGATCTTCACCCAATATCATTCAGTCAGTAAGACCTAAACCTGGCGATACAGTTACTCTTAGTTTCTATGCAAAAGGACATGGTAGGGTTTATTCTACTATTGACGGTGTTAATGGAGCAATTAGCGCCGATGCTACTGATGATTGGAAGCTTTACAAGTTGACTGGGGTGGCTACGAAAGAAGTTCATAGTGTCGCTATCTATCTACACAACGTTGACAAGACATCAACAAGCATTTATGTTCATTCCGTTAAAATAGAAAAAGGCTCAACCGCCACCCCTTGGATGCCATCAGCTAGCGAAGTAACAATAAATGACTATCCGAAGTATGTGGGGTTTAGTAATAGCATTAAACCAAATAAGAAAAATTCTGATTACAAATGGCTACCAATGGGGTTAGTGTCAATTGATAGGGTTACAGGCTCACTCAAGCCTGCGGTTATAGGTATAGATTGCGCTGAAGCACACCCAGTTGGCTCAGTAGTCACAAATACTTCAAGTTCATCATCAGGATATTCCACAGGCAAATGGGAAAATATCGGTTCAGCAGTAATCGGTTCAACAACAATATATTATTGGAAACGTACTGCATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_11</td>
+<td style="text-align: left;">ATGAGTTTAGATAATTTTAGAAATAGAACGATTTTGTGGGATACAGTTAATAAAGATTTCCCCCAACCAATACAAATAATGCAAGGCGATGTCAATGCTAGAACATTATTAATTAAAATAGTTGATAATGGAGCTCAAATTGACTTAACTGGTTATTCGTTAAAACTTACATATCAATACACTAATAGTAGTAATTCTGGTCTTGTTATGATCCCTCCTAAGGACTTAGCTAAGGGAGAATTTATTTTGGTAATTCCTACCGAGATGACAGCGACAGGAGTTATTGAAGCGAACTTAATACTTCTCAATAAAGACAAAGAGCAAGTTATTGTCAGTAAAAGTCTTACATTTATATCAGATAATTCCACAGTTACAAATTTAGCTCAAAAAGTAAATAATAAGATTGATGATTTTACAAAATTATTATTGGAAAATATGCCACAAGTGTTGCGCAGTGAGTTGAATGACTTACATGCTCAAACTGAATCAAACAAGAGCAATGTTGAGCTTAAAGCAAATTTAGCTGATATGACGAGCTTACAAAACGCAATGACAGAGCTAAAAAATGAAGTAGAAGCATTTGGTATTAGTCCTGAAAATTTAGTTACTATAAAATCGCTATTAGACGCAATCGCAAGTAACGCCAGTGAATCAGAAGTAGCCGAACTAATAAATTCAGTAAAGGCTTTAACAAGTAACGTTTCTCTGATGAGTAATGGAGATTATTCCCCTAAGGCTAATCAAACAGATTTAGAAAGTTTACAGCATACTGTAAATGACCATTCGGCAACCATTTCAGCAAAGGCTAATCAAACAGACTTAAATAACTTACAAGCTACTGTTGATAAACAAGGTATCTCTATTTCAGAAAAAGCTGAACAATCAGAGTTATCAATCACAAATAAAAATGTCGCAACTGCTCAAGAAACAGCAAAACAAGCTGAAAGTGAAGCCAAAAATGCAATGGCGAAGGCTACCGAAGCACAAGCGAACAGTTTACCACTTAATGGCACCGCGGTAAGTGCACTCAAACTGGCAACACCTAGAAAACTCAGAGTAAATCTTCAATCTTCATCATTTCAATACTTTGACGGGACTGCTGATGCAACTGATATTGGAGTTACGGGTGTACTTCAAATTGCAAATGGAGGCACTTCAACAGATGACGGAGTTGTAAATACCATTGCCTATGCCAATAGCGCAGACGGTACTGACGGTTTCACGACTGTTTATCCTAATTTGAATCTGTTGAATAATACACGTGATTATGCTGGATGGACATTTTATCGCACAGAAATATTAGAAGCGGATGGAACGCCTACTAAGATTCTTAAAATTAATTACGATCCTAACGCTTGGGCAGGTGGATCTTCACCCAATATCATTCAGTCAGTAAGACCTAAACCTGGCGATACAGTTACTCTTAGTTTCTATGCAAAAGGACATGGTAGGGTTTATTCTACTATTGACGGTGTTAATGGAGCAATTAGCGCCGATGCTACTGATGATTGGAAGCTTTACAAGTTGACTGGGGTGGCTACGAAAGAAGTTCATAGTGTCGCTATCTATCTACACAACGTTGACAAGACATCAACAAGCATTTATGTTCATTCCGTTAAAATAGAAAAAGGCTCAACCGCCACCCCTTGGATGCCATCAGCTAGCGAAGTAACAATAAATGACTATCCGAAGTATGTGGGGTTTAGTAATAGCATTAAACCAAATAAGAAAAATTCTGATTACAAATGGCTACCAATGGGGTTAGTGTCAATTGATAGGGTTACAGGCTCACTCAAGCCTGCGGTTATAGGTATAGATTGCGCTGAAGCACACCCAGTTGGCTCAGTAGTCACAAATACTTCAAGTTCATCATCAGGATATTCCACAGGCAAATGGGAAAATATCGGTTCAGCAGTAATCGGTTCAACAACAATATATTATTGGAAACGTACTGCATAA</td>
+<td style="text-align: left;">MSLDNFRNRTILWDTVNKDFPQPIQIMQGDVNARTLLIKIVDNGAQIDLTGYSLKLTYQYTNSSNSGLVMIPPKDLAKGEFILVIPTEMTATGVIEANLILLNKDKEQVIVSKSLTFISDNSTVTNLAQKVNNKIDDFTKLLLENMPQVLRSELNDLHAQTESNKSNVELKANLADMTSLQNAMTELKNEVEAFGISPENLVTIKSLLDAIASNASESEVAELINSVKALTSNVSLMSNGDYSPKANQTDLESLQHTVNDHSATISAKANQTDLNNLQATVDKQGISISEKAEQSELSITNKNVATAQETAKQAESEAKNAMAKATEAQANSLPLNGTAVSALKLATPRKLRVNLQSSSFQYFDGTADATDIGVTGVLQIANGGTSTDDGVVNTIAYANSADGTDGFTTVYPNLNLLNNTRDYAGWTFYRTEILEADGTPTKILKINYDPNAWAGGSSPNIIQSVRPKPGDTVTLSFYAKGHGRVYSTIDGVNGAISADATDDWKLYKLTGVATKEVHSVAIYLHNVDKTSTSIYVHSVKIEKGSTATPWMPSASEVTINDYPKYVGFSNSIKPNKKNSDYKWLPMGLVSIDRVTGSLKPAVIGIDCAEAHPVGSVVTNTSSSSSGYSTGKWENIGSAVIGSTTIYYWKRTA</td>
+<td style="text-align: left;">KP793102.1</td>
+<td style="text-align: left;">KP793102</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793102_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_13</td>
+<td style="text-align: left;">ALM63052.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">major tail protein</td>
+<td style="text-align: left;">MKLDYNSREIFFGNEALIVADMAKGSNGKPEFTNHKIVTGLVSVGEMEDQAETNSYPADDVPDHGVKKGATLLQGEMVFIQTDQALKEDILGQQRTANGLGWSPTGNWKTKCVQYLIKGRKRDKVTGEFIDGYRVVVYPSLRPTAEATKESETDSVDGVDPIQWTLAVQATESDIYLNGDKKVPAIEYEIWGEQAKSFAKKMEAGLFIMQPDTVLADTFTLVPPVIPNTITAKHGGNDGAIIVPTTLKDSNGETVKVTSVIKDAHGKEATNGKLAPGIYLVTSSADGYKDVTSGFTVTDHS</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">9347</td>
+<td style="text-align: right;">10253</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAAATTAGATTATAACTCACGTGAGATTTTCTTTGGTAATGAAGCTCTAATCGTAGCTGATATGGCTAAGGGAAGCAACGGAAAACCAGAGTTCACTAACCATAAAATCGTAACTGGTTTAGTATCAGTTGGCGAAATGGAAGACCAAGCGGAGACAAACAGCTATCCTGCTGATGACGTGCCAGACCATGGAGTAAAAAAAGGTGCTACCTTGCTTCAAGGCGAAATGGTATTTATTCAAACAGACCAAGCACTTAAAGAAGATATTTTAGGTCAACAAAGAACAGCGAATGGTTTGGGTTGGTCTCCTACTGGTAATTGGAAAACGAAATGTGTTCAGTACCTTATTAAAGGTCGCAAGCGTGATAAAGTTACAGGAGAATTTATTGACGGTTACCGTGTAGTCGTTTATCCAAGTTTGAGACCAACAGCAGAAGCTACAAAAGAATCAGAAACAGATTCAGTAGACGGTGTAGACCCTATTCAATGGACTCTGGCAGTACAAGCGACTGAATCAGATATTTATTTGAATGGCGATAAAAAAGTTCCTGCTATTGAGTATGAAATTTGGGGAGAACAAGCTAAAAGCTTTGCTAAGAAAATGGAAGCAGGCTTATTCATCATGCAACCTGACACAGTTCTAGCTGACACATTTACACTTGTACCTCCTGTTATTCCTAATACGATTACTGCTAAACATGGAGGAAATGACGGAGCAATCATAGTACCTACCACTTTGAAAGACTCTAATGGTGAAACTGTAAAAGTAACATCAGTGATTAAGGACGCACATGGAAAAGAAGCAACAAATGGGAAACTTGCGCCCGGTATCTATCTCGTAACGTCCTCCGCTGACGGTTATAAAGATGTTACCTCAGGGTTTACAGTAACTGACCATTCATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Phi4_13</td>
+<td style="text-align: left;">ATGAAATTAGATTATAACTCACGTGAGATTTTCTTTGGTAATGAAGCTCTAATCGTAGCTGATATGGCTAAGGGAAGCAACGGAAAACCAGAGTTCACTAACCATAAAATCGTAACTGGTTTAGTATCAGTTGGCGAAATGGAAGACCAAGCGGAGACAAACAGCTATCCTGCTGATGACGTGCCAGACCATGGAGTAAAAAAAGGTGCTACCTTGCTTCAAGGCGAAATGGTATTTATTCAAACAGACCAAGCACTTAAAGAAGATATTTTAGGTCAACAAAGAACAGCGAATGGTTTGGGTTGGTCTCCTACTGGTAATTGGAAAACGAAATGTGTTCAGTACCTTATTAAAGGTCGCAAGCGTGATAAAGTTACAGGAGAATTTATTGACGGTTACCGTGTAGTCGTTTATCCAAGTTTGAGACCAACAGCAGAAGCTACAAAAGAATCAGAAACAGATTCAGTAGACGGTGTAGACCCTATTCAATGGACTCTGGCAGTACAAGCGACTGAATCAGATATTTATTTGAATGGCGATAAAAAAGTTCCTGCTATTGAGTATGAAATTTGGGGAGAACAAGCTAAAAGCTTTGCTAAGAAAATGGAAGCAGGCTTATTCATCATGCAACCTGACACAGTTCTAGCTGACACATTTACACTTGTACCTCCTGTTATTCCTAATACGATTACTGCTAAACATGGAGGAAATGACGGAGCAATCATAGTACCTACCACTTTGAAAGACTCTAATGGTGAAACTGTAAAAGTAACATCAGTGATTAAGGACGCACATGGAAAAGAAGCAACAAATGGGAAACTTGCGCCCGGTATCTATCTCGTAACGTCCTCCGCTGACGGTTATAAAGATGTTACCTCAGGGTTTACAGTAACTGACCATTCATAA</td>
+<td style="text-align: left;">MKLDYNSREIFFGNEALIVADMAKGSNGKPEFTNHKIVTGLVSVGEMEDQAETNSYPADDVPDHGVKKGATLLQGEMVFIQTDQALKEDILGQQRTANGLGWSPTGNWKTKCVQYLIKGRKRDKVTGEFIDGYRVVVYPSLRPTAEATKESETDSVDGVDPIQWTLAVQATESDIYLNGDKKVPAIEYEIWGEQAKSFAKKMEAGLFIMQPDTVLADTFTLVPPVIPNTITAKHGGNDGAIIVPTTLKDSNGETVKVTSVIKDAHGKEATNGKLAPGIYLVTSSADGYKDVTSGFTVTDHS</td>
+<td style="text-align: left;">KP793101.1</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage Phi4</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793101_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+<td style="text-align: right;">3871623470077828020</td>
+<td style="text-align: right;">906</td>
+<td style="text-align: right;">4088581426845717968</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">906</td>
+<td style="text-align: right;">94.046</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_12</td>
+<td style="text-align: left;">ALM63102.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">major tail protein</td>
+<td style="text-align: left;">MKLDYNSREIFFGNEALVVADMTKGSNGKPEFTNHKIVTGLVSVGEMEDQAETNSYPADDVPDHGVKKGATLLQGEMVFIQTDQALKEDILGQQRTANGLGWSPTGNWKAKCVQYLIKGRKRDKVTGEFIDGYRVVVYPNLRPTAEATKESETDSVDGVDPIQWTLKVQATESDIYLNGDKKVPAIEYEIWGEQAKDFAKKMEAGLFIMQPDTELAGAVTLVAPVIPNVTTATKGNNDGTIVVPATLKDSKGGTVKVTSVIRDAHGKEATNGKLAPGVYLVTSSADGYKDVTSGFTVTDHS</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8851</td>
+<td style="text-align: right;">9757</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">ATGAAATTAGATTATAACTCACGTGAGATTTTCTTTGGTAATGAAGCTCTAGTCGTAGCTGATATGACTAAGGGAAGCAACGGAAAACCAGAGTTCACTAACCATAAAATCGTAACTGGTTTAGTATCAGTTGGCGAAATGGAAGACCAAGCGGAGACAAACAGCTATCCTGCTGATGACGTGCCAGACCATGGAGTAAAAAAAGGTGCTACCTTGCTTCAAGGCGAAATGGTATTTATTCAAACAGACCAAGCACTTAAAGAAGATATTTTAGGTCAACAAAGAACAGCGAATGGCTTGGGTTGGTCTCCTACTGGTAATTGGAAAGCGAAATGTGTTCAGTACCTTATTAAAGGTCGCAAGCGTGATAAAGTTACAGGAGAATTTATTGACGGTTACCGTGTAGTCGTTTATCCAAATTTGAGACCAACAGCAGAAGCAACAAAAGAATCAGAAACAGATTCAGTAGACGGCGTAGACCCTATCCAATGGACTTTGAAAGTACAAGCGACCGAGTCAGATATTTATTTGAATGGCGATAAAAAAGTACCTGCTATTGAATATGAAATTTGGGGAGAACAAGCAAAAGACTTCGCTAAGAAAATGGAAGCAGGCTTATTCATCATGCAACCTGACACGGAATTGGCTGGTGCTGTTACATTAGTTGCTCCAGTTATTCCTAATGTAACTACTGCTACAAAGGGTAATAATGACGGAACAATCGTAGTGCCTGCCACTTTGAAAGACTCTAAGGGTGGAACTGTAAAAGTAACATCAGTAATTAGAGACGCACATGGAAAAGAAGCAACAAATGGGAAACTTGCGCCCGGTGTCTATCTCGTAACGTCCTCCGCTGACGGTTATAAAGATGTTACCTCAGGGTTTACAGTAACTGACCATTCATAA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PhiA16_12</td>
+<td style="text-align: left;">ATGAAATTAGATTATAACTCACGTGAGATTTTCTTTGGTAATGAAGCTCTAGTCGTAGCTGATATGACTAAGGGAAGCAACGGAAAACCAGAGTTCACTAACCATAAAATCGTAACTGGTTTAGTATCAGTTGGCGAAATGGAAGACCAAGCGGAGACAAACAGCTATCCTGCTGATGACGTGCCAGACCATGGAGTAAAAAAAGGTGCTACCTTGCTTCAAGGCGAAATGGTATTTATTCAAACAGACCAAGCACTTAAAGAAGATATTTTAGGTCAACAAAGAACAGCGAATGGCTTGGGTTGGTCTCCTACTGGTAATTGGAAAGCGAAATGTGTTCAGTACCTTATTAAAGGTCGCAAGCGTGATAAAGTTACAGGAGAATTTATTGACGGTTACCGTGTAGTCGTTTATCCAAATTTGAGACCAACAGCAGAAGCAACAAAAGAATCAGAAACAGATTCAGTAGACGGCGTAGACCCTATCCAATGGACTTTGAAAGTACAAGCGACCGAGTCAGATATTTATTTGAATGGCGATAAAAAAGTACCTGCTATTGAATATGAAATTTGGGGAGAACAAGCAAAAGACTTCGCTAAGAAAATGGAAGCAGGCTTATTCATCATGCAACCTGACACGGAATTGGCTGGTGCTGTTACATTAGTTGCTCCAGTTATTCCTAATGTAACTACTGCTACAAAGGGTAATAATGACGGAACAATCGTAGTGCCTGCCACTTTGAAAGACTCTAAGGGTGGAACTGTAAAAGTAACATCAGTAATTAGAGACGCACATGGAAAAGAAGCAACAAATGGGAAACTTGCGCCCGGTGTCTATCTCGTAACGTCCTCCGCTGACGGTTATAAAGATGTTACCTCAGGGTTTACAGTAACTGACCATTCATAA</td>
+<td style="text-align: left;">MKLDYNSREIFFGNEALVVADMTKGSNGKPEFTNHKIVTGLVSVGEMEDQAETNSYPADDVPDHGVKKGATLLQGEMVFIQTDQALKEDILGQQRTANGLGWSPTGNWKAKCVQYLIKGRKRDKVTGEFIDGYRVVVYPNLRPTAEATKESETDSVDGVDPIQWTLKVQATESDIYLNGDKKVPAIEYEIWGEQAKDFAKKMEAGLFIMQPDTELAGAVTLVAPVIPNVTTATKGNNDGTIVVPATLKDSKGGTVKVTSVIRDAHGKEATNGKLAPGVYLVTSSADGYKDVTSGFTVTDHS</td>
+<td style="text-align: left;">KP793102.1</td>
+<td style="text-align: left;">KP793102</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16, complete genome</td>
+<td style="text-align: left;">linear</td>
+<td style="text-align: left;">Lactococcus phage 936 group phage PhiA.16</td>
+<td style="text-align: left;">['Viruses' 'Duplodnaviria' 'Heunggongvirae' 'Uroviricota' 'Caudoviricetes'</td>
+<td style="text-align: left;">/data/genbank/KP793102_1.gb</td>
+<td style="text-align: left;">locus_tag</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The generated <code>gene_uniqueness.parquet</code> file is used to generate the downstream graphic.<br />
+This file can be read and manipulated with any DataFrame API the user choose, such as <a href="https://pandas.pydata.org/">Pandas</a>, <a href="https://spark.apache.org/docs/latest/api/python/index.html">Apache Spark</a>, <a href="https://docs.pola.rs/api/python/stable/reference/index.html">Polars</a>, <a href="https://duckdb.org/">DuckDB</a> but also in a non-programmatic manner using softwares such as <a href="https://www.tadviewer.com/">Tad</a>.  </p>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>The pipeline to generate the blastp data follow the same logic and the same type of data is generated, except that it is based on the protein sequences.<br />
+The unified dataset generated through the blastp pipeline is saved under <code>protein_uniqueness.parquet</code>.</p>
+</details>
+<h3 id="step-4-generate-the-plot">Step 4: Generate the plot  <a id="step4-phage-example"></a></h3>
+<p>Go to Dagster_home -&gt; Jobs -&gt; make_plot</p>
+<figure>
+    <img alt="Overview - Plot Job" src="../images/phages/plot_job_overview.png" />
+    <figcaption>Overview of the plot job.</figcaption>
+</figure>
+<details class="info" open="open">
+<summary>Info</summary>
+<p>If only the blastn or the blastp pipeline has been run, a warning message will pop-up.
+Select confirm to run the job. This will not impair the smooth run of step 4.<br />
+<figure markdown="span">
+    <img alt="Warning message - Plot Job" src="../images/phages/plot_warning_message.png" />
+    <figcaption>Warning message - Plot Job.</figcaption>
+</figure> </p>
+</details>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<ul>
+<li>By default, the graph will be plotted based on the DataFrame generated through the <code>blastn pipeline</code>. To plot the data obtained for the blastp, the value for <code>graph-type</code> needs to be changed to <code>blastp</code>.  </li>
+<li>To see the complete configuration for this step, go to the <a href="../configurations/#plot-config">Configuration</a>.  </li>
+<li>To access the configuration window, open the dropdown menu (white arrow on the right of the black box located on the up right corner, labelled Materialize all) and select <code>Open launchpad</code>.  </li>
+</ul>
+</details>
+<figure>
+    <img alt="Launchpad - Plot Job" src="../images/phages/plot_launchpad.png" />
+    <figcaption>Launchpad - Plot Job.</figcaption>
+</figure>
+<details class="success" open="open">
+<summary>create_graph</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">blastn</label><label for="__tabbed_4_2">blastp</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nt">ops</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">create_genome</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">sequence_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sequences.csv</span>
+<span class="w">    </span><span class="nt">create_graph</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">colours</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#fde725&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#90d743&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#35b779&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#21918c&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#31688e&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#443983&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#440154&quot;</span>
+<span class="w">        </span><span class="nt">gradient</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#B22222&quot;</span>
+<span class="w">        </span><span class="nt">graph_fragments</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">        </span><span class="nt">graph_pagesize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A4</span>
+<span class="w">        </span><span class="nt">graph_shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linear</span>
+<span class="w">        </span><span class="nt">graph_start</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">        </span><span class="nt">graph_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blastn</span>
+<span class="w">        </span><span class="nt">output_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SVG</span>
+<span class="w">        </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">synteny_based_on_blastn</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nt">ops</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">create_genome</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">sequence_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sequences.csv</span>
+<span class="w">    </span><span class="nt">create_graph</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">colours</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#fde725&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#90d743&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#35b779&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#21918c&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#31688e&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#443983&quot;</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;#440154&quot;</span>
+<span class="w">        </span><span class="nt">gradient</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#B22222&quot;</span>
+<span class="w">        </span><span class="nt">graph_fragments</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">        </span><span class="nt">graph_pagesize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A4</span>
+<span class="w">        </span><span class="nt">graph_shape</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linear</span>
+<span class="w">        </span><span class="nt">graph_start</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">        </span><span class="nt">graph_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blastp</span>
+<span class="w">        </span><span class="nt">output_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SVG</span>
+<span class="w">        </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">synteny_based_on_blastp</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+</details>
+<p>Select the <code>Materialize</code> botton to run the job. </p>
+<figure>
+    <img alt="Completed job - Plot Job" src="../images/phages/plot_after_completion.png" />
+    <figcaption>Job after completion.</figcaption>
+</figure>
+<p>Metadata are also available for the plot, including a preview of the graph.</p>
+<figure>
+    <img alt="Sequences - Plot Job" src="../images/phages/plot_sequences.png" />
+    <figcaption>Sequences to be plotted.</figcaption>
+    <img alt="Diagram preview - Plot Job" src="../images/phages/plot_preview_graph.png" />
+    <figcaption>Preview of the synteny diagram.</figcaption>
+</figure>
+<h2 id="analysing-the-data">Analysing the data</h2>
+<p>The output plot(s) allows to quickly visualise conserved and unique genes among our 35 <em>Lactococcus</em> 936-type phage sequences.</p>
+<details class="example" open="open">
+<summary>Synteny diagram</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">blastn data</label><label for="__tabbed_5_2">blastp data</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><img alt="Synteny diagram based on blastn data" src="../images/phages/Lactococcus_synteny_blastn.svg" /></p>
+</div>
+<div class="tabbed-block">
+<p><img alt="Synteny diagram based on blastp data" src="../images/phages/Lactococcus_synteny_blastp.svg" /></p>
+</div>
+</div>
+</div>
+</details>
+<p>In addition, the generated parquet files <code>gene_uniqueness.parquet</code> and <code>protein_uniqueness.parquet</code>, respectively as output of the blastn and the blastp, allows to query for particular gene(s) or sequence(s) of interest.</p>
+<details class="example" open="open">
+<summary>unique genes and proteins</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">unique genes</label><label for="__tabbed_6_2">unique proteins</label><label for="__tabbed_6_3">gene of interest</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>For example, we would like to query all the unique genes presents in KP793123 sequence (using polars):
+<div class="highlight"><span class="filename">Query:</span><pre><span></span><code><span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s1">&#39;gene_uniqueness.parquet&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;query_name&#39;</span><span class="p">,</span> <span class="s1">&#39;query_locus_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;query_gene&#39;</span><span class="p">,</span> <span class="s1">&#39;query_protein_id&#39;</span><span class="p">,</span> <span class="s1">&#39;percentage_of_identity&#39;</span><span class="p">,</span> <span class="s1">&#39;source_name&#39;</span><span class="p">,</span> <span class="s1">&#39;source_locus_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;source_gene&#39;</span><span class="p">,</span> <span class="s1">&#39;source_protein_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;query_name&#39;</span><span class="p">)</span><span class="o">==</span><span class="s1">&#39;KP793123&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;source_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">is_null</span><span class="p">()))</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;query_locus_tag&#39;</span><span class="p">)</span>
+</code></pre></div>
+<strong><code>Result:</code></strong>  </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">query_name</th>
+<th style="text-align: left;">query_locus_tag</th>
+<th style="text-align: left;">query_gene</th>
+<th style="text-align: left;">query_protein_id</th>
+<th style="text-align: right;">percentage_of_identity</th>
+<th style="text-align: left;">source_name</th>
+<th style="text-align: left;">source_locus_tag</th>
+<th style="text-align: left;">source_gene</th>
+<th style="text-align: left;">source_protein_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">KP793123</td>
+<td style="text-align: left;">Phi42_18</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64133.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793123</td>
+<td style="text-align: left;">Phi42_19</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64134.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793123</td>
+<td style="text-align: left;">Phi42_20</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64135.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793123</td>
+<td style="text-align: left;">Phi42_25</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64140.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793123</td>
+<td style="text-align: left;">Phi42_26</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64141.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p>According to the synteny diagram, only four genomes <code>KP793108</code>, <code>KP793119</code>, <code>KP793131</code> and <code>KP793132</code> have unique proteins. We can retrieve the protein ids from the Dataframe (using polars):
+<div class="highlight"><span class="filename">Query:</span><pre><span></span><code><span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s1">&#39;protein_uniqueness.parquet&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;query_name&#39;</span><span class="p">,</span> <span class="s1">&#39;query_locus_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;query_gene&#39;</span><span class="p">,</span> <span class="s1">&#39;query_protein_id&#39;</span><span class="p">,</span> <span class="s1">&#39;percentage_of_identity&#39;</span><span class="p">,</span> <span class="s1">&#39;source_name&#39;</span><span class="p">,</span> <span class="s1">&#39;source_locus_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;source_gene&#39;</span><span class="p">,</span> <span class="s1">&#39;source_protein_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;source_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">is_null</span><span class="p">())</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;query_name&#39;</span><span class="p">,</span> <span class="s1">&#39;query_locus_tag&#39;</span><span class="p">)</span>
+</code></pre></div>
+<strong><code>Result:</code></strong>  </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">query_name</th>
+<th style="text-align: left;">query_locus_tag</th>
+<th style="text-align: left;">query_gene</th>
+<th style="text-align: left;">query_protein_id</th>
+<th style="text-align: right;">percentage_of_identity</th>
+<th style="text-align: left;">source_name</th>
+<th style="text-align: left;">source_locus_tag</th>
+<th style="text-align: left;">source_gene</th>
+<th style="text-align: left;">source_protein_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">KP793108</td>
+<td style="text-align: left;">Phi512_34</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63433.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793108</td>
+<td style="text-align: left;">Phi512_45</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63444.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793119</td>
+<td style="text-align: left;">Phi105_42</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64941.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793119</td>
+<td style="text-align: left;">Phi105_44</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64943.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793131</td>
+<td style="text-align: left;">PhiE1127_54</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64620.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793132</td>
+<td style="text-align: left;">PhiM1127_03</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64629.1</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p>Gene(s), locus_tag(s) and protein_id(s) of interest can also be directly queried (using polars): example of  locus_tag <code>Phi19_46</code>
+<div class="highlight"><pre><span></span><code><span class="n">pl</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s1">&#39;gene_uniqueness.parquet&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;query_name&#39;</span><span class="p">,</span> <span class="s1">&#39;query_locus_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;query_gene&#39;</span><span class="p">,</span> <span class="s1">&#39;query_protein_id&#39;</span><span class="p">,</span> <span class="s1">&#39;percentage_of_identity&#39;</span><span class="p">,</span> <span class="s1">&#39;source_name&#39;</span><span class="p">,</span> <span class="s1">&#39;source_locus_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;source_gene&#39;</span><span class="p">,</span> <span class="s1">&#39;source_protein_id&#39;</span><span class="p">,</span> <span class="s1">&#39;source_function&#39;</span><span class="p">,</span> <span class="s1">&#39;source_product&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;query_name&#39;</span><span class="p">)</span><span class="o">==</span><span class="s1">&#39;KP793103&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;query_locus_tag&#39;</span><span class="p">)</span><span class="o">==</span><span class="s1">&#39;Phi19_46&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;source_name&#39;</span><span class="p">)</span>
+</code></pre></div>
+<strong><code>Result:</code></strong>  </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">query_name</th>
+<th style="text-align: left;">query_locus_tag</th>
+<th style="text-align: left;">query_gene</th>
+<th style="text-align: left;">query_protein_id</th>
+<th style="text-align: right;">percentage_of_identity</th>
+<th style="text-align: left;">source_name</th>
+<th style="text-align: left;">source_locus_tag</th>
+<th style="text-align: left;">source_gene</th>
+<th style="text-align: left;">source_protein_id</th>
+<th style="text-align: left;">source_function</th>
+<th style="text-align: left;">source_product</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">KP793101</td>
+<td style="text-align: left;">Phi4_47</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63086.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">92.063</td>
+<td style="text-align: left;">KP793104</td>
+<td style="text-align: left;">PhiB1127_49</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63238.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">94.18</td>
+<td style="text-align: left;">KP793105</td>
+<td style="text-align: left;">Phi193_48</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63290.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">98.413</td>
+<td style="text-align: left;">KP793106</td>
+<td style="text-align: left;">PhiA1127_48</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63342.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">91.053</td>
+<td style="text-align: left;">KP793108</td>
+<td style="text-align: left;">Phi512_49</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63448.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">96.045</td>
+<td style="text-align: left;">KP793109</td>
+<td style="text-align: left;">PhiC0139_49</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63501.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">94.18</td>
+<td style="text-align: left;">KP793111</td>
+<td style="text-align: left;">Phi192_51</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64895.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">93.122</td>
+<td style="text-align: left;">KP793113</td>
+<td style="text-align: left;">PhiF17_52</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63665.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">89.474</td>
+<td style="text-align: left;">KP793114</td>
+<td style="text-align: left;">Phi17_52</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63721.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">94.18</td>
+<td style="text-align: left;">KP793115</td>
+<td style="text-align: left;">Phi114_49</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63774.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">94.18</td>
+<td style="text-align: left;">KP793116</td>
+<td style="text-align: left;">Phi1316_50</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63828.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">93.478</td>
+<td style="text-align: left;">KP793117</td>
+<td style="text-align: left;">PhiG_53</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63885.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">92.593</td>
+<td style="text-align: left;">KP793118</td>
+<td style="text-align: left;">PhiF0139_52</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63942.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">95.238</td>
+<td style="text-align: left;">KP793119</td>
+<td style="text-align: left;">Phi105_59</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64958.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">90.526</td>
+<td style="text-align: left;">KP793120</td>
+<td style="text-align: left;">PhiL18_51</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63998.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">92.593</td>
+<td style="text-align: left;">KP793121</td>
+<td style="text-align: left;">Phi109_50</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64052.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">91.579</td>
+<td style="text-align: left;">KP793122</td>
+<td style="text-align: left;">PhiL6_54</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64110.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">94.709</td>
+<td style="text-align: left;">KP793123</td>
+<td style="text-align: left;">Phi42_54</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64169.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">94.18</td>
+<td style="text-align: left;">KP793124</td>
+<td style="text-align: left;">Phi44_48</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64222.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">89.474</td>
+<td style="text-align: left;">KP793125</td>
+<td style="text-align: left;">Phi91127_52</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64278.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">89.474</td>
+<td style="text-align: left;">KP793126</td>
+<td style="text-align: left;">PhiM5_53</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64337.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">KP793127</td>
+<td style="text-align: left;">Phi40_52</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64394.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">90.526</td>
+<td style="text-align: left;">KP793128</td>
+<td style="text-align: left;">PhiM16_50</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64449.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">93.478</td>
+<td style="text-align: left;">KP793129</td>
+<td style="text-align: left;">PhiJF1_53</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64506.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">KP793130</td>
+<td style="text-align: left;">Phi155_50</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64561.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">89.474</td>
+<td style="text-align: left;">KP793131</td>
+<td style="text-align: left;">PhiE1127_55</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64621.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">90.526</td>
+<td style="text-align: left;">KP793132</td>
+<td style="text-align: left;">PhiM1127_55</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64681.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+<tr>
+<td style="text-align: left;">KP793103</td>
+<td style="text-align: left;">Phi19_46</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM63185.1</td>
+<td style="text-align: right;">89.474</td>
+<td style="text-align: left;">KP793135</td>
+<td style="text-align: left;">Phi16_52</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">ALM64839.1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">hypothetical protein</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../output/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Output data">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Output data
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../plasmids/" class="md-footer__link md-footer__link--next" aria-label="Next: Plasmid sequences">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Plasmid sequences
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/vestalisvirginis/synphage" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://hub.docker.com/r/vestalisvirginis/synphage" target="_blank" rel="noopener" title="hub.docker.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1v59.4zm0-204.3h-66.1v60.7h66.1V32zm78.2 144.8H362v59.4h66.1v-59.4zm-156.3-72.1h-66.1v60.1h66.1v-60.1zm78.1 0h-66.1v60.1h66.1v-60.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1l-13.3-8.9zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1v-59.4zm-78.1-72.1h-66.1v60.1h66.1v-60.1z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.indexes", "navigation.footer", "navigation.tracking", "toc.follow", "navigation.top", "search.suggest", "search.highlight", "search.share", "content.code.annotate", "content.code.copy", "content.tooltips", "content.tabs.link"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+    
+  </body>
+</html>
