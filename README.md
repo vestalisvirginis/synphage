@@ -242,7 +242,7 @@ The `synteny plot` is generated as `.svg file` and `.png file`, and contains the
 
 ## Documentation
 
-Visit [https://vestalisvirginis.github.io/synphage/](https://vestalisvirginis.github.io/synphage/) for complete [installation instruction](https://vestalisvirginis.github.io/synphage/installation/), [pipeline guidelines](https://vestalisvirginis.github.io/synphage/jobs/) and [step-by-step example](https://vestalisvirginis.github.io/synphage/phages/).
+Visit [https://vestalisvirginis.github.io/synphage/](https://vestalisvirginis.github.io/synphage/) for complete [installation instruction](https://vestalisvirginis.github.io/synphage/installation/), [guidelines to navigate the pipeline](https://vestalisvirginis.github.io/synphage/pipeline/) and [step-by-step example](https://vestalisvirginis.github.io/synphage/phages/).
 
 
 ## Support
