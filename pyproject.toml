@@ -18,7 +18,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "dagster == 1.7.15",
+    "dagster == 1.7.16",
     "dagster-webserver == 1.7.15",
     "biopython == 1.84",
     "reportlab == 4.2.2",
