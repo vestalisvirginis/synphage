@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "dagster == 1.7.15",
-    "dagster-webserver == 1.7.15",
+    "dagster-webserver == 1.7.16",
     "biopython == 1.84",
     "reportlab == 4.2.2",
     "rlPyCairo == 0.3.0",
