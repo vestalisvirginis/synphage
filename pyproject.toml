@@ -34,6 +34,7 @@ dependencies = [
     "cairosvg == 2.7.1",
     "pre-commit>=4.5.1",
     "black>=24.4.2",
+    "radon>=6.0.1",
 ]
 
 [project.optional-dependencies]

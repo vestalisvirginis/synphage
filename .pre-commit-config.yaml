@@ -10,3 +10,10 @@ repos:
       - id: ruff
         files: synphage/
         language_version: python3.11
+
+  - repo: local
+    hooks:
+      - id: radon-cyclomatic-complexity
+        language: system
+        name: Radon Cyclomatic Complexity
+        entry: bash -c 'radon cc --min C synphage'
