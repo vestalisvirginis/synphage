@@ -12,7 +12,6 @@ from .jobs import get_user_data, download, validations, blastn, blastp, all_blas
 
 from .resources import RESOURCES_LOCAL
 
-
 all_assets = [
     *ncbi_connect_assets,
     *user_input_assets,

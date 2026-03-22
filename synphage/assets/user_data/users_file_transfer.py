@@ -14,7 +14,6 @@ from pathlib import Path
 from collections import namedtuple
 from synphage.resources.local_resource import OWNER
 
-
 UsersRecord = namedtuple("UsersRecord", "new,history")
 
 

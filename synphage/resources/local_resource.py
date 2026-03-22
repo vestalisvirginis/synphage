@@ -5,7 +5,6 @@ from pathlib import Path
 from dagster import ConfigurableResource, FilesystemIOManager
 from pydantic import Field, field_validator
 
-
 TEMP_DIR = tempfile.gettempdir()
 OWNER = os.getenv("OWNER", "N/A")
 

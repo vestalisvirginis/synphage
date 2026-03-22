@@ -33,6 +33,7 @@ dependencies = [
     "svgutils == 0.3.4",
     "cairosvg == 2.7.1",
     "pre-commit>=4.5.1",
+    "black>=24.4.2",
 ]
 
 [project.optional-dependencies]
@@ -54,3 +55,6 @@ all = [
 [project.urls]
 "Homepage" = "https://github.com/vestalisvirginis/synphage"
 "Bug Tracker" = "https://github.com/vestalisvirginis/synphage"
+
+[tool.ruff.lint]
+ignore = ["E731", "E722"]
