@@ -16,4 +16,4 @@ repos:
       - id: radon-cyclomatic-complexity
         language: system
         name: Radon Cyclomatic Complexity
-        entry: bash -c 'radon cc --min C synphage'
+        entry: uv run radon cc --min C synphage
