@@ -32,6 +32,7 @@ dependencies = [
     "pycairo == 1.26.1",
     "svgutils == 0.3.4",
     "cairosvg == 2.7.1",
+    "pre-commit>=4.5.1",
 ]
 
 [project.optional-dependencies]
