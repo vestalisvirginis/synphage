@@ -10,10 +10,19 @@ repos:
       - id: ruff
         files: synphage/
         language_version: python3.11
-
-  - repo: local
+  - repo: https://github.com/rubik/xenon
+    rev: v0.9.0
     hooks:
-      - id: radon-cyclomatic-complexity
-        language: system
-        name: Radon Cyclomatic Complexity
-        entry: uv run radon cc --min C synphage
+      - id: xenon
+        args:
+          - --max-absolute=C
+          - --max-modules=C
+          - --max-average=A
+          - --exclude=synphage/assets/viewer/static_graph.py
+
+  # - repo: local
+  #   hooks:
+  #     - id: radon-cyclomatic-complexity
+  #       language: system
+  #       name: Radon Cyclomatic Complexity
+  #       entry: bash -c 'uv run radon cc --min C synphage | grep -v ".py$" | grep -v "create_graph"'
