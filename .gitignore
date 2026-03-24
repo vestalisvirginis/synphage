@@ -8,6 +8,7 @@
 dagster_home/
 data/
 temp/
+uv.lock
 
 # Cache
 **__pycache__/

@@ -7,7 +7,6 @@ from synphage.assets.ncbi_connect.accession import fetch_genome, QueryConfig
 from synphage.resources.ncbi_resource import NCBIConnection
 from synphage.resources.local_resource import InputOutputConfig
 
-
 ACCESSION_IDS = {
     "Count": "2",
     "RetMax": "2",

@@ -25,7 +25,6 @@ from string import Template
 from PIL import ImageColor
 from synphage.resources.local_resource import OWNER
 
-
 TEMP_DIR = tempfile.gettempdir()
 
 
