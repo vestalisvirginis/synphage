@@ -19,10 +19,16 @@ repos:
           - --max-modules=C
           - --max-average=A
           - --exclude=synphage/assets/viewer/static_graph.py
-
-  # - repo: local
-  #   hooks:
-  #     - id: radon-cyclomatic-complexity
-  #       language: system
-  #       name: Radon Cyclomatic Complexity
-  #       entry: bash -c 'uv run radon cc --min C synphage | grep -v ".py$" | grep -v "create_graph"'
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: check-added-large-files
+        args:
+          - --maxkb=100
+  - repo: local
+    hooks:
+      - id: check-file-line-count
+        name: Check file line count (max 500)
+        language: python
+        entry: python scripts/check_line_count.py
+        types: [python]
