@@ -21,7 +21,6 @@ from synphage.utils.check_factory import (
 )
 from synphage.resources.local_resource import OWNER
 
-
 TEMP_DIR = tempfile.gettempdir()
 
 PATH_TO_LOCAL_DIR = str(Path(os.getenv("OUTPUT_DIR", TEMP_DIR)) / "fs")
@@ -82,13 +81,11 @@ def append_processed_df(context):
     parquet_destination = str(Path(path_file) / "processed_genbank_df.parquet")
     df = (
         duckdb.connect(":memory:")
-        .execute(
-            """
+        .execute("""
                 CREATE or REPLACE TABLE genbank (
                 cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
                 start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
-                taxonomy varchar[], filename string, gb_type string);"""
-        )
+                taxonomy varchar[], filename string, gb_type string);""")
         .execute(
             f"INSERT INTO genbank by position (select * from read_parquet('{parquet_origin}'))"
         )

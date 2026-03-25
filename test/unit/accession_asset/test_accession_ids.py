@@ -5,7 +5,6 @@ from dagster import materialize_to_memory, build_asset_context, asset
 from synphage.assets.ncbi_connect.accession import accession_ids, QueryConfig
 from synphage.resources.ncbi_resource import NCBIConnection
 
-
 TEST_KEY = "Bacillus subtilis strain P9_B1"
 
 

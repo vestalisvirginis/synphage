@@ -8,7 +8,6 @@ from typing import List
 from pathlib import Path
 from synphage.resources.local_resource import OWNER
 
-
 warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
 
 

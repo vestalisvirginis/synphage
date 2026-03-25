@@ -9,7 +9,6 @@ from typing import List
 from collections import namedtuple
 from synphage.resources.local_resource import OWNER
 
-
 FastaPRecord = namedtuple("FastaPRecord", "new,history")
 BlastPRecord = namedtuple("BlastPRecord", "new,history")
 

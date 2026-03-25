@@ -8,7 +8,6 @@ from pathlib import Path
 from collections import namedtuple
 from synphage.resources.local_resource import OWNER
 
-
 DownloadRecord = namedtuple("DownloadRecord", "new,history")
 
 
