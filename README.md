@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/github/license/vestalisvirginis/synphage.svg?style=popout-square)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-<p align="center" style="padding: 50px 0;">
+<p align="center" style="padding: 80px 0 50px;">
   <img src="./logo/synphage_logo.png" alt="synphage logo" title="synphage logo" width="320" style="display: block; margin: 0 auto;" />
 </p>
 
