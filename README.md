@@ -27,6 +27,17 @@ As a result `synphage` was born.
 In addition to show conserved genes across multiple sequences, the originality of this library stands in the fact that when working on the same set of genomes the initial blast and computation need to be run only once. Multiple graphics can then be generated from these data, comparing all the genomes or only a set of genomes from the analysed dataset. Moreover, the generated data is also available to the user as a table, where individual genes or groups of genes can easily be checked by name for conservation or uniqueness.
 
 
+## Paper
+
+`synphage` has been published in Bioinformatics Advances ([https://doi.org/10.1093/bioadv/vbae126](https://doi.org/10.1093/bioadv/vbae126)):
+
+```
+Virginie Grosboillot, Anna Dragoš, synphage: a pipeline for phage genome synteny graphics focused on gene conservation, Bioinformatics Advances, Volume 4, Issue 1, 2024, vbae126, https://doi.org/10.1093/bioadv/vbae126
+```
+
+If you use `synphage` please cite this work.
+
+
 ## Install
 
 `synphage` is available via [pip install](https://pypi.org/project/synphage/) or as [docker image](https://hub.docker.com/r/vestalisvirginis/synphage).
