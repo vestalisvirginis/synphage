@@ -58,4 +58,4 @@ all = [
 "Bug Tracker" = "https://github.com/vestalisvirginis/synphage"
 
 [tool.ruff.lint]
-ignore = ["E731", "E722"]
+ignore = ["E731"]
