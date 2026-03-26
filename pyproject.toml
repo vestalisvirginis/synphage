@@ -28,7 +28,7 @@ dependencies = [
     "duckdb == 1.1.0",
     "polars == 1.12.0",
     "pyarrow == 17.0.0",
-    "requests == 2.32.4",
+    "requests == 2.33.0",
     "pycairo == 1.27.0",
     "svgutils == 0.3.4",
     "cairosvg == 2.9.0",
