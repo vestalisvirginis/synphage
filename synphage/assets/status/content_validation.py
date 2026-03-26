@@ -89,16 +89,6 @@ GENBANK_CHECKS = {
     },
 }
 
-# Check logic to implement:
-#   if cds_locus_tag, check locus_tag == cds_locus_tag
-#   bio checks:
-#       levenstein distance
-#       cols=[('translate', 'translate_fn')]
-
-#   for id , name check on the full dataframe --> unique to each file
-#       are_unique
-#       cols = [(file, id), (file, name)]
-
 
 def _gb_validation_settings(
     asset_name: str,
@@ -156,7 +146,6 @@ def gb_validation(key, name, check_specs, check, description):
             asset_description=description,
         )
     )
-    # def asset_template(context: AssetExecutionContext, create_genbank_df):
     def asset_template(context: AssetExecutionContext, reload_ui_asset):
         entity = name
         fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
@@ -439,42 +428,6 @@ def gb_labelling(key, input_name, description):
                 },
             )
 
-        # Check first LOCUS_TAG:
-        # is_unique ?
-        #   yes -> continue
-        #   no -> next loop
-        # is_complete AND is_unique --> 'gene' type
-        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'locus_tag' type
-        # --> downstream processing:
-        #       - if protein_id, filter (locus_tag AND protein_id) isNotNull
-        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
-        #       - else: filter locus_tag isNotNull
-        # Check second CDS_LOCUS_TAG:
-        # is_unique ?
-        #   yes -> continue
-        #   no -> next loop
-        # is_complete AND is_unique --> 'cds_locus_tag' type
-        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR protein_id)  AND is_unique --> 'cds_locus_tag' type
-        # --> downstream processing:
-        #       filter cds_locus_tag isNotNull
-        #       fill locus_tag with cds_locus_tag
-        # Check third PROTEIN_ID:
-        # is_unique ?
-        #   yes -> continue
-        #   no -> next loop
-        # is_complete AND is_unique --> 'protein_id' type
-        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR cds_locus_tag)  AND is_unique --> 'protein' type
-        # --> downstream processing:
-        #       filter protein_id isNotNull
-        #       fill locus tag
-        # Check forth GENE:
-        # is_complete AND is_unique --> 'gene' type
-        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'gene' type
-        # --> downstream processing:
-        #       - if protein_id, filter (gene AND protein_id) isNotNull
-        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
-        #       - else: filter locus_tag isNotNull
-
     return asset_template
 
 
@@ -496,15 +449,11 @@ def df_transformation(key, input_name, description):
 
         conn = duckdb.connect(":memory:")
 
-        (
-            conn.execute(
-                """
+        (conn.execute("""
                     CREATE or REPLACE TABLE genbank (
                     cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
-                    start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
-                    taxonomy varchar[], filename string, gb_type string);"""
-            )
-        )
+                    start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string,
+                    taxonomy varchar[], filename string, gb_type string);"""))
 
         parquet_destination = f"{_path}/{entity}.parquet"
 
@@ -516,9 +465,7 @@ def df_transformation(key, input_name, description):
                 )
 
                 (
-                    conn.execute(
-                        f"INSERT INTO genbank by position (select * from data)"
-                    )
+                    conn.execute("INSERT INTO genbank by position (select * from data)")
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -542,9 +489,7 @@ def df_transformation(key, input_name, description):
                 )
 
                 (
-                    conn.execute(
-                        f"INSERT INTO genbank by position (select * from data)"
-                    )
+                    conn.execute("INSERT INTO genbank by position (select * from data)")
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -565,9 +510,7 @@ def df_transformation(key, input_name, description):
                 data = data.filter(pl.col("locus_tag").is_not_null())
 
                 (
-                    conn.execute(
-                        f"INSERT INTO genbank by position (select * from data)"
-                    )
+                    conn.execute("INSERT INTO genbank by position (select * from data)")
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -598,7 +541,7 @@ def df_transformation(key, input_name, description):
             )
 
             (
-                conn.execute(f"INSERT INTO genbank by position (select * from data)")
+                conn.execute("INSERT INTO genbank by position (select * from data)")
                 .execute("select * from genbank")
                 .pl()
             ).write_parquet(parquet_destination)
@@ -627,7 +570,7 @@ def df_transformation(key, input_name, description):
             )
 
             (
-                conn.execute(f"INSERT INTO genbank by position (select * from data)")
+                conn.execute("INSERT INTO genbank by position (select * from data)")
                 .execute("select * from genbank")
                 .pl()
             ).write_parquet(parquet_destination)
@@ -650,9 +593,7 @@ def df_transformation(key, input_name, description):
                 ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
 
                 (
-                    conn.execute(
-                        f"INSERT INTO genbank by position (select * from data)"
-                    )
+                    conn.execute("INSERT INTO genbank by position (select * from data)")
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -676,9 +617,7 @@ def df_transformation(key, input_name, description):
                 ).with_columns(pl.coalesce(["locus_tag", "gene"]).alias("locus_tag"))
 
                 (
-                    conn.execute(
-                        f"INSERT INTO genbank by position (select * from data)"
-                    )
+                    conn.execute("INSERT INTO genbank by position (select * from data)")
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -701,9 +640,7 @@ def df_transformation(key, input_name, description):
                 )
 
                 (
-                    conn.execute(
-                        f"INSERT INTO genbank by position (select * from data)"
-                    )
+                    conn.execute("INSERT INTO genbank by position (select * from data)")
                     .execute("select * from genbank")
                     .pl()
                 ).write_parquet(parquet_destination)
@@ -733,58 +670,14 @@ def df_transformation(key, input_name, description):
                 },
             )
 
-        # LOGIC TEMPLATE
-        # Check first LOCUS_TAG:
-        # is_unique ?
-        #   yes -> continue
-        #   no -> next loop
-        # is_complete AND is_unique --> 'gene' type
-        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'gene' type
-        # --> downstream processing:
-        #       - if protein_id, filter (locus_tag AND protein_id) isNotNull
-        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
-        #       - else: filter locus_tag isNotNull
-        # Check second CDS_LOCUS_TAG:
-        # is_unique ?
-        #   yes -> continue
-        #   no -> next loop
-        # is_complete AND is_unique --> 'cds_locus_tag' type
-        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR protein_id)  AND is_unique --> 'cds_locus_tag' type
-        # --> downstream processing:
-        #       filter cds_locus_tag isNotNull
-        #       fill locus_tag with cds_locus_tag
-        # Check third PROTEIN_ID:
-        # is_unique ?
-        #   yes -> continue
-        #   no -> next loop
-        # is_complete AND is_unique --> 'protein_id' type
-        # is_complete has violations but nbr violations <= nbr violations (locus_tag OR cds_locus_tag)  AND is_unique --> 'protein' type
-        # --> downstream processing:
-        #       filter protein_id isNotNull
-        #       fill locus tag
-        # Check forth GENE:
-        # is_complete AND is_unique --> 'gene' type
-        # is_complete has violations but nbr violations <= nbr violations (cds_locus_tag OR protein_id)  AND is_unique --> 'gene' type
-        # --> downstream processing:
-        #       - if protein_id, filter (gene AND protein_id) isNotNull
-        #       - elif cds_locus_tag, filter (locus_tag AND cds_locus_tag) isNotNull
-        #       - else: filter locus_tag isNotNull
-
     return asset_template
 
 
 def load_dynamic():
     """Asset factory generator based on the genbank files history"""
-    # fs = context.resources.local_resource.get_paths()["FILESYSTEM_DIR"]
-    # path = str(Path(fs) / "gb_parsing")
-    # _file = 'temp/development/data/fs/genbank_history'
-    # entities = pickle.load(open(path, 'rb'))
-    # asset_names = entities.history
-    # path = PATH_TO_LOCAL_DIR
-    # path = PATH_TO_DVP_DIR
+
     path = PATH_TO_LOCAL_DIR
     if os.path.exists(path):
-        # asset_names = [Path(file).stem for file in os.listdir(path)]
         entities = pickle.load(open(path, "rb"))
         asset_names = [Path(e).stem for e in entities.history]
     else:
@@ -824,18 +717,3 @@ def load_dynamic():
 
 
 my_dynamic_assets = load_dynamic()
-
-
-# @asset
-# def reload_ui_downstream_assets(
-#     context: AssetExecutionContext, pipes_subprocess_client: PipesSubprocessClient, my_dynamic_assets
-# ) -> Output:
-#     # Command to reload the UI
-#     cmd = [shutil.which("python"), file_relative_path(__file__, "external_code.py")]
-#     # return pipes_subprocess_client.run(
-#     #     command=cmd, context=context
-#     # ).get_materialize_result()
-#     pipes_subprocess_client.run(
-#         command=cmd, context=context
-#     )
-#     return Output(value = "Definitions have been reloaded")

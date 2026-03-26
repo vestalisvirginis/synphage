@@ -122,14 +122,12 @@ def parse_gb(context, setup_config: ValidationConfig, file: str):
     df = genbank_to_dataframe(full_path)
     (
         duckdb.connect(":memory:")
-        .execute(
-            """
+        .execute("""
                 CREATE or REPLACE TABLE genbank (
                 cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
-                start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
-                taxonomy varchar[], filename string);"""
-        )
-        .execute(f"INSERT INTO genbank by position (select * from df)")
+                start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string,
+                taxonomy varchar[], filename string);""")
+        .execute("INSERT INTO genbank by position (select * from df)")
         .execute("select * from genbank")
         .pl()
         .write_parquet(f"{target}/{file}.parquet")
@@ -155,13 +153,11 @@ def append_gb(context, setup_config: ValidationConfig):
 
     (
         duckdb.connect(":memory:")
-        .execute(
-            """
+        .execute("""
                 CREATE or REPLACE TABLE genbank (
                 cds_gene string, cds_locus_tag string, protein_id string, function string, product string, translation string, transl_table string, codon_start string,
-                start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string, 
-                taxonomy varchar[], filename string);"""
-        )
+                start_sequence integer, end_sequence integer, strand integer, cds_extract string, gene string, locus_tag string, extract string, translation_fn string, id string, name string, description string, topology string, organism string,
+                taxonomy varchar[], filename string);""")
         .execute(
             f"INSERT INTO genbank by position (select * from read_parquet('{parquet_origin}'))"
         )
