@@ -276,6 +276,7 @@ Open a [discussion](https://github.com/vestalisvirginis/synphage/discussions).
 - ~~[x] implement blastp~~
 - [ ] create possibility to add ref sequence with special colour coding
 - [ ] create interactive plot
+- [ ] comparison based on structure
 - [ ] Help us in a discussion?
 
 
