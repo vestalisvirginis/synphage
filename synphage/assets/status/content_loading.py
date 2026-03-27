@@ -11,7 +11,6 @@ from dagster import (
     AssetExecutionContext,
     file_relative_path,
     Output,
-    ExperimentalWarning,
     MetadataValue,
 )
 
@@ -19,7 +18,6 @@ import os
 import pickle
 import duckdb
 import shutil
-import warnings
 import polars as pl
 
 from pathlib import Path
@@ -28,9 +26,6 @@ from functools import partial
 
 from synphage.utils.convert_gb_to_df import genbank_to_dataframe
 from synphage.resources.local_resource import OWNER
-
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
 
 GenbankRecord = namedtuple("GenbankRecord", "new,history")
 

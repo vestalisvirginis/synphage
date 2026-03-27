@@ -7,7 +7,6 @@ from dagster import (
     AssetExecutionContext,
     MetadataValue,
     file_relative_path,
-    ExperimentalWarning,
 )
 
 import os
@@ -16,15 +15,11 @@ import shutil
 import duckdb
 import polars as pl
 import tempfile
-import warnings
 from pathlib import Path
 from Bio.Seq import translate
 
 from synphage.utils.check_factory import _check_severity, _create_check_specs
 from synphage.resources.local_resource import OWNER
-
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
 
 TEMP_DIR = tempfile.gettempdir()
 
