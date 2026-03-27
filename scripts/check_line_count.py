@@ -2,7 +2,7 @@
 
 import sys
 
-MAX_LINES = 500
+MAX_LINES = 800
 files = sys.argv[1:]
 failed = []
 

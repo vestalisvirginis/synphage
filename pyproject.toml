@@ -18,8 +18,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "dagster == 1.10.16",
-    "dagster-webserver == 1.8.13",
+    "dagster == 1.12.21",
+    "dagster-webserver == 1.12.21",
     "biopython == 1.84",
     "reportlab == 4.2.2",
     "rlPyCairo == 0.3.0",
@@ -59,3 +59,8 @@ all = [
 
 [tool.ruff.lint]
 ignore = ["E731"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.8",
+]

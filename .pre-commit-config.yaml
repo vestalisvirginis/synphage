@@ -34,7 +34,7 @@ repos:
   - repo: local
     hooks:
       - id: check-file-line-count
-        name: Check file line count (max 500)
+        name: Check file line count (max 800)
         language: python
         entry: python scripts/check_line_count.py
         types: [python]

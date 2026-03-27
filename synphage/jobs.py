@@ -1,13 +1,11 @@
 from dagster import (
     AssetSelection,
     define_asset_job,
-    ExperimentalWarning,
     ConfigArgumentWarning,
 )
 
 import warnings
 
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
 warnings.filterwarnings("ignore", category=ConfigArgumentWarning)
 
 

@@ -1,17 +1,13 @@
-from dagster import asset, ExperimentalWarning
+from dagster import asset
 
 import os
 import pickle
-import warnings
 import polars as pl
 
 from pathlib import Path
 from typing import List
 from collections import namedtuple
 from synphage.resources.local_resource import OWNER
-
-warnings.filterwarnings("ignore", category=ExperimentalWarning)
-
 
 FastaNRecord = namedtuple("FastaNRecord", "new,history")
 BlastNRecord = namedtuple("BlastNRecord", "new,history")
