@@ -1,4 +1,4 @@
-name: ci 
+name: ci
 on:
   push:
     branches:
@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: 'actions/checkout@v3'
-    - name: Setup ncbi-blast+
+    - name: Setup ncbi-blast+ and system dependencies
       run: |
         sudo apt update
-        sudo apt install ncbi-blast+ -y
+        sudo apt install ncbi-blast+ libcairo2-dev pkg-config python3-dev -y
     - name: Setup Python
       uses: actions/setup-python@master
       with:
