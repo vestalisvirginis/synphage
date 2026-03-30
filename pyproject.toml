@@ -22,7 +22,7 @@ dependencies = [
     "dagster-webserver == 1.12.21",
     "biopython == 1.84",
     "reportlab == 4.2.2",
-    "rlPyCairo == 0.3.0",
+    "rlPyCairo == 0.4.0",
     "cuallee == 0.13.1",
     "pandas == 2.2.2",
     "duckdb == 1.1.0",
