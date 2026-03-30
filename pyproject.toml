@@ -20,7 +20,7 @@ classifiers = [
 dependencies = [
     "dagster == 1.12.21",
     "dagster-webserver == 1.12.21",
-    "biopython == 1.84",
+    "biopython == 1.87",
     "reportlab == 4.2.2",
     "rlPyCairo == 0.4.0",
     "cuallee == 0.13.1",
@@ -32,9 +32,6 @@ dependencies = [
     "pycairo == 1.27.0",
     "svgutils == 0.3.4",
     "cairosvg == 2.9.0",
-    "pre-commit>=4.5.1",
-    "black>=24.4.2",
-    "radon>=6.0.1",
 ]
 
 [project.optional-dependencies]
@@ -42,6 +39,9 @@ dev = [
   "black==26.3.1",
   "mypy",
   "flake8",
+  "pre-commit>=4.5.1",
+  "radon>=6.0.1",
+  "ruff>=0.15.8",
 ]
 test = [
   "pytest",
@@ -59,8 +59,3 @@ all = [
 
 [tool.ruff.lint]
 ignore = ["E731"]
-
-[dependency-groups]
-dev = [
-    "ruff>=0.15.8",
-]
