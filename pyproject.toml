@@ -27,7 +27,7 @@ dependencies = [
     "pandas == 3.0.1",
     "duckdb == 1.1.0",
     "polars == 1.39.3",
-    "pyarrow == 17.0.0",
+    "pyarrow == 23.0.1",
     "requests == 2.33.0",
     "pycairo == 1.27.0",
     "svgutils == 0.3.4",
