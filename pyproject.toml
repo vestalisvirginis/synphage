@@ -23,7 +23,7 @@ dependencies = [
     "biopython == 1.87",
     "reportlab == 4.2.2",
     "rlPyCairo == 0.4.0",
-    "cuallee == 0.13.1",
+    "cuallee == 0.15.4",
     "pandas == 3.0.1",
     "duckdb == 1.1.0",
     "polars == 1.39.3",
