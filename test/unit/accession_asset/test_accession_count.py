@@ -1,4 +1,3 @@
-import os
 import pytest
 from unittest.mock import Mock, MagicMock
 
@@ -15,11 +14,6 @@ def mock_ncbi_connection():
     """
     mock_conn = Mock()
     mock_handle = MagicMock()
-    mock_handle.read.return_value = (
-        '<?xml version="1.0" ?>\n'
-        "<!DOCTYPE eSearchResult>\n"
-        "<eSearchResult><Count>2</Count><QueryTranslation>Myoalterovirus[All Fields]</QueryTranslation></eSearchResult>"
-    )
     mock_handle.close = Mock()
 
     mock_conn.esearch.return_value = mock_handle  ## mock esearch output
@@ -33,7 +27,7 @@ def mock_ncbi_connection():
 @pytest.fixture
 def mock_ncbi_resource(mock_ncbi_connection):
     """
-    Create a mock NCBIConnection resource.
+    Create a mock NCBIConnection resource
     """
     mock_ncbi = Mock(spec=NCBIConnection)  ## mock NCBIConnection resource
     mock_ncbi.conn = mock_ncbi_connection
