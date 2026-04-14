@@ -6,9 +6,19 @@ from .assets import (
     blaster_assets,
     viewer_assets,
     status_assets,
+    foldseek_assets
 )
 
-from .jobs import get_user_data, download, validations, blastn, blastp, all_blast, plot
+from .jobs import (
+    get_user_data,
+    download,
+    validations,
+    blastn,
+    blastp,
+    all_blast,
+    plot,
+    foldseek,
+)
 
 from .resources import RESOURCES_LOCAL
 
@@ -18,6 +28,7 @@ all_assets = [
     *blaster_assets,
     *viewer_assets,
     *status_assets,
+    *foldseek_assets,
 ]
 
 
@@ -29,5 +40,14 @@ resources_by_deployment_name = {
 defs = Definitions(
     assets=all_assets,
     resources=resources_by_deployment_name["local"],
-    jobs=[get_user_data, download, validations, blastn, blastp, all_blast, plot],
+    jobs=[
+        get_user_data, 
+        download, 
+        validations, 
+        blastn, 
+        blastp, 
+        all_blast, 
+        plot,
+        foldseek,
+        ],
 )

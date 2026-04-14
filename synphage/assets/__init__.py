@@ -1,12 +1,13 @@
 from dagster import load_assets_from_package_module
 
-from . import ncbi_connect, user_data, status, blaster, viewer
+from . import ncbi_connect, user_data, status, blaster, viewer, foldseek
 
 NCBI_CONNECT = "ncbi_connect"
 USERS_INPUT = "users_input"
 STATUS = "status"
 BLASTER = "blaster"
 VIEWER = "viewer"
+FOLDSEEK = "foldseek"
 
 ncbi_connect_assets = load_assets_from_package_module(
     package_module=ncbi_connect,
@@ -31,4 +32,9 @@ blaster_assets = load_assets_from_package_module(
 viewer_assets = load_assets_from_package_module(
     package_module=viewer,
     group_name=VIEWER,
+)
+
+foldseek_assets = load_assets_from_package_module(
+    package_module=foldseek,
+    group_name=FOLDSEEK,
 )
