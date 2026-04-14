@@ -32,6 +32,7 @@ dependencies = [
     "pycairo == 1.27.0",
     "svgutils == 0.3.4",
     "cairosvg == 2.9.0",
+    "modal == 1.4.1",
 ]
 
 [project.optional-dependencies]

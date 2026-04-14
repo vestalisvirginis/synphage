@@ -9,6 +9,7 @@ dagster_home/
 data/
 temp/
 uv.lock
+development_log.csv
 
 # Cache
 **__pycache__/
