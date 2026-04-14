@@ -66,7 +66,15 @@ all_blast = define_asset_job(
     ),
 )
 
-# Job 7 : create the synteny diagram
+# Job 7 : foldseek structure-based clustering via Modal
+foldseek = define_asset_job(
+    name="step_3d_make_foldseek",
+    selection=(
+        AssetSelection.assets("create_fasta_p") | AssetSelection.groups("foldseek")
+    ),
+)
+
+# Job 8 : create the synteny diagram
 plot = define_asset_job(
     name="step_4_make_plot",
     selection=AssetSelection.groups("viewer"),
