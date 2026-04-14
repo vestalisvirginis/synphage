@@ -64,6 +64,8 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
         BLASTP_DB_DIR = str(Path(PROTEIN_DIR) / "blastp_database")
         # Path to folder containing the blastp json files
         BLASTP_DIR = str(Path(PROTEIN_DIR) / "blastp")
+        # Path to folder containing the foldseek clustering results
+        FOLDSEEK_DIR = str(Path(PROTEIN_DIR) / "foldseek")
 
         return {
             "USER_DATA": USER_DATA,
@@ -81,6 +83,7 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
             "FASTA_P_DIR": FASTA_P_DIR,
             "BLASTP_DB_DIR": BLASTP_DB_DIR,
             "BLASTP_DIR": BLASTP_DIR,
+            "FOLDSEEK_DIR": FOLDSEEK_DIR,
         }
 
 
