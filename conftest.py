@@ -1,6 +1,9 @@
 import pytest
+import tempfile
+import shutil
 
 from unittest.mock import Mock, MagicMock
+from pathlib import Path
 
 from synphage.resources.ncbi_resource import NCBIConnection
 
@@ -38,6 +41,61 @@ def mock_ncbi_resource(mock_ncbi_connection):
     mock_ncbi = Mock(spec=NCBIConnection)  ## mock NCBIConnection resource
     mock_ncbi.conn = mock_ncbi_connection()  # Call the factory to get the actual mock
     return mock_ncbi
+
+
+@pytest.fixture
+def temp_download_dir_with_file(monkeypatch):
+    """
+    Create a temporary directory, copy test file and set environment variables
+    """
+    temp_dir = tempfile.mkdtemp()
+    download_subdir = Path(temp_dir) / "download"
+    download_subdir.mkdir(exist_ok=True)
+
+    # Get the project root
+    project_root = Path(__file__).parent
+
+    # Copy fixture file - relative to project root
+    fixture_file = (
+        project_root
+        / "test"
+        / "fixtures"
+        / "assets_testing_folder"
+        / "ncbi_download"
+        / "positive"
+        / "download"
+        / "TT_000001.gb"
+    )
+    dest_file = download_subdir / "TT_000001.gb"
+    shutil.copy(fixture_file, dest_file)
+
+    # Set environment variables for InputOutputConfig validators
+    monkeypatch.setenv("INPUT_DIR", temp_dir)
+    monkeypatch.setenv("OUTPUT_DIR", temp_dir)
+
+    yield temp_dir
+
+    # Cleanup
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+@pytest.fixture
+def temp_empty_download_dir(monkeypatch):
+    """
+    Create a temporary empty directory for testing empty download scenario
+    """
+    temp_dir = tempfile.mkdtemp()
+    download_subdir = Path(temp_dir) / "download"
+    download_subdir.mkdir(exist_ok=True)
+
+    # Set environment variables for InputOutputConfig validators
+    monkeypatch.setenv("INPUT_DIR", temp_dir)
+    monkeypatch.setenv("OUTPUT_DIR", temp_dir)
+
+    yield temp_dir
+
+    # Cleanup
+    shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @pytest.fixture
