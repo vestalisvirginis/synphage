@@ -1,0 +1,22 @@
+.ko {
+    color: #EE0F0F;
+  }
+
+.ok {
+    color: #00e676;
+  }
+
+.kk {
+    color: #ffe600;
+  }
+
+figure {
+  text-align: center;
+  font-style: italic;
+  font-size: smaller;
+  text-indent: 0;
+}
+
+code {
+  white-space : pre-wrap !important;
+}
