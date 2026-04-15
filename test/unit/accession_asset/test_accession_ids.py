@@ -18,32 +18,8 @@ MOCK_RESPONSE = {
 }
 
 
-@pytest.fixture
-def mock_ncbi_connection():
-    """
-    Mock NCBI connection: simulates Entrez esearch response
-    """
-    mock_conn = Mock()
-
-    mock_handle = MagicMock()
-    mock_handle.close = Mock()
-    mock_conn.esearch.return_value = mock_handle  ## mock esearch output
-    mock_conn.read.return_value = MOCK_RESPONSE  ## mock read output
-
-    return mock_conn
-
-
-@pytest.fixture
-def mock_ncbi_resource(mock_ncbi_connection):
-    """
-    Create a mock NCBIConnection resource
-    """
-    mock_ncbi = Mock(spec=NCBIConnection)
-    mock_ncbi.conn = mock_ncbi_connection
-    return mock_ncbi
-
-
-def test_accession_ids(mock_ncbi_resource):
+def test_accession_ids(mock_ncbi_resource, mock_ncbi_connection):
+    mock_ncbi_resource.conn = mock_ncbi_connection(MOCK_RESPONSE)
     context = build_asset_context(
         resources={"ncbi_connection": mock_ncbi_resource},
     )
@@ -55,7 +31,8 @@ def test_accession_ids(mock_ncbi_resource):
     assert result["IdList"] == ["NZ_CP045811.1", "CP045811.1"]
 
 
-def test_accession_ids_asset(mock_ncbi_resource):
+def test_accession_ids_asset(mock_ncbi_resource, mock_ncbi_connection):
+    mock_ncbi_resource.conn = mock_ncbi_connection(MOCK_RESPONSE)
 
     @asset(name="accession_count")
     def mock_count_upstream():
