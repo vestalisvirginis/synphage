@@ -1,5 +1,44 @@
 import pytest
 
+from unittest.mock import Mock, MagicMock
+
+from synphage.resources.ncbi_resource import NCBIConnection
+
+
+@pytest.fixture
+def mock_ncbi_connection():
+    """
+    Mock NCBI connection: simulates Entrez esearch response
+    """
+
+    def _create_mock(read_return_value=None):
+        if read_return_value is None:
+            read_return_value = {
+                "Count": "2",
+                "QueryTranslation": "Myoalterovirus[All Fields]",
+            }
+
+        mock_conn = Mock()
+        mock_handle = MagicMock()
+        mock_handle.close = Mock()
+
+        mock_conn.esearch.return_value = mock_handle  ## mock esearch output
+        mock_conn.read.return_value = read_return_value  ## mock read output
+
+        return mock_conn
+
+    return _create_mock
+
+
+@pytest.fixture
+def mock_ncbi_resource(mock_ncbi_connection):
+    """
+    Create a mock NCBIConnection resource
+    """
+    mock_ncbi = Mock(spec=NCBIConnection)  ## mock NCBIConnection resource
+    mock_ncbi.conn = mock_ncbi_connection()  # Call the factory to get the actual mock
+    return mock_ncbi
+
 
 @pytest.fixture
 def mock_env_input_validator(monkeypatch):
