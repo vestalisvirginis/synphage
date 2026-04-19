@@ -16,11 +16,11 @@ from synphage.assets.foldseek.foldseek_modal import app, run_foldseek_cluster_re
     io_manager_key="io_manager",
     metadata={"owner": OWNER},
 )
-def run_foldseek_cluster(context, create_fasta_p) -> str:
+def run_foldseek_cluster(context, foldseek_create_fasta_p) -> str:
     _foldseek_dir = Path(context.resources.local_resource.get_paths()["FOLDSEEK_DIR"])
     _foldseek_dir.mkdir(parents=True, exist_ok=True)
 
-    fasta_files = create_fasta_p.history
+    fasta_files = foldseek_create_fasta_p.history
     context.log.info(
         f"Concatenating {len(fasta_files)} FASTA file(s) for Foldseek input"
     )

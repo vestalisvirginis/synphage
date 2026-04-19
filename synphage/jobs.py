@@ -70,7 +70,7 @@ all_blast = define_asset_job(
 foldseek = define_asset_job(
     name="step_3d_make_foldseek",
     selection=(
-        AssetSelection.assets("create_fasta_p") | AssetSelection.groups("foldseek")
+        AssetSelection.assets("append_processed_df") | AssetSelection.groups("foldseek")
     ),
 )
 
