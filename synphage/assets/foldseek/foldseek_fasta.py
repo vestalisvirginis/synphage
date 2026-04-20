@@ -20,7 +20,7 @@ FastaPRecord = namedtuple("FastaPRecord", "new,history")
 )
 def foldseek_create_fasta_p(context, append_processed_df) -> FastaPRecord:
     # Path to fasta folder
-    _fasta_path = context.resources.local_resource.get_paths()["FASTA_P_DIR"]
+    _fasta_path = context.resources.local_resource.get_paths()["FOLDSEEK_FASTA_P_DIR"]
     os.makedirs(_fasta_path, exist_ok=True)
 
     # Check if history of created fasta files
