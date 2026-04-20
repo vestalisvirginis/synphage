@@ -26,7 +26,7 @@ dependencies = [
     "cuallee == 0.15.4",
     "pandas == 3.0.2",
     "duckdb == 1.5.1",
-    "polars == 1.39.3",
+    "polars == 1.40.0",
     "pyarrow == 23.0.1",
     "requests == 2.33.0",
     "pycairo == 1.27.0",
