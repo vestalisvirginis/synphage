@@ -64,8 +64,18 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
         BLASTP_DB_DIR = str(Path(PROTEIN_DIR) / "blastp_database")
         # Path to folder containing the blastp json files
         BLASTP_DIR = str(Path(PROTEIN_DIR) / "blastp")
-        # Path to folder containing the foldseek clustering results
-        FOLDSEEK_DIR = str(Path(PROTEIN_DIR) / "foldseek")
+
+        # foldseek related folders
+        # Top-level directory for all foldseek outputs
+        FOLDSEEK_DIR = str(Path(SYNPHAGE_DATA) / "foldseek")
+        # Path to folder containing the fasta files for foldseek
+        FOLDSEEK_FASTA_P_DIR = str(Path(FOLDSEEK_DIR) / "foldseek_fasta_p")
+
+        # phold related folders
+        # Top-level directory for all phold outputs
+        PHOLD_DIR = str(Path(SYNPHAGE_DATA) / "phold")
+        # Path to folder containing the fasta files for phold
+        PHOLD_FASTA_P_DIR = str(Path(PHOLD_DIR) / "phold_fasta_p")
 
         return {
             "USER_DATA": USER_DATA,
@@ -84,6 +94,9 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
             "BLASTP_DB_DIR": BLASTP_DB_DIR,
             "BLASTP_DIR": BLASTP_DIR,
             "FOLDSEEK_DIR": FOLDSEEK_DIR,
+            "FOLDSEEK_FASTA_P_DIR": FOLDSEEK_FASTA_P_DIR,
+            "PHOLD_DIR": PHOLD_DIR,
+            "PHOLD_FASTA_P_DIR": PHOLD_FASTA_P_DIR,
         }
 
 

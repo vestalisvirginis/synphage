@@ -66,7 +66,7 @@ all_blast = define_asset_job(
     ),
 )
 
-# Job 7 : foldseek structure-based clustering via Modal
+# Job 7 : foldseek structure-based protein clustering via Modal
 foldseek = define_asset_job(
     name="step_3d_make_foldseek",
     selection=(
@@ -74,7 +74,15 @@ foldseek = define_asset_job(
     ),
 )
 
-# Job 8 : create the synteny diagram
+# Job 8 : phold structure-based protein annotation via Modal
+phold = define_asset_job(
+    name="step_3e_annotate_phold",
+    selection=(
+        AssetSelection.assets("append_processed_df") | AssetSelection.groups("phold")
+    ),
+)
+
+# Job 9 : create the synteny diagram
 plot = define_asset_job(
     name="step_4_make_plot",
     selection=AssetSelection.groups("viewer"),
