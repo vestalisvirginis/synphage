@@ -1,5 +1,7 @@
 from dagster import asset
 
+import zipfile
+
 from pathlib import Path
 
 from synphage.resources.local_resource import OWNER
@@ -41,18 +43,34 @@ def run_foldseek_cluster(context, foldseek_create_fasta_p) -> str:
 
     context.log.info("Dispatching to Modal for Foldseek clustering ...")
     with app.run():
-        result = run_foldseek_cluster_remote.remote(fasta_content)
+        results_zip_bytes = run_foldseek_cluster_remote.remote(fasta_content)
 
-    output_path = _foldseek_dir / "results_cluster.tsv"
-    output_path.write_text(result, encoding="utf-8")
-    context.log.info(f"Foldseek results written to: {output_path}")
+    # Save the returned ZIP
+    zip_out_path = _foldseek_dir / "foldseek_results.zip"
+    zip_out_path.write_bytes(results_zip_bytes)
+    context.log.info(f"Foldseek results ZIP written to: {zip_out_path}")
+
+    # Extract ZIP to FOLDSEEK_DIR
+    with zipfile.ZipFile(zip_out_path, "r") as zip_ref:
+        zip_ref.extractall(_foldseek_dir)
+    context.log.info(f"Foldseek results extracted to: {_foldseek_dir}")
+
+    # Locate results_cluster.tsv inside the extracted directory
+    tsv_matches = list(_foldseek_dir.rglob("results_cluster.tsv"))
+    if not tsv_matches:
+        raise FileNotFoundError(
+            f"results_cluster.tsv not found after extracting ZIP to {_foldseek_dir}"
+        )
+    output_path = tsv_matches[0]
+    context.log.info(f"Foldseek cluster TSV located at: {output_path}")
 
     context.add_output_metadata(
         metadata={
             "output_path": str(output_path),
+            "zip_path": str(zip_out_path),
             "num_fasta_files": len(fasta_parts),
             "fasta_files": fasta_files,
-            "result_characters": len(result),
+            "zip_size_bytes": len(results_zip_bytes),
         }
     )
 

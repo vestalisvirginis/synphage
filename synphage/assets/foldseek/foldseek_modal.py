@@ -1,13 +1,14 @@
 import modal
+import os
+import shutil
 import subprocess
 import tempfile
-import os
 
 # include_source=False stops Modal from auto-mounting the local Python source
-# tree into the container. Default Modal uploads the entire package it finds
+# tree into the container. By default Modal uploads the entire package it finds
 # on sys.path (which includes synphage/), causing the container to try to
 # import synphage/__init__.py — and fail because dagster is not installed there.
-# The function body is entirely self-contained
+# The function body is entirely self-contained and needs no local source code.
 app = modal.App("foldseek-clustering", include_source=False)
 
 foldseek_image = (
@@ -24,11 +25,13 @@ foldseek_image = (
 
 
 @app.function(image=foldseek_image, gpu="T4", timeout=3600, serialized=True)
-def run_foldseek_cluster_remote(fasta_content: str) -> str:
+def run_foldseek_cluster_remote(fasta_content: str) -> bytes:
     with tempfile.TemporaryDirectory() as work_dir:
         fasta_path = os.path.join(work_dir, "all_proteins.fasta")
-        results_prefix = os.path.join(work_dir, "results")
+        results_dir = os.path.join(work_dir, "foldseek_results")
+        results_prefix = os.path.join(results_dir, "results")
         tmp_dir = os.path.join(work_dir, "tmp")
+        os.makedirs(results_dir, exist_ok=True)
         os.makedirs(tmp_dir, exist_ok=True)
 
         with open(fasta_path, "w") as f:
@@ -56,12 +59,9 @@ def run_foldseek_cluster_remote(fasta_content: str) -> str:
             print(f"STDERR: {process.stderr}")
             raise RuntimeError(f"Foldseek failed with return code {process.returncode}")
 
-        cluster_tsv_path = f"{results_prefix}_cluster.tsv"
+        # ZIP the entire results directory and return as bytes
+        zip_path = os.path.join(work_dir, "foldseek_results")
+        shutil.make_archive(zip_path, "zip", results_dir)
 
-        if not os.path.exists(cluster_tsv_path):
-            return (
-                "Execution succeeded, but no cluster.tsv"
-            )
-
-        with open(cluster_tsv_path, "r") as f:
+        with open(f"{zip_path}.zip", "rb") as f:
             return f.read()
