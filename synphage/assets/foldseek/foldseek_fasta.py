@@ -58,7 +58,7 @@ def foldseek_create_fasta_p(context, append_processed_df) -> FastaPRecord:
                 .iter_rows(named=True)
             ):
                 _f.write(
-                    ">%s \n%s\n"
+                    ">f_%s \n%s\n"
                     % (
                         data["key"],
                         data["translation_fn"],
