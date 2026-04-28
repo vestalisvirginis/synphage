@@ -68,9 +68,12 @@ all_blast = define_asset_job(
 
 # Job 7 : foldseek structure-based protein clustering via Modal
 foldseek = define_asset_job(
-    name="step_3d_make_foldseek",
+    name="step_4_make_foldseek",
     selection=(
-        AssetSelection.assets("append_processed_df") | AssetSelection.groups("foldseek")
+        AssetSelection.assets("append_processed_df")
+        | AssetSelection.groups("blaster")
+        & AssetSelection.assets("create_fasta_p").downstream()
+        | AssetSelection.groups("step_4_structure_module")
     ),
 )
 
@@ -82,8 +85,20 @@ phold = define_asset_job(
     ),
 )
 
-# Job 9 : create the synteny diagram
+# Job 9 : interproscan protein domain annotation
+interpro = define_asset_job(
+    name="step_3f_annotate_interpro",
+    selection=(
+        AssetSelection.assets("append_processed_df") | AssetSelection.groups("interpro")
+    ),
+)
+
+# Job 10 : create the synteny diagram
 plot = define_asset_job(
-    name="step_4_make_plot",
-    selection=AssetSelection.groups("viewer"),
+    name="step_5_make_plot",
+    selection=(
+        AssetSelection.groups("step_4_structure_module")
+        & AssetSelection.assets("transform_foldseek").downstream()
+        | AssetSelection.groups("viewer")
+    ),
 )

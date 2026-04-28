@@ -40,13 +40,6 @@ def transform_foldseek(context, run_foldseek_cluster) -> str:
         dtype=str,
     )
 
-    # Strip the f_ prefix added during FASTA generation so keys align with
-    # the raw integer-string key values stored in the genbank DataFrame.
-    cluster_df["key"] = cluster_df["key"].str.removeprefix("f_")
-    cluster_df["representative_key"] = cluster_df[
-        "representative_key"
-    ].str.removeprefix("f_")
-
     context.log.info(
         f"Cluster TSV: {len(cluster_df)} rows, "
         f"{cluster_df['representative_key'].nunique()} unique clusters"

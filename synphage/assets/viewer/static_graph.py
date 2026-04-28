@@ -83,6 +83,7 @@ class Genome(Config):
     deps=[
         AssetSpec("transform_blastn", skippable=True),
         AssetSpec("transform_blastp", skippable=True),
+        AssetSpec("transform_foldseek", skippable=True),
     ],
     description="Load file names and orientations for the sequences to be plotted",
     required_resource_keys={"local_resource"},
@@ -255,7 +256,7 @@ def create_graph(
         (
             _record_names[_i],
             _record_names[_i + 1],
-            f"{_record_names[_i]}_vs_{_record_names[_i+1]}",
+            f"{_record_names[_i]}_vs_{_record_names[_i + 1]}",
         )
         for _i in range(len(_record_names))
         if _i + 1 < len(_record_names)
