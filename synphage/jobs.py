@@ -73,7 +73,7 @@ foldseek = define_asset_job(
         AssetSelection.assets("append_processed_df")
         | AssetSelection.groups("blaster")
         & AssetSelection.assets("create_fasta_p").downstream()
-        | AssetSelection.groups("step_4_structure_module")
+        | AssetSelection.groups("structure_module")
     ),
 )
 
@@ -85,19 +85,11 @@ phold = define_asset_job(
     ),
 )
 
-# Job 9 : interproscan protein domain annotation
-interpro = define_asset_job(
-    name="step_3f_annotate_interpro",
-    selection=(
-        AssetSelection.assets("append_processed_df") | AssetSelection.groups("interpro")
-    ),
-)
-
-# Job 10 : create the synteny diagram
+# Job 9 : create the synteny diagram
 plot = define_asset_job(
     name="step_5_make_plot",
     selection=(
-        AssetSelection.groups("step_4_structure_module")
+        AssetSelection.groups("structure_module")
         & AssetSelection.assets("transform_foldseek").downstream()
         | AssetSelection.groups("viewer")
     ),

@@ -5,7 +5,10 @@ import zipfile
 from pathlib import Path
 
 from synphage.resources.local_resource import OWNER
-from synphage.assets.foldseek.foldseek_modal import app, run_foldseek_cluster_remote
+from synphage.assets.structure_module.foldseek_modal import (
+    app,
+    run_foldseek_cluster_remote,
+)
 
 
 @asset(

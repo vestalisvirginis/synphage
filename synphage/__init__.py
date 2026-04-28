@@ -6,7 +6,7 @@ from .assets import (
     blaster_assets,
     viewer_assets,
     status_assets,
-    foldseek_assets,
+    structure_module_assets,
     phold_assets,
 )
 
@@ -30,7 +30,7 @@ all_assets = [
     *blaster_assets,
     *viewer_assets,
     *status_assets,
-    *foldseek_assets,
+    *structure_module_assets,
     *phold_assets,
 ]
 
