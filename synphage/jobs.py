@@ -66,15 +66,10 @@ all_blast = define_asset_job(
     ),
 )
 
-# Job 7 : foldseek structure-based protein clustering via Modal
-foldseek = define_asset_job(
-    name="step_4_make_foldseek",
-    selection=(
-        AssetSelection.assets("append_processed_df")
-        | AssetSelection.groups("blaster")
-        & AssetSelection.assets("create_fasta_p").downstream()
-        | AssetSelection.groups("structure_module")
-    ),
+# Job 7 : structure-based protein clustering via Modal and interpro annotation via API
+structure = define_asset_job(
+    name="step_4_structure_module",
+    selection=AssetSelection.groups("structure_module"),
 )
 
 # Job 8 : phold structure-based protein annotation via Modal
@@ -89,8 +84,6 @@ phold = define_asset_job(
 plot = define_asset_job(
     name="step_5_make_plot",
     selection=(
-        AssetSelection.groups("structure_module")
-        & AssetSelection.assets("transform_foldseek").downstream()
-        | AssetSelection.groups("viewer")
+        AssetSelection.groups("structure_module") | AssetSelection.groups("viewer")
     ),
 )

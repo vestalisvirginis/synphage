@@ -18,7 +18,7 @@ from .jobs import (
     blastp,
     all_blast,
     plot,
-    foldseek,
+    structure,
     phold,
 )
 
@@ -51,7 +51,7 @@ defs = Definitions(
         blastp,
         all_blast,
         plot,
-        foldseek,
+        structure,
         phold,
     ],
 )

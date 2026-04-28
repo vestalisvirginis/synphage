@@ -77,6 +77,14 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
         # Path to folder containing the fasta files for phold
         PHOLD_FASTA_P_DIR = str(Path(PHOLD_DIR) / "phold_fasta_p")
 
+        # interproscan related folders
+        # Top-level directory for all interproscan outputs
+        INTERPRO_DIR = str(Path(SYNPHAGE_DATA) / "interpro")
+        # Path to folder containing the fasta files for interproscan
+        INTERPRO_FASTA_P_DIR = str(Path(INTERPRO_DIR) / "interpro_fasta_p")
+        # Path to folder containing the intermediate chunk TSV files
+        INTERPRO_CHUNKS_DIR = str(Path(INTERPRO_DIR) / "chunks")
+
         return {
             "USER_DATA": USER_DATA,
             "SYNPHAGE_DATA": SYNPHAGE_DATA,
@@ -97,6 +105,9 @@ class InputOutputConfig(ConfigurableResource):  # type: ignore[misc] # should be
             "FOLDSEEK_FASTA_P_DIR": FOLDSEEK_FASTA_P_DIR,
             "PHOLD_DIR": PHOLD_DIR,
             "PHOLD_FASTA_P_DIR": PHOLD_FASTA_P_DIR,
+            "INTERPRO_DIR": INTERPRO_DIR,
+            "INTERPRO_FASTA_P_DIR": INTERPRO_FASTA_P_DIR,
+            "INTERPRO_CHUNKS_DIR": INTERPRO_CHUNKS_DIR,
         }
 
 
