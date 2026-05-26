@@ -1,4 +1,5 @@
 from dagster import load_assets_from_package_module
+from . import phold
 
 from . import (
     ncbi_connect,
@@ -7,7 +8,6 @@ from . import (
     blaster,
     viewer,
     structure_module,
-    phold,
 )
 
 NCBI_CONNECT = "ncbi_connect"

@@ -84,6 +84,7 @@ class Genome(Config):
         AssetSpec("transform_blastn", skippable=True),
         AssetSpec("transform_blastp", skippable=True),
         AssetSpec("transform_foldseek", skippable=True),
+        AssetSpec("transform_interproscan", skippable=True),
     ],
     description="Load file names and orientations for the sequences to be plotted",
     required_resource_keys={"local_resource"},
