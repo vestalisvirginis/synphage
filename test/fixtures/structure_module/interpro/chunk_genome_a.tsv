@@ -1,0 +1,5 @@
+prot_001	d41d8cd98f00b204e980	300	Pfam	PF00948	Tail_spike_N	10	110	1.5e-30	T	2024-01-01	IPR014824	Tail spike protein	-	-
+prot_001	d41d8cd98f00b204e980	300	Pfam	PF09039	Phage_T7_tail	120	250	2.0e-10	T	2024-01-01	IPR015129	Phage T7 tail fibre	-	-
+prot_002	d41d8cd98f00b204e980	200	Pfam	PF03864	Major_capsid_E	5	185	3.0e-25	T	2024-01-01	IPR005468	Phage major capsid protein	-	-
+prot_002	d41d8cd98f00b204e980	200	Gene3D	G3DSA:1.10.8.10	3.10.8.10	5	185	0.003	T	2024-01-01	-	-	-	-
+prot_003	d41d8cd98f00b204e980	150	Pfam	PF04233	DUF429	20	130	8.0e-15	T	2024-01-01	IPR007325	Domain of unknown function DUF429	-	-
